@@ -9,9 +9,18 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install iverilog
+      # cocotb 2.1 requires Verilator >= 5.036; pin the tested version.
+      - name: Build Verilator 5.052
         shell: bash
-        run: sudo apt-get update && sudo apt-get install -y iverilog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y iverilog autoconf flex bison help2man libfl-dev g++ make
+          git clone --depth 1 --branch v5.052 https://github.com/verilator/verilator.git "$RUNNER_TEMP/verilator"
+          cd "$RUNNER_TEMP/verilator"
+          autoconf
+          ./configure
+          make -j2
+          sudo make install
 
       # Set Python up and install cocotb
       - name: Setup python

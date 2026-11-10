@@ -1,3 +1,17 @@
+# Not-so-tiny sparse accelerator — SKY130
+
+Four-lane FP16 accelerator with an SPI host interface for Tiny Tapeout.
+The RTL was imported from `/docker/projects/egru/acc` without deleting the original.
+
+- Top: `tt_um_not_so_tiny_sparse_acc_ramzxc` in `src/project.v`.
+- SPI: mode 0; SCK=`ui[0]`, CS_N=`ui[1]`, MOSI=`ui[2]`, MISO=`uio[0]`.
+- Host supplies external tensor memory by servicing AXI requests over SPI.
+- [Protocol, pinout, test instructions, and implementation limits](docs/info.md).
+- Run tests with `cd test && make` after installing Verilator and `test/requirements.txt`.
+
+The original FreePDK45 SRAM dependency is replaced by synthesizable memories.
+**RTL integration is tested; fit in 8x2 tiles and SKY130 physical signoff are not verified.**
+
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
 
 # Tiny Tapeout Verilog Project Template

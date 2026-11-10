@@ -4,7 +4,7 @@ project:
   author:       "Aram Yun"      # Your name
   discord:      "ramzxc"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
   description:  "not so tiny sparse acc"      # One line description of what your project does
-  language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
+  language:     "SystemVerilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
   clock_hz:     10000000       # Clock frequency in Hz (or 0 if not applicable)
 
   # How many tiles your design occupies? A single tile is about 167x108 uM.
@@ -17,15 +17,37 @@ project:
   # Source files must be in ./src and you must list each source file separately, one per line.
   # Don't forget to also update `PROJECT_SOURCES` in test/Makefile.
   source_files:
+    - "tpu_pkg.sv"
+    - "acc_host.sv"
+    - "acc_memory_1r1w_64x256.sv"
+    - "acc_spi.sv"
+    - "activation.sv"
+    - "activation_ctrl.sv"
+    - "axi_master_adapter.sv"
+    - "dma.sv"
+    - "inst_decoder.sv"
+    - "inst_fifo.sv"
+    - "mac_unit.sv"
+    - "register_file.sv"
+    - "replacement_policy.sv"
+    - "sparsity_ctrl.sv"
+    - "tpu.sv"
+    - "tpu_core.sv"
+    - "unified_buffer.sv"
+    - "vpu.sv"
+    - "vpu_ctrl.sv"
+    - "weight_buffer.sv"
+    - "weight_cache.sv"
+    - "weight_load_ctrl.sv"
     - "project.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
 pinout:
   # Inputs
-  ui[0]: ""
-  ui[1]: ""
-  ui[2]: ""
+  ui[0]: "SPI_SCK"
+  ui[1]: "SPI_CS_N"
+  ui[2]: "SPI_MOSI"
   ui[3]: ""
   ui[4]: ""
   ui[5]: ""
@@ -33,17 +55,17 @@ pinout:
   ui[7]: ""
 
   # Outputs
-  uo[0]: ""
-  uo[1]: ""
-  uo[2]: ""
-  uo[3]: ""
-  uo[4]: ""
-  uo[5]: ""
-  uo[6]: ""
-  uo[7]: ""
+  uo[0]: "AXI_AWVALID"
+  uo[1]: "AXI_WVALID"
+  uo[2]: "AXI_ARVALID"
+  uo[3]: "INST_EMPTY"
+  uo[4]: "INST_FULL"
+  uo[5]: "SYNC_DONE"
+  uo[6]: "AXI_ERROR"
+  uo[7]: "HOST_ERROR"
 
   # Bidirectional pins
-  uio[0]: ""
+  uio[0]: "SPI_MISO"
   uio[1]: ""
   uio[2]: ""
   uio[3]: ""

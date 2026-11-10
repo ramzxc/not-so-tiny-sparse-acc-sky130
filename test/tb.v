@@ -10,7 +10,6 @@ module tb ();
   initial begin
     $dumpfile("tb.fst");
     $dumpvars(0, tb);
-    #1;
   end
 
   // Wire up the inputs and outputs:
@@ -27,8 +26,8 @@ module tb ();
   wire VGND = 1'b0;
 `endif
 
-  // Replace tt_um_example with your module name:
-  tt_um_example user_project (
+  // Replace tt_um_not_so_tiny_sparse_acc_ramzxc with your module name:
+  tt_um_not_so_tiny_sparse_acc_ramzxc user_project (
 
       // Include power ports for the Gate Level test:
 `ifdef GL_TEST

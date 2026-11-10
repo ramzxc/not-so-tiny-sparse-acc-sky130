@@ -2,11 +2,15 @@
 # See https://docs.cocotb.org/en/stable/quickstart.html for more info
 
 # defaults
+ifeq ($(GATES),yes)
 SIM ?= icarus
+else
+SIM ?= verilator
+endif
 FST ?= -fst # Use more efficient FST format
 TOPLEVEL_LANG ?= verilog
-SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = project.v
+SRC_DIR = $(CURDIR)/../src
+PROJECT_SOURCES = tpu_pkg.sv acc_host.sv acc_memory_1r1w_64x256.sv acc_spi.sv activation.sv activation_ctrl.sv axi_master_adapter.sv dma.sv inst_decoder.sv inst_fifo.sv mac_unit.sv register_file.sv replacement_policy.sv sparsity_ctrl.sv tpu.sv tpu_core.sv unified_buffer.sv vpu.sv vpu_ctrl.sv weight_buffer.sv weight_cache.sv weight_load_ctrl.sv project.v
 
 ifneq ($(GATES),yes)
 
@@ -27,15 +31,19 @@ VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitiv
 VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
 
 # this gets copied in by the GDS action workflow
-VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
+VERILOG_SOURCES += $(CURDIR)/gate_level_netlist.v
 
 endif
 
 # Allow sharing configuration between design and testbench via `include`:
 COMPILE_ARGS 		+= -I$(SRC_DIR)
 
+ifeq ($(SIM),verilator)
+COMPILE_ARGS += -Wno-fatal
+endif
+
 # Include the testbench sources:
-VERILOG_SOURCES += $(PWD)/tb.v
+VERILOG_SOURCES += $(CURDIR)/tb.v
 TOPLEVEL = tb
 
 # List test modules to run, separated by commas and without the .py suffix:
