@@ -21,7 +21,8 @@ No SKY130 synthesis, timing closure, place-and-route, DRC, or LVS result is clai
 The top module is `tt_um_not_so_tiny_sparse_acc_ramzxc`. `rst_n=0` resets the
 interface and accelerator. `ena=0` also holds them in reset; deselection discards
 in-flight work. The system clock target is 10 MHz (`CLOCK_PERIOD=100` ns).
-`USE_SLANG` enables package/packed-type support in the LibreLane synthesis flow;
+`SLANG_ARGUMENTS` raises the bounded loop-unroll limit to 16384 for the nested
+FP16 activation functions. `USE_SLANG` enables package/packed-type support in the LibreLane synthesis flow;
 see the [LibreLane configuration reference](https://librelane.readthedocs.io/en/latest/reference/step_config_vars.html).
 
 ## How to test

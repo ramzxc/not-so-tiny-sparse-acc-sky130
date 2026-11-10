@@ -21,6 +21,8 @@
 
   "//": "Package imports and packed types require the SystemVerilog frontend.",
   "USE_SLANG": true,
+  "//": "Four FP16 activation lanes exceed Slang's default 4000 loop iterations.",
+  "SLANG_ARGUMENTS": ["--unroll-limit=16384"],
 
   "//": "Hold slack margin - Increase them in case you are getting hold violations.",
   "PL_RESIZER_HOLD_SLACK_MARGIN": 0.1,
