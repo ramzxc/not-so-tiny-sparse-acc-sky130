@@ -10,7 +10,7 @@ endif
 FST ?= -fst # Use more efficient FST format
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(CURDIR)/../src
-PROJECT_SOURCES = tpu_pkg.sv acc_host.sv acc_memory_1r1w_64x256.sv acc_spi.sv activation.sv activation_ctrl.sv axi_master_adapter.sv dma.sv inst_decoder.sv inst_fifo.sv mac_unit.sv register_file.sv replacement_policy.sv sparsity_ctrl.sv tpu.sv tpu_core.sv unified_buffer.sv vpu.sv vpu_ctrl.sv weight_buffer.sv weight_cache.sv weight_load_ctrl.sv project.v
+PROJECT_SOURCES = project.v tpu_pkg.sv acc_host.sv acc_memory_1r1w_64x256.sv acc_spi.sv activation.sv activation_ctrl.sv axi_master_adapter.sv dma.sv inst_decoder.sv inst_fifo.sv mac_unit.sv register_file.sv replacement_policy.sv sparsity_ctrl.sv tpu.sv tpu_core.sv unified_buffer.sv vpu.sv vpu_ctrl.sv weight_buffer.sv weight_cache.sv weight_load_ctrl.sv
 
 ifneq ($(GATES),yes)
 
