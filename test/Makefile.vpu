@@ -1,0 +1,5 @@
+BUILD ?= sim_build/vpu
+.PHONY: all
+all:
+	verilator --binary --timing --assert -j 2 -Wno-fatal --top-module tb_vpu_shared --Mdir $(BUILD) ../src/tpu_pkg.sv ../src/mac_unit.sv ../src/vpu.sv tb_vpu_shared.sv
+	./$(BUILD)/Vtb_vpu_shared

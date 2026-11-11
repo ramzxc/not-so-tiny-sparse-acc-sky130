@@ -1,63 +1,80 @@
-// 1D Vector Processing / Matrix Multiply Unit (1D VPU)
+// Two-lane architectural vectors share one pipelined physical MAC.
 module vpu
     import tpu_pkg::*;
-#(
-    parameter int COMPUTE_WIDTH = 14
-)(
-    input  logic clk,
-    input  logic rst,
-
-    input  fp16_type [COMPUTE_WIDTH-1:0] weight_data,
-    input  logic                         load_weight,
-
-    input  fp16_type [COMPUTE_WIDTH-1:0] input_data,
-    input  logic                         input_valid,
-
-    input  fp16_type [COMPUTE_WIDTH-1:0] last_sum_data,
-    input  logic                         last_sum_valid,
-
+#(parameter int COMPUTE_WIDTH = 14)(
+    input logic clk, rst,
+    input fp16_type [COMPUTE_WIDTH-1:0] weight_data,
+    input logic load_weight,
+    input fp16_type [COMPUTE_WIDTH-1:0] input_data,
+    input logic input_valid,
+    input fp16_type [COMPUTE_WIDTH-1:0] last_sum_data,
+    input logic last_sum_valid,
     output fp16_type [COMPUTE_WIDTH-1:0] result,
-    output logic                         result_valid
+    output logic result_valid
 );
+    localparam int INDEX_WIDTH = COMPUTE_WIDTH > 1 ? $clog2(COMPUTE_WIDTH) : 1;
+    typedef enum logic [1:0] {IDLE, ISSUE, DRAIN} state_t;
+    state_t state;
+    fp16_type [COMPUTE_WIDTH-1:0] weights, inputs, sums;
+    logic [INDEX_WIDTH-1:0] issue_index, result_index;
+    logic [2:0] valid_pipe;
+    fp16_type mac_result;
+    logic issue;
+    assign issue = state == ISSUE;
 
-    localparam int RESULT_VALID_STAGE = 3;
-
-    fp16_type interim_result [COMPUTE_WIDTH-1:0];
-    logic [RESULT_VALID_STAGE-1:0] result_valid_pipe_cs;
-
-    genvar col;
-    generate
-        for (col = 0; col < COMPUTE_WIDTH; col++) begin : gen_col
-            mac_unit mac (
-                .clk            (clk),
-                .rst            (rst),
-                .weight_in      (weight_data[col]),
-                .load_weight    (load_weight),
-                .data_in        (input_data[col]),
-                .last_sum       (last_sum_valid ? last_sum_data[col] : FP16_ZERO),
-                .partial_sum    (interim_result[col])
-            );
-        end
-    endgenerate
-
-    always_comb begin
-        for (int i = 0; i < COMPUTE_WIDTH; i++) begin
-            result[i] = interim_result[i];
-        end
-    end
-
-    assign result_valid = result_valid_pipe_cs[RESULT_VALID_STAGE-1];
+    // The MAC captures data and weight on the issue edge. Multiplication
+    // uses both captured values on the next edge, then addition follows.
+    mac_unit mac (
+        .clk(clk), .rst(rst),
+        .weight_in(weights[issue_index]), .load_weight(issue),
+        .data_in(inputs[issue_index]), .last_sum(sums[issue_index]),
+        .partial_sum(mac_result)
+    );
 
     always_ff @(posedge clk) begin
         if (rst) begin
-            result_valid_pipe_cs <= '0;
-        end
-        else begin
-            result_valid_pipe_cs[0] <= input_valid;
-            for (int i = 1; i < RESULT_VALID_STAGE; i++) begin
-                result_valid_pipe_cs[i] <= result_valid_pipe_cs[i-1];
+            state <= IDLE;
+            weights <= '0;
+            inputs <= '0;
+            sums <= '0;
+            result <= '0;
+            result_valid <= 0;
+            issue_index <= '0;
+            result_index <= '0;
+            valid_pipe <= '0;
+        end else begin
+            result_valid <= 0;
+            valid_pipe <= {valid_pipe[1:0], issue};
+            if (load_weight) weights <= weight_data;
+            case (state)
+                IDLE: if (input_valid) begin
+                    inputs <= input_data;
+                    sums <= last_sum_valid ? last_sum_data : '0;
+                    issue_index <= '0;
+                    result_index <= '0;
+                    state <= ISSUE;
+                end
+                ISSUE: begin
+                    if (issue_index == INDEX_WIDTH'(COMPUTE_WIDTH-1)) state <= DRAIN;
+                    else issue_index <= issue_index + 1'b1;
+                end
+                default: ;
+            endcase
+            if (valid_pipe[2]) begin
+                result[result_index] <= mac_result;
+                if (result_index == INDEX_WIDTH'(COMPUTE_WIDTH-1)) begin
+                    result_valid <= 1;
+                    state <= IDLE;
+                end else result_index <= result_index + 1'b1;
             end
         end
     end
-
+`ifndef SYNTHESIS
+    always @(posedge clk) if (!rst) begin
+        if (input_valid && state != IDLE)
+            $fatal(1, "VPU controller issued a vector while the shared MAC was busy");
+        if (load_weight && state != IDLE)
+            $fatal(1, "VPU weights changed while the shared MAC was busy");
+    end
+`endif
 endmodule

@@ -40,12 +40,17 @@ output stalls and reset. Run this check and the 512 B memory stress test with:
 
 ```sh
 make -f Makefile.activation
+make -f Makefile.vpu
 make -f Makefile.mem SRAM_BYTES=512
 python -m cocotb_tools.check_results sim_build/mem_512/results.xml
 ```
 
 The memory test also resets both halves of accumulated writes before commit,
 checking that interrupted operations leave the SRAM contents unchanged.
+
+The VPU check compares 20,000 lane results from the single shared MAC against
+the FP16 helpers, including arbitrary binary16 values and reset during each
+issue/drain phase. The architectural vector width remains two lanes.
 
 Using GTKWave
 

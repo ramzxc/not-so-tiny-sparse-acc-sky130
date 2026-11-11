@@ -1,0 +1,61 @@
+{
+  "sram_bytes": 512,
+  "architectural_lanes": 2,
+  "physical_macs": 1,
+  "baseline_commit": "fd09b8a",
+  "dc_corner": "sky130_fd_sc_hd TT 1.8V 25C",
+  "clock_ns": 100,
+  "area_unit": "um^2",
+  "two_mac_dc": {
+    "spi": 1517.705553,
+    "instruction_fifo": 8843.48134,
+    "decoder": 2105.769535,
+    "sparsity_flow_controller": 7669.855801,
+    "weight_flow_controller": 1674.105556,
+    "vpu_flow_controller": 6309.801455,
+    "vpu_core": 21056.444429,
+    "activation_flow_controller": 3824.918313,
+    "activation_core": 13250.207849,
+    "SRAM": 97582.710938,
+    "memory_controller": 16540.863642,
+    "glue": 110.1056,
+    "dma_engine": 12549.535711,
+    "axi_adapter": 6162.159815,
+    "host": 7812.492582
+  },
+  "one_mac_dc": {
+    "spi": 1517.705553,
+    "instruction_fifo": 8843.48134,
+    "decoder": 2105.769535,
+    "sparsity_flow_controller": 7669.855801,
+    "weight_flow_controller": 1674.105556,
+    "vpu_flow_controller": 6309.801455,
+    "vpu_core": 14782.92768,
+    "activation_flow_controller": 3824.918313,
+    "activation_core": 13250.207849,
+    "SRAM": 97582.710938,
+    "memory_controller": 16540.863642,
+    "glue": 110.1056,
+    "dma_engine": 12549.535711,
+    "axi_adapter": 6162.159815,
+    "host": 7808.738982
+  },
+  "yosys_standard_cell_area": {
+    "two_mac_ci": 153064.3008,
+    "one_mac_local_same_config": 139165.9712
+  },
+  "two_mac_ci_placement_utilization_percent": 94.937,
+  "one_mac_estimated_placement_utilization_percent": 86.31666390373894,
+  "notes": [
+    "One-MAC Yosys completed with exit code 0.",
+    "One-MAC placement utilization is a proportional estimate, not a placement result.",
+    "VPU vector result becomes valid five rising-edge intervals after acceptance (previously two).",
+    "SRAM capacity, two-lane vector format, FP16 helper functions and mac_unit are unchanged.",
+    "20,000 random bit-exact lane comparisons plus reset and two SPI integration tests passed."
+  ],
+  "source_sha256": {
+    "src/vpu.sv": "8892ed98e4c199fa9f0303e50016f53246ee3015c3628e3f14e38cff10d176ff",
+    "src/mac_unit.sv": "6c4780050d7a67e1b808d68a37936e5d370fcb3d98d1bb784b675003dbc2190e",
+    "src/tpu_pkg.sv": "e3f115c0a3804c33ca66dba2d076d5af4c0ac7ea262cc1946485630a0b3f9ed8"
+  }
+}
