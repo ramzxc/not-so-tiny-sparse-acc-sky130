@@ -70,3 +70,104 @@ python3 memory/openram/package.py
 기본 도구 위치는 `/tmp` 아래다. 장기 재현 시 기록한 commit에서 다시 설치해야 한다. `TT_OPENRAM_ROOT`, `TT_OPENRAM_PYTHON`, `TT_PDK_ROOT`는 생성 도구 위치, `TT_MAGIC`, `TT_NETGEN`은 검증 실행 파일을 지정한다. 검증 시 `OPENRAM_HOME`, `OPENRAM_TECH`, `PDK_ROOT`도 해당 설치에 맞춰 지정한다.
 
 이전 실패 산출물은 `archive/rejected_cypress/`에 로컬 보관했다. Git push는 수행하지 않았다.
+
+### 512 B physical repair candidate (SRAM-only CI)
+
+The raw detailed LEF omitted actual routing geometry. `lef_from_gds.py` rebuilds
+M1–M4 and via–via3 OBS from final GDS, subtracting only the public LEF pin
+shapes. It verifies that pins exist in GDS and no routing geometry is omitted.
+See [ORFS #4753](https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts/issues/4753)
+for an independently reported analogous failure. No route/check exemptions are added.
+
+The raw macro also had 1700 KLayout mask-spacing violations. The geometry-specific
+`repair_512_masks.py` adds NSDM/PSDM/NPC bridges while retaining every original
+cell polygon. It follows the merge requirement in the SKY130
+[periphery rules](https://skywater-pdk.readthedocs.io/en/main/rules/periphery.html)
+(nsd.2, psd.2, npc.2). Two diagonal PSDM junctions use asymmetric 0.78 x 0.63 um bridges;
+these coordinates apply only to this 512 B layout. It does not modify transistor,
+contact, routing-metal or via geometry. Magic DRC, KLayout DRC and LVS must be
+rerun after any change to the repair or input.
+
+Reproduce using Python with `gdstk` (raw input is retained in git):
+
+```sh
+mkdir -p /tmp/sram-raw /tmp/sram-repaired
+name=tt_sram_1rw_64x64_sky130
+git show 92e4afc:memory/openram/generated/$name/$name.gds > /tmp/sram-raw/$name.gds
+git show 92e4afc:memory/openram/generated/$name/$name.lef > /tmp/sram-raw/$name.lef
+python3 memory/openram/repair_512_masks.py /tmp/sram-raw/$name.gds /tmp/sram-repaired/$name.gds
+python3 memory/openram/lef_from_gds.py /tmp/sram-repaired/$name.gds /tmp/sram-raw/$name.lef /tmp/sram-repaired/$name.lef
+```
+
+GDS timestamps may differ; cell geometry must be identical. `repair_audit.json`
+records the reproduction audit. `lef_coverage.json` records coverage on all seven
+routing/cut layers. The adopted GDS is the exact file checked by Magic and LVS
+(`verification.json` includes its SHA256); standalone KLayout checked FEOL,
+BEOL, off-grid and seal rules with zero markers. Local OpenROAD pin access also
+passed. Full wrapper routing DRC/LVS and Magic-versus-KLayout XOR are **pending**
+for this candidate. The previous strict run 42994071301 failed (254954 XOR,
+3609 Magic DRC, 2593 KLayout DRC). Earlier route-zero results in
+`routing_checks.json` apply only to the previous, incomplete LEF.
+Timing Liberty is still analytical, not SPICE/PVT signoff. This is a CI validation
+candidate, not a tapeout-qualified release. All strict CI checks remain enabled.
+
+The first repaired run (42998782861) stopped in Magic streamout: 81 LEF
+polygon parsing errors. The writer put as many as 31279 characters on one line,
+exceeding Magic's 2048-byte LEF input buffer. Coordinates now appear one pair
+per line (maximum line length 48); all LEF tokens and geometry are unchanged.
+Magic 8.3.623, the CI version, read all 356310 lines with no errors. See
+`provenance/512b-physical-repair/magic_lef_read.txt`. Full signoff remains pending.
+
+### Integration repair after run 43000975752
+
+The run passed LVS and antenna but failed with 394 KLayout DRC markers,
+576 Magic DRC markers, 310 extraction overlap errors and 252193 XOR differences.
+The KLayout streamout contained an empty SRAM cell: `RenameCell` retained the
+cleared LEF cell rather than replacing it with macro GDS. `OverwriteCell` now
+fills the existing cell from its supplied GDS. The macro geometry must be present
+and equivalent in both streamouts; XOR remains mandatory.
+
+392 KLayout markers were via3 size/spacing violations at the SRAM power rings.
+Automatic macro M3/M4 stitching duplicated existing internal macro vias.
+`pdn_standard_grid.tcl` preserves LibreLane 3.0.14's standard-cell power grid
+(Apache-2.0 source), omitting its default macro grid; the explicit checked edge
+connections remain in `pdn_sram_connections.tcl`. Both supply connectivity checks
+must pass. This removes duplicate geometry rather than ignoring DRC.
+
+The other two markers were NSDM/PSDM overlap on active beneath the previously
+added square bridges. The bridges are now asymmetric and the generation script
+asserts zero implant overlap on active. The earlier standalone KLayout deck
+lacked that rule and was insufficient. The CI PDK reference at open_pdks
+8afc8346a57fe1ab7934ba5a6056ea8b43078e71 pins fossi-foundation/mpw_precheck
+7eb869a4b6a5807f49d5ae738c541cce39c41ba5. Its `sky130A_mr.drc` SHA256 is
+caf4a6b08cb12f78d6bb2d120737424c786b3bae8d6489234b9b269e91107bfc.
+The updated macro passes this deck with FEOL/BEOL/offgrid/seal enabled, plus
+Magic DRC and unique Netgen LVS, with no property errors. Previous reports were
+replaced by reports for the updated macro. Physical checks are not timing/PVT
+characterization.
+
+Local replay of run 43000975752's final signal routing with the corrected PDN
+and macro gives **Magic DRC 0, KLayout DRC 0, XOR 0**, and both supply nets
+connected. Both streamouts contain the actual SRAM geometry. Evidence and hashes
+are in `provenance/512b-integration-repair/`. This replay does not replace a fresh
+full CI run or full-chip extraction/LVS after the changes. All checks stay enabled.
+
+### External power access and gate-level CI
+
+Run 43005593257 passed the full GDS job (including DRC/LVS/XOR/antenna).
+Precheck's physical checks also passed; only its power-pin LEF check failed.
+PDN stripe segments above/below SRAM were incorrectly exported as full-chip
+power access ports. The PDN hook now exports only continuous full-height M4
+straps (22 VPWR, 21 VGND). All 54 short pieces remain connected internal metal;
+only BPin metadata is changed. No manufacturing layer is removed and no check
+is disabled. Both power nets remain connected. The official pin check at
+TT tools commit 9d13ff3e3e6202090740110438c6a10c1d62ca0f passes on the successful
+CI GDS and the corrected DEF-derived LEF. An independent local layout replay
+has zero XOR on all layers other than the intentionally changed M4 pin-purpose
+layer. The normal CI Magic/KLayout XOR still compares all configured layers.
+
+The GL job failed before simulation because `make clean` selected Verilator,
+which the GL action does not install. Its job environment now sets SIM=icarus,
+covering both clean and the GATES=yes invocation. The actual successful-CI
+netlist passes the existing full-512-byte read/write/overwrite/reset/enable
+test under Icarus. Evidence is in `provenance/512b-precheck-gl/`.

@@ -1,0 +1,27 @@
+{
+  "reproduced_gds_cell_geometry_exact_match": true,
+  "reproduced_lef_byte_exact_match": true,
+  "all_original_polygons_preserved": true,
+  "added_layers_only": {
+    "NSDM": [
+      93,
+      44
+    ],
+    "PSDM": [
+      94,
+      20
+    ],
+    "NPC": [
+      95,
+      20
+    ]
+  },
+  "gds_sha256": "a30021946db6cfa1286b5776980fc04661e39dace5297fd3e170f99745b52c74",
+  "lef_whitespace_fix": {
+    "coordinates_and_all_tokens_unchanged": true,
+    "max_line_length": 48,
+    "previous_commit": "95af9c2"
+  },
+  "mask_bridge_revision": "Asymmetric 0.78um wide bridges, 0.63um tall; no NSDM/PSDM overlap on active",
+  "routing_geometry_unchanged": true
+}

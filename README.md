@@ -53,3 +53,18 @@ The GitHub action will automatically build the ASIC files using [LibreLane](http
   - Mastodon [#tinytapeout](https://chaos.social/tags/tinytapeout) [@matthewvenn](https://chaos.social/@matthewvenn)
   - X (formerly Twitter) [#tinytapeout](https://twitter.com/hashtag/tinytapeout) [@tinytapeout](https://twitter.com/tinytapeout)
   - Bluesky [@tinytapeout.com](https://bsky.app/profile/tinytapeout.com)
+
+### Full accelerator CI with validated 512 B SRAM
+
+Branch `ci/accel-512b` retains the complete SPI host, DMA, TPU and memory
+controller with two compute lanes and instruction FIFO depth four. It imports
+the 512 B macro and physical integration fixes from SRAM-only commit a92fb82:
+exact GDS-derived LEF, corrected implants, explicit edge PDN connections,
+continuous external power ports, strict DRC/LVS/XOR and KLayout GDS merge.
+The macro instance path in PDN/config is the full accelerator hierarchy.
+The SRAM-only validation records are reference evidence, not full-accelerator
+signoff. This branch requires its own full CI validation. Only 512 B is selected;
+1 KiB artifacts/configuration have not been rebuilt or validated by this update.
+GL jobs select Icarus for both cleanup and simulation. SRAM power ports are
+connected by physical PDN/global connection rules; RTL PINMISSING warnings
+must be assessed against power-connectivity and LVS results.

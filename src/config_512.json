@@ -50,8 +50,8 @@
   "RUN_LINTER": 1,
   "LINTER_INCLUDE_PDK_MODELS": 1,
   "CLOCK_PORT": "clk",
-  "RUN_KLAYOUT_XOR": 0,
-  "RUN_KLAYOUT_DRC": 0,
+  "RUN_KLAYOUT_XOR": true,
+  "RUN_KLAYOUT_DRC": true,
   "DESIGN_REPAIR_BUFFER_OUTPUT_PORTS": 0,
   "TOP_MARGIN_MULT": 1,
   "BOTTOM_MARGIN_MULT": 1,
@@ -68,5 +68,24 @@
   "MAGIC_WRITE_LEF_PINONLY": 1,
   "VERILOG_DEFINES": [
     "ACC_SRAM_BYTES=512"
-  ]
+  ],
+  "PDN_CFG": "dir::pdn.tcl",
+  "PDN_OBSTRUCTIONS": [
+    [
+      "met4",
+      410,
+      9.135,
+      950.455,
+      216.63
+    ]
+  ],
+  "RUN_MAGIC_DRC": true,
+  "RUN_LVS": true,
+  "ERROR_ON_MAGIC_DRC": true,
+  "ERROR_ON_KLAYOUT_DRC": true,
+  "ERROR_ON_LVS_ERROR": true,
+  "ERROR_ON_PDN_VIOLATIONS": true,
+  "ERROR_ON_TR_DRC": true,
+  "ERROR_ON_XOR_ERROR": true,
+  "KLAYOUT_CONFLICT_RESOLUTION": "OverwriteCell"
 }

@@ -1,0 +1,23 @@
+{
+  "source_ci_run": 43005593257,
+  "source_commit": "258ce7d",
+  "source_gds": "GDS job passed all enabled checks; precheck failed only pin check",
+  "official_tt_pin_check": "PASS",
+  "tt_support_tools_commit": "9d13ff3e3e6202090740110438c6a10c1d62ca0f",
+  "external_power_straps": {
+    "VPWR": 22,
+    "VGND": 21
+  },
+  "short_stripe_pieces_retained_as_internal_metal": 54,
+  "supply_connectivity": "PASS both nets",
+  "gate_level_test": "PASS all_rows_roundtrip on actual CI netlist with Icarus",
+  "physical_equivalence_scope": "Earlier local full-layout replay, ignoring only met4.pin (71/16) metadata; all other layers compared",
+  "physical_equivalence_xor": 0,
+  "fresh_ci": "pending",
+  "checked_sha256": {
+    "tt_um_not_so_tiny_sparse_acc_ramzxc.gds": "c6b838ea6103160138c474900d6edf34649c954544a008ec08300e3f2b028483",
+    "tt_um_not_so_tiny_sparse_acc_ramzxc.lef": "53da1334df2f0fe208531815a38ef36b79630eca9555680cfa00be3092b216de",
+    "gate_level_netlist.v": "c0850019e6e19909277e40aa409a68c98320038d132290a0933aae13633fb59c",
+    "pdn_sram_connections.tcl": "a6e72d13fd8871d117785987308305eae10bd5fd74ca13e3b15c14422a1d0d7e"
+  }
+}

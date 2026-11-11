@@ -1,0 +1,98 @@
+{
+  "scope": "GDS-derived LEF pin-access check only; full-chip routing and signoff pending",
+  "macro_pins_without_access": 0,
+  "standard_cell_pins_without_access": 0,
+  "previous_geometry_results": {
+    "scope": "Local replay of placed SRAM-only CI DEF with regenerated detailed LEF and perimeter power connections; not a fresh placement or full-chip Magic/LVS signoff; final CI configuration additionally enables KLayout DRC and GDS XOR",
+    "source_ci_run": 42975241234,
+    "macro_drc_errors": 0,
+    "macro_lvs_errors": 0,
+    "rtl_full_512_bytes": "PASS",
+    "power_connectivity": {
+      "VPWR": "PASS",
+      "VGND": "PASS"
+    },
+    "macro_pins_without_access": 0,
+    "routing_max_layer": "met4",
+    "detailed_route_final_violations": 0,
+    "openroad_version": "dcf36133a369abc8f3c5e5738cd4d82e4903c0e0",
+    "checked_sha256": {
+      "tt_sram_1rw_64x64_sky130.gds": "79c03b07ae0ffd54d4f40f9c8fe5601d43bf25b0207bf22d75a4313b65594618",
+      "tt_sram_1rw_64x64_sky130.lef": "3abbe6b3af8503be8fe2c88ea02362a66cd80061d64690e5903a1530423be4b4",
+      "pdn.tcl": "e4448e8a576dd5c4261dd16d19356f7342fae701826d69726b0832ce4926c8ac",
+      "pdn_sram_connections.tcl": "f4a2c812dbdde27c999bbab9c3c01a32e04e144cb663729c7690f5ebd51436c6"
+    },
+    "fresh_pdn_with_detailed_lef": {
+      "VPWR": "PASS",
+      "VGND": "PASS",
+      "temporary_met4_obstruction_um": [
+        410,
+        9.135,
+        950.455,
+        216.63
+      ]
+    }
+  },
+  "previous_strict_ci": {
+    "run": 42998782861,
+    "failure": "Magic streamout LEF parser: 81 missing polygon Y coordinate errors; long lines exceed parser buffer"
+  },
+  "previous_polygon_lef_sha256": "dab91c96041dc9abc21250f0be7005720e941600f663691d1c1da10e79ff5f18",
+  "checked_lef_sha256": "25561c0ed3d25d88d22747a6ebeb602f4e639073380e6dec8b8ccc8261457a06",
+  "lef_whitespace_only_change": true,
+  "magic_lef_read": {
+    "version": "8.3.623 (same as CI)",
+    "errors": 0,
+    "processed_lines": 356310
+  },
+  "latest_integration_replay": {
+    "scope": "Local replay of CI 43000975752 final placement/signal routing, regenerating PDN and both streamouts; not a fresh full flow",
+    "magic_drc_errors": 0,
+    "klayout_drc_errors": 0,
+    "xor_differences": 0,
+    "macro_present_in_both_streamouts": true,
+    "VPWR_connectivity": "PASS",
+    "VGND_connectivity": "PASS",
+    "full_chip_lvs": "Fresh CI pending; previous CI LVS passed",
+    "macro_lvs": "PASS",
+    "klayout_drc_deck_sha256": "caf4a6b08cb12f78d6bb2d120737424c786b3bae8d6489234b9b269e91107bfc",
+    "checked_sha256": {
+      "tt_sram_1rw_64x64_sky130.gds": "a30021946db6cfa1286b5776980fc04661e39dace5297fd3e170f99745b52c74",
+      "tt_sram_1rw_64x64_sky130.lef": "25561c0ed3d25d88d22747a6ebeb602f4e639073380e6dec8b8ccc8261457a06",
+      "pdn.tcl": "1fd38a9053aae9e0dea29c61261e03f84c9d5333b215db4108e7061bf634d91e",
+      "pdn_standard_grid.tcl": "f37f7ebfa5002c3d1fffa3b30ee6261bb15208ceb725f21706e9ff23ec49bc0c",
+      "pdn_sram_connections.tcl": "f4a2c812dbdde27c999bbab9c3c01a32e04e144cb663729c7690f5ebd51436c6",
+      "tt_um_not_so_tiny_sparse_acc_ramzxc.magic.gds": "aae9246b596f521c4b68f506244a7d8ab383fbc67f27762b1bc4889bcf49053b",
+      "tt-clean.klayout.gds": "a1645f7760cd2896ed6c623600e4f92dff1810e8ba15984d2d732c120a823d45"
+    }
+  },
+  "latest_ci": {
+    "run": 43005593257,
+    "gds_job": "PASS",
+    "precheck": "Only power pin LEF export failed; local fix verified",
+    "gl_test": "Simulator unavailable during make clean; local workflow fix verified"
+  },
+  "latest_pin_check": {
+    "source_ci_run": 43005593257,
+    "source_commit": "258ce7d",
+    "source_gds": "GDS job passed all enabled checks; precheck failed only pin check",
+    "official_tt_pin_check": "PASS",
+    "tt_support_tools_commit": "9d13ff3e3e6202090740110438c6a10c1d62ca0f",
+    "external_power_straps": {
+      "VPWR": 22,
+      "VGND": 21
+    },
+    "short_stripe_pieces_retained_as_internal_metal": 54,
+    "supply_connectivity": "PASS both nets",
+    "gate_level_test": "PASS all_rows_roundtrip on actual CI netlist with Icarus",
+    "physical_equivalence_scope": "Earlier local full-layout replay, ignoring only met4.pin (71/16) metadata; all other layers compared",
+    "physical_equivalence_xor": 0,
+    "fresh_ci": "pending",
+    "checked_sha256": {
+      "tt_um_not_so_tiny_sparse_acc_ramzxc.gds": "c6b838ea6103160138c474900d6edf34649c954544a008ec08300e3f2b028483",
+      "tt_um_not_so_tiny_sparse_acc_ramzxc.lef": "53da1334df2f0fe208531815a38ef36b79630eca9555680cfa00be3092b216de",
+      "gate_level_netlist.v": "c0850019e6e19909277e40aa409a68c98320038d132290a0933aae13633fb59c",
+      "pdn_sram_connections.tcl": "a6e72d13fd8871d117785987308305eae10bd5fd74ca13e3b15c14422a1d0d7e"
+    }
+  }
+}
