@@ -2,7 +2,6 @@
   "scope": "GDS-derived LEF pin-access check only; full-chip routing and signoff pending",
   "macro_pins_without_access": 0,
   "standard_cell_pins_without_access": 0,
-  "checked_lef_sha256": "dab91c96041dc9abc21250f0be7005720e941600f663691d1c1da10e79ff5f18",
   "previous_geometry_results": {
     "scope": "Local replay of placed SRAM-only CI DEF with regenerated detailed LEF and perimeter power connections; not a fresh placement or full-chip Magic/LVS signoff; final CI configuration additionally enables KLayout DRC and GDS XOR",
     "source_ci_run": 42975241234,
@@ -35,9 +34,15 @@
     }
   },
   "previous_strict_ci": {
-    "run": 42994071301,
-    "xor_differences": 254954,
-    "magic_drc_errors": 3609,
-    "klayout_drc_errors": 2593
+    "run": 42998782861,
+    "failure": "Magic streamout LEF parser: 81 missing polygon Y coordinate errors; long lines exceed parser buffer"
+  },
+  "previous_polygon_lef_sha256": "dab91c96041dc9abc21250f0be7005720e941600f663691d1c1da10e79ff5f18",
+  "checked_lef_sha256": "25561c0ed3d25d88d22747a6ebeb602f4e639073380e6dec8b8ccc8261457a06",
+  "lef_whitespace_only_change": true,
+  "magic_lef_read": {
+    "version": "8.3.623 (same as CI)",
+    "errors": 0,
+    "processed_lines": 356310
   }
 }

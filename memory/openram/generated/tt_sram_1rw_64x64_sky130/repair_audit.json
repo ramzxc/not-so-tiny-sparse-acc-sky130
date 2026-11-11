@@ -16,5 +16,10 @@
       20
     ]
   },
-  "gds_sha256": "7137c41b2be824dc9c7fb52b791c1118bffa7325a489890155e135abf57692bd"
+  "gds_sha256": "7137c41b2be824dc9c7fb52b791c1118bffa7325a489890155e135abf57692bd",
+  "lef_whitespace_fix": {
+    "coordinates_and_all_tokens_unchanged": true,
+    "max_line_length": 48,
+    "previous_commit": "95af9c2"
+  }
 }

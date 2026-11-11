@@ -24,7 +24,10 @@ for key,(layer,datatype) in maplayers.items():
  out.append(f'      LAYER {key} ;\n')
  for p in obs:
   # LEF POLYGON describes exact Manhattan polygons, including fractured holes.
-  out.append('         POLYGON '+' '.join(f'{v:.3f}' for xy in p.points for v in xy)+' ;\n')
+  # Magic's LEF reader has a 2048-byte line buffer. Keep coordinate pairs intact.
+  out.append('         POLYGON\n')
+  out.extend(f'            {x:.3f} {y:.3f}\n' for x,y in p.points)
+  out.append('         ;\n')
  report[key]={'gds_polygons':len(actual),'obstruction_polygons':len(obs),'missing_area_um2':sum(p.area() for p in missing),'pin_excess_area_um2':sum(p.area() for p in excess)}
  print(key,report[key],flush=True)
 out.append(f'   END\nEND {name}\nEND LIBRARY\n');a.output.write_text(''.join(out));a.output.with_suffix('.coverage.json').write_text(json.dumps(report,indent=2)+'\n')

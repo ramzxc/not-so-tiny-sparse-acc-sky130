@@ -110,3 +110,10 @@ for this candidate. The previous strict run 42994071301 failed (254954 XOR,
 `routing_checks.json` apply only to the previous, incomplete LEF.
 Timing Liberty is still analytical, not SPICE/PVT signoff. This is a CI validation
 candidate, not a tapeout-qualified release. All strict CI checks remain enabled.
+
+The first repaired run (42998782861) stopped in Magic streamout: 81 LEF
+polygon parsing errors. The writer put as many as 31279 characters on one line,
+exceeding Magic's 2048-byte LEF input buffer. Coordinates now appear one pair
+per line (maximum line length 48); all LEF tokens and geometry are unchanged.
+Magic 8.3.623, the CI version, read all 356310 lines with no errors. See
+`provenance/512b-physical-repair/magic_lef_read.txt`. Full signoff remains pending.
