@@ -27,3 +27,7 @@ environment setup. The 1 KiB variant is not rebuilt by this experiment.
 the SRAM placement halo to the top/bottom met3 power rings. The extensions stay
 outside the array interior. Power connectivity and downstream DRC/LVS checks
 remain enabled; macro-level checks and full-chip checks are separate results.
+
+The `PDN_OBSTRUCTIONS` rectangle covers the macro plus its 10 um halo only during
+PDN generation; LibreLane removes it before signal routing. This keeps supply
+stripes out of SRAM internal wiring without blocking detailed-LEF signal access.

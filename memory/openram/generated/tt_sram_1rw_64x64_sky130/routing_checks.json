@@ -16,6 +16,17 @@
     "tt_sram_1rw_64x64_sky130.gds": "79c03b07ae0ffd54d4f40f9c8fe5601d43bf25b0207bf22d75a4313b65594618",
     "tt_sram_1rw_64x64_sky130.lef": "3abbe6b3af8503be8fe2c88ea02362a66cd80061d64690e5903a1530423be4b4",
     "pdn.tcl": "e4448e8a576dd5c4261dd16d19356f7342fae701826d69726b0832ce4926c8ac",
-    "pdn_sram_connections.tcl": "f4a2c812dbdde27c999bbab9c3c01a32e04e144cb663729c7690f5ebd51436c6"
+    "pdn_sram_connections.tcl": "f4a2c812dbdde27c999bbab9c3c01a32e04e144cb663729c7690f5ebd51436c6",
+    "config.json": "7c16b117303fc8b5e079c1531173036d1ac3316034f0654c1286de2d9c0d01ca"
+  },
+  "fresh_pdn_with_detailed_lef": {
+    "VPWR": "PASS",
+    "VGND": "PASS",
+    "temporary_met4_obstruction_um": [
+      410,
+      9.135,
+      950.455,
+      216.63
+    ]
   }
 }

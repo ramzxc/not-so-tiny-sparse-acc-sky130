@@ -69,5 +69,14 @@
   "VERILOG_DEFINES": [
     "ACC_SRAM_BYTES=512"
   ],
-  "PDN_CFG": "dir::pdn.tcl"
+  "PDN_CFG": "dir::pdn.tcl",
+  "PDN_OBSTRUCTIONS": [
+    [
+      "met4",
+      410,
+      9.135,
+      950.455,
+      216.63
+    ]
+  ]
 }
