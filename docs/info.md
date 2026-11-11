@@ -204,21 +204,22 @@ TPU's external tensors. Use IO levels appropriate to the Tiny Tapeout carrier.
 
 ### Local synthesis
 
-Compile the generated analytical SRAM libraries with
-`lc_shell -f syn/compile_openram.tcl`, then run
-`ACC_SRAM_BYTES=1024 dc_shell -f syn/run_dc.tcl` or select `512`.
-The flow checks that the design contains exactly one selected OpenRAM macro and
-two MAC instances. Reports are saved in `syn/runs/shared_fifo4_<bytes>_tt/`.
-Standard-cell and SRAM areas are reported separately. The earlier three-SRAM
-baseline is preserved in `syn/runs/fp16_fifo4_lane2_tt/`.
+Local Synopsys synthesis scripts and P&R experiments live in excluded `syn/`
+and `pnr/` directories. GitHub Actions uses `src/config.json` (512 B) and the
+checked-in OpenRAM views instead. The default RTL and test capacity is also 512 B.
 
-Current pre-layout results (100 ns, analytical TT SRAM timing):
+Latest local pre-layout result after DMA FIFO/address/count/register sharing
+optimizations, at 100 ns with analytical TT SRAM timing:
 
-| Capacity | Standard cells (um2) | SRAM (um2) | Total (um2) | 8x2 tile |
+| Version | Standard cells (um2) | SRAM (um2) | Total (um2) | 8x2 tile |
 |---|---:|---:|---:|---:|
-| 1 KiB | 141172.893 | 180155.734 | 321328.627 | 103.28% |
-| 512 B | 141104.077 | 97582.711 | 238686.788 | 76.72% |
+| Before DMA optimization, 512 B |141104.077|97582.711|238686.788|76.72%|
+| Current, 512 B |122288.532|97582.711|219871.243|70.67%|
 
-Both variants passed integration and memory-controller stress tests. Setup
-WNS/TNS is 0/0 ns; hold and max-transition violations remain. The 512 B total
-is only a raw cell-area sum, not proof that placement/routing will fit.
+DMA area decreased from 31315.033 to 12549.536 um2. The 372-transfer DMA test
+and both integration tests passed. Setup slack is 27.42 ns with zero setup TNS;
+hold and max-transition violations remain. These are raw cell-area sums,
+not proof that placement/routing or chip-level DRC/LVS will pass.
+
+The `ci/sram-only-512b` branch isolates the same 512 B macro with a minimal
+wrapper so its Actions result can be compared with the full accelerator.

@@ -35,7 +35,7 @@
     "nom_tt_025C_1v80"
   ],
   "PDN_MACRO_CONNECTIONS": [
-    ".*\\.memory\\.size_.*\\.macro VDPWR VGND vccd1 vssd1"
+    ".*\\.memory\\.size_.*\\.macro VPWR VGND vccd1 vssd1"
   ],
   "PL_RESIZER_HOLD_SLACK_MARGIN": 0.1,
   "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.05,
