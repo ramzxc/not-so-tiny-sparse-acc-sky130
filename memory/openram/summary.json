@@ -57,8 +57,8 @@
       "klayout_deck_source": "https://github.com/fossi-foundation/mpw_precheck/blob/7eb869a4b6a5807f49d5ae738c541cce39c41ba5/checks/tech-files/sky130A_mr.drc",
       "klayout_deck_options": "feol=1 beol=1 offgrid=1 seal=1"
     },
-    "release_status": "Macro-only Magic DRC, KLayout DRC and LVS PASS; updated full-chip DRC/LVS/XOR pending; analytical timing only",
+    "release_status": "GDS checks passed in CI; local precheck pin fix and GL test pass; full workflow rerun pending; analytical timing only",
     "liberty": "analytical TT estimate, not SPICE timing characterization",
-    "top_level_pnr": "Local CI-layout replay: Magic DRC 0, KLayout DRC 0, XOR 0, power connectivity PASS; fresh full CI pending"
+    "top_level_pnr": "CI 43005593257 GDS passed DRC/LVS/XOR/antenna. External pin metadata fix passes local TT pin check; new full CI pending."
   }
 ]

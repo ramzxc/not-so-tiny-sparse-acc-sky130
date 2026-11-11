@@ -151,3 +151,23 @@ and macro gives **Magic DRC 0, KLayout DRC 0, XOR 0**, and both supply nets
 connected. Both streamouts contain the actual SRAM geometry. Evidence and hashes
 are in `provenance/512b-integration-repair/`. This replay does not replace a fresh
 full CI run or full-chip extraction/LVS after the changes. All checks stay enabled.
+
+### External power access and gate-level CI
+
+Run 43005593257 passed the full GDS job (including DRC/LVS/XOR/antenna).
+Precheck's physical checks also passed; only its power-pin LEF check failed.
+PDN stripe segments above/below SRAM were incorrectly exported as full-chip
+power access ports. The PDN hook now exports only continuous full-height M4
+straps (22 VPWR, 21 VGND). All 54 short pieces remain connected internal metal;
+only BPin metadata is changed. No manufacturing layer is removed and no check
+is disabled. Both power nets remain connected. The official pin check at
+TT tools commit 9d13ff3e3e6202090740110438c6a10c1d62ca0f passes on the successful
+CI GDS and the corrected DEF-derived LEF. An independent local layout replay
+has zero XOR on all layers other than the intentionally changed M4 pin-purpose
+layer. The normal CI Magic/KLayout XOR still compares all configured layers.
+
+The GL job failed before simulation because `make clean` selected Verilator,
+which the GL action does not install. Its job environment now sets SIM=icarus,
+covering both clean and the GATES=yes invocation. The actual successful-CI
+netlist passes the existing full-512-byte read/write/overwrite/reset/enable
+test under Icarus. Evidence is in `provenance/512b-precheck-gl/`.

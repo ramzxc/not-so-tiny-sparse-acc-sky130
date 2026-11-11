@@ -66,3 +66,38 @@ foreach {netname pinname} {VPWR vccd1 VGND vssd1} {
         odb::dbSBox_create $sw $via $cx $cy STRIPE
     }
 }
+
+# Only continuous full-height M4 straps are external power access pins.
+# Short stripe pieces above/below the SRAM are internal PDN conductors, not
+# independent top-level ports. Keep every SWire/metal shape and its connection.
+set die [$block getDieArea]
+set edge_margin 10000
+foreach name {VPWR VGND} {
+    set term [$block findBTerm $name]
+    if {$term == "NULL"} {error "Missing supply terminal $name"}
+    set keep {}
+    set removed 0
+    set old_pins [$term getBPins]
+    foreach pin $old_pins {
+        foreach box [$pin getBoxes] {
+            if {[[$box getTechLayer] getName] != "met4"} {
+                error "Unexpected $name pin layer"
+            }
+            if {[$box yMin] <= [$die yMin]+$edge_margin &&
+                [$box yMax] >= [$die yMax]-$edge_margin} {
+                lappend keep [list [$box xMin] [$box yMin] [$box xMax] [$box yMax]]
+            } else {
+                incr removed
+            }
+        }
+    }
+    if {[llength $keep] == 0} {error "No full-height external power access for $name"}
+    foreach pin $old_pins {odb::dbBPin_destroy $pin}
+    set pin [odb::dbBPin_create $term]
+    $pin setPlacementStatus FIRM
+    foreach rect $keep {
+        lassign $rect x1 y1 x2 y2
+        odb::dbBox_create $pin $m4 $x1 $y1 $x2 $y2
+    }
+    puts "SRAM PDN: $name exports [llength $keep] full-height straps; $removed short pieces remain internal"
+}
