@@ -10,12 +10,11 @@ endif
 FST ?= -fst # Use more efficient FST format
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(CURDIR)/../src
-PROJECT_SOURCES = project.v tpu_pkg.sv acc_host.sv mem_ctrl.sv shared_sram.sv acc_spi.sv activation.sv activation_ctrl.sv axi_master_adapter.sv dma.sv inst_decoder.sv inst_fifo.sv mac_unit.sv sparsity_ctrl.sv tpu.sv tpu_core.sv vpu.sv vpu_ctrl.sv weight_load_ctrl.sv
+PROJECT_SOURCES = project.v
 
 SRAM_BYTES ?= 512
 export SRAM_BYTES
 COMPILE_ARGS += -DACC_SRAM_BYTES=$(SRAM_BYTES)
-VERILOG_SOURCES += $(SRC_DIR)/../memory/openram/generated/tt_sram_1rw_64x128_sky130/tt_sram_1rw_64x128_sky130.v
 VERILOG_SOURCES += $(SRC_DIR)/../memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.v
 
 ifneq ($(GATES),yes)

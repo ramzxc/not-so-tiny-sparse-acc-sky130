@@ -1,75 +1,37 @@
-# Tiny Tapeout project information
 project:
-  title:        "not-so-tiny sparse acc"      # Project title
-  author:       "Aram Yun"      # Your name
-  discord:      "ramzxc"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  "not so tiny sparse acc"      # One line description of what your project does
-  language:     "SystemVerilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
-  clock_hz:     10000000       # Clock frequency in Hz (or 0 if not applicable)
-
-  # How many tiles your design occupies? A single tile is about 167x108 uM.
-  tiles: "8x2"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
-
-  # Your top module name must start with "tt_um_". Make it unique by including your github username:
-  top_module:  "tt_um_not_so_tiny_sparse_acc_ramzxc"
-
-  # List your project's source files here.
-  # Source files must be in ./src and you must list each source file separately, one per line.
-  # Don't forget to also update `PROJECT_SOURCES` in test/Makefile.
-  # Keep the plain-Verilog top first for Tiny Tapeout port discovery.
+  title: 512 B SRAM macro isolation
+  author: Aram Yun
+  discord: ramzxc
+  description: Standalone 512 B OpenRAM SRAM with byte access wrapper
+  language: SystemVerilog
+  clock_hz: 10000000
+  tiles: 8x2
+  top_module: tt_um_not_so_tiny_sparse_acc_ramzxc
   source_files:
-    - "project.v"
-    - "tpu_pkg.sv"
-    - "acc_host.sv"
-    - "mem_ctrl.sv"
-    - "shared_sram.sv"
-    - "acc_spi.sv"
-    - "activation.sv"
-    - "activation_ctrl.sv"
-    - "axi_master_adapter.sv"
-    - "dma.sv"
-    - "inst_decoder.sv"
-    - "inst_fifo.sv"
-    - "mac_unit.sv"
-    - "sparsity_ctrl.sv"
-    - "tpu.sv"
-    - "tpu_core.sv"
-    - "vpu.sv"
-    - "vpu_ctrl.sv"
-    - "weight_load_ctrl.sv"
-
-# The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
-# This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
+  - project.v
 pinout:
-  # Inputs
-  ui[0]: "SPI_SCK"
-  ui[1]: "SPI_CS_N"
-  ui[2]: "SPI_MOSI"
-  ui[3]: ""
-  ui[4]: ""
-  ui[5]: ""
-  ui[6]: ""
-  ui[7]: ""
-
-  # Outputs
-  uo[0]: "AXI_AWVALID"
-  uo[1]: "AXI_WVALID"
-  uo[2]: "AXI_ARVALID"
-  uo[3]: "INST_EMPTY"
-  uo[4]: "INST_FULL"
-  uo[5]: "SYNC_DONE"
-  uo[6]: "AXI_ERROR"
-  uo[7]: "HOST_ERROR"
-
-  # Bidirectional pins
-  uio[0]: "SPI_MISO"
-  uio[1]: ""
-  uio[2]: ""
-  uio[3]: ""
-  uio[4]: ""
-  uio[5]: ""
-  uio[6]: ""
-  uio[7]: ""
-
-# Do not change!
+  ui[0]: WORD_ADDR_0
+  ui[1]: WORD_ADDR_1
+  ui[2]: WORD_ADDR_2
+  ui[3]: WORD_ADDR_3
+  ui[4]: WORD_ADDR_4
+  ui[5]: WORD_ADDR_5
+  ui[6]: WRITE
+  ui[7]: MEM_ENABLE
+  uo[0]: READ_DATA_0
+  uo[1]: READ_DATA_1
+  uo[2]: READ_DATA_2
+  uo[3]: READ_DATA_3
+  uo[4]: READ_DATA_4
+  uo[5]: READ_DATA_5
+  uo[6]: READ_DATA_6
+  uo[7]: READ_DATA_7
+  uio[0]: WRITE_BYTE_0/READ_BYTE_SELECT
+  uio[1]: WRITE_BYTE_1/READ_BYTE_SELECT
+  uio[2]: WRITE_BYTE_2/READ_BYTE_SELECT
+  uio[3]: WRITE_BYTE_3
+  uio[4]: WRITE_BYTE_4
+  uio[5]: WRITE_BYTE_5
+  uio[6]: WRITE_BYTE_6
+  uio[7]: WRITE_BYTE_7
 yaml_version: 6
