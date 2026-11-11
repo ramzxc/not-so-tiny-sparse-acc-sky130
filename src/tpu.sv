@@ -2,17 +2,18 @@
 //
 // Responsibilities:
 //   * Queue 64-bit host instructions
-//   * Connect the instruction core to the DMA and local memories (with Multi-Row Burst Weight Cache Refill)
+//   * Connect the instruction core to the DMA and local memories (with explicit weight-buffer preloads)
 //   * Expose tensor-memory traffic through one AXI4 master interface
 module tpu
     import tpu_pkg::*;
 #(
-    parameter int COMPUTE_WIDTH          = 4,
-    parameter int WEIGHT_BUFFER_DEPTH    = 256,
-    parameter int UNIFIED_BUFFER_DEPTH   = 256,
+    parameter int COMPUTE_WIDTH          = 2,
+    parameter int SRAM_BYTES             = DEFAULT_SRAM_BYTES,
+    parameter int WEIGHT_BUFFER_DEPTH    = SRAM_BYTES / 16,
+    parameter int UNIFIED_BUFFER_DEPTH   = SRAM_BYTES / 8,
     parameter int AXI_DATA_BYTES         = 8,
     parameter int AXI_ID_WIDTH           = 4,
-    parameter int REGISTER_DEPTH         = 1 << ACCUMULATOR_ADDR_WIDTH
+    parameter int REGISTER_DEPTH         = SRAM_BYTES / 16
 )(
     input logic clk,
     input logic rst,
@@ -90,6 +91,8 @@ module tpu
     inst_type inst;
     logic inst_pop;
     logic core_busy;
+    logic memory_error, adapter_error;
+    assign axi_error = memory_error || adapter_error;
 
     // ------------------------------------------------------------------
     // TPU core <-> DMA command/status interface
@@ -102,17 +105,9 @@ module tpu
     logic dma_buffer_resource_busy;
     logic dma_acc_resource_busy;
 
-    // ------------------------------------------------------------------
-    // DMA <-> Weight Cache Refill Channel Wires (Multi-Row Burst)
-    // ------------------------------------------------------------------
-
-    logic                         dma_cache_refill_req_valid;
-    logic                         dma_cache_refill_req_ready;
-    dram_addr_type                dma_cache_refill_dram_addr;
-    logic [7:0]                   dma_cache_refill_len;
-    fp16_type [COMPUTE_WIDTH-1:0] dma_cache_refill_rsp_data;
-    logic                         dma_cache_refill_rsp_valid;
-    logic                         dma_cache_refill_rsp_ready;
+    weight_addr_type dma_weight_write_addr;
+    fp16_type [COMPUTE_WIDTH-1:0] dma_weight_write_data;
+    logic dma_weight_write_valid, dma_weight_write_ready;
 
     // ------------------------------------------------------------------
     // DMA <-> local memories inside TPU core (UB & ACC)
@@ -172,7 +167,7 @@ module tpu
     // ------------------------------------------------------------------
 
     inst_fifo #(
-        .FIFO_DEPTH (32)
+        .FIFO_DEPTH (4)
     ) instruction_fifo (
         .clk        (clk),
         .rst        (rst),
@@ -186,11 +181,12 @@ module tpu
     );
 
     // ------------------------------------------------------------------
-    // TPU Core (with Multi-Row Burst Weight Cache)
+    // TPU core with software-managed weight SRAM
     // ------------------------------------------------------------------
 
     tpu_core #(
         .COMPUTE_WIDTH         (COMPUTE_WIDTH),
+        .SRAM_BYTES            (SRAM_BYTES),
         .WEIGHT_BUFFER_DEPTH   (WEIGHT_BUFFER_DEPTH),
         .UNIFIED_BUFFER_DEPTH  (UNIFIED_BUFFER_DEPTH),
         .REGISTER_DEPTH        (REGISTER_DEPTH)
@@ -206,14 +202,10 @@ module tpu
         .dma_inst                     (dma_inst),
         .dma_inst_enable              (dma_inst_enable),
 
-        // Weight Cache Refill Channel
-        .dma_cache_refill_req_valid   (dma_cache_refill_req_valid),
-        .dma_cache_refill_req_ready   (dma_cache_refill_req_ready),
-        .dma_cache_refill_dram_addr   (dma_cache_refill_dram_addr),
-        .dma_cache_refill_len         (dma_cache_refill_len),
-        .dma_cache_refill_rsp_data    (dma_cache_refill_rsp_data),
-        .dma_cache_refill_rsp_valid   (dma_cache_refill_rsp_valid),
-        .dma_cache_refill_rsp_ready   (dma_cache_refill_rsp_ready),
+        .dma_weight_write_addr(dma_weight_write_addr),
+        .dma_weight_write_data(dma_weight_write_data),
+        .dma_weight_write_valid(dma_weight_write_valid),
+        .dma_weight_write_ready(dma_weight_write_ready),
 
         // Unified Buffer Ports
         .dma_buffer_write_addr        (dma_buffer_write_addr),
@@ -240,6 +232,7 @@ module tpu
         .dma_acc_write_ready          (dma_acc_write_ready),
 
         .busy                         (core_busy),
+        .memory_error                 (memory_error),
         .synchronize                  (synchronize)
     );
 
@@ -260,14 +253,10 @@ module tpu
         .buffer_resource_busy  (dma_buffer_resource_busy),
         .acc_resource_busy     (dma_acc_resource_busy),
 
-        // Weight Cache Refill Channel (Multi-Row Burst)
-        .cache_refill_req_valid(dma_cache_refill_req_valid),
-        .cache_refill_req_ready(dma_cache_refill_req_ready),
-        .cache_refill_dram_addr(dma_cache_refill_dram_addr),
-        .cache_refill_len      (dma_cache_refill_len),
-        .cache_refill_rsp_data (dma_cache_refill_rsp_data),
-        .cache_refill_rsp_valid(dma_cache_refill_rsp_valid),
-        .cache_refill_rsp_ready(dma_cache_refill_rsp_ready),
+        .weight_write_addr(dma_weight_write_addr),
+        .weight_write_data(dma_weight_write_data),
+        .weight_write_valid(dma_weight_write_valid),
+        .weight_write_ready(dma_weight_write_ready),
 
         // DRAM AXI Channels
         .dram_read_cmd_addr    (dma_read_cmd_addr),
@@ -342,7 +331,7 @@ module tpu
         .dma_write_data_ready (dma_write_data_ready),
         .dma_write_rsp_valid  (dma_write_rsp_valid),
         .dma_write_rsp_ready  (dma_write_rsp_ready),
-        .error                (axi_error),
+        .error                (adapter_error),
         .m_axi_awid           (m_axi_awid),
         .m_axi_awaddr         (m_axi_awaddr),
         .m_axi_awlen          (m_axi_awlen),

@@ -10,7 +10,7 @@ module activation_ctrl
     import tpu_pkg::*;
 #(
     parameter int COMPUTE_WIDTH    = 14,
-    parameter int META_FIFO_DEPTH = 32
+    parameter int META_FIFO_DEPTH = 4
 )(
     input  logic clk,
     input  logic rst,
@@ -128,9 +128,9 @@ module activation_ctrl
 
     assign accept_inst = inst_enable && !issue_valid_cs;
 
-    // A same-cycle activation write frees one slot for a new read request.
+    // Registered FIFO occupancy avoids a ready-to-valid loop through mem_ctrl.
     assign acc_req_valid =
-        issue_valid_cs && (!fifo_full || buffer_write_fire);
+        issue_valid_cs && !fifo_full;
 
     assign acc_req_addr     = acc_addr_cs;
     assign acc_request_fire = acc_req_valid && acc_req_ready;

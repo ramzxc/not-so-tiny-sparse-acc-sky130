@@ -1,5 +1,5 @@
 // SPI host bridge: staged instructions and independently backpressured AXI channels.
-module acc_host (
+module acc_host #(parameter int SRAM_BYTES = tpu_pkg::DEFAULT_SRAM_BYTES) (
     input wire clk, rst,
     input wire [5:0] address,
     input wire [7:0] write_data,
@@ -116,11 +116,19 @@ module acc_host (
             27: read_data = {m_axi_awregion, m_axi_awqos};
             28: read_data = {m_axi_arcache, m_axi_arprot, m_axi_arlock};
             29: read_data = {m_axi_arregion, m_axi_arqos};
+            30: read_data = 8'(SRAM_BYTES);
+            31: read_data = 8'(SRAM_BYTES >> 8);
+            32: read_data = 8'(SRAM_BYTES / 8);  // UB 32-bit rows
+            33: read_data = 8'((SRAM_BYTES / 8) >> 8);
+            34: read_data = 8'(SRAM_BYTES / 16); // ACC rows
+            35: read_data = 8'((SRAM_BYTES / 16) >> 8);
+            36: read_data = 8'(SRAM_BYTES / 16); // WB rows
+            37: read_data = 8'((SRAM_BYTES / 16) >> 8);
             63: read_data = 8'hA1; // Protocol version / device ID
             default: read_data = 0;
         endcase
     end
-    tpu accelerator (
+    tpu #(.SRAM_BYTES(SRAM_BYTES)) accelerator (
         .clk(clk), .rst(rst), .inst_word(inst_stage),
         .inst_write_enable(action[5] && !fifo_full),
         .inst_fifo_empty(fifo_empty), .inst_fifo_full(fifo_full),

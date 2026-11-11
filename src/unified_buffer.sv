@@ -59,7 +59,7 @@ module unified_buffer
 );
 
     localparam int ROW_WIDTH       = COMPUTE_WIDTH * FP16_WIDTH;
-    localparam int SRAM_DATA_WIDTH = 64;
+    localparam int SRAM_DATA_WIDTH = COMPUTE_WIDTH * FP16_WIDTH;
     localparam int SRAM_ADDR_WIDTH = 8;
     localparam int SRAM_DEPTH      = 1 << SRAM_ADDR_WIDTH;
 
@@ -230,7 +230,7 @@ module unified_buffer
     assign sram_write_addr =
         internal_write_addr[SRAM_ADDR_WIDTH-1:0];
 
-    acc_memory_1r1w_64x256 unified_sram (
+    acc_memory_1r1w_64x256 #(.DATA_WIDTH(SRAM_DATA_WIDTH)) unified_sram (
         .clk0  (clk),
         .csb0  (!sram_write_enable),
         .addr0 (sram_write_addr),
@@ -251,8 +251,8 @@ module unified_buffer
             $fatal(1, "unified_buffer DEPTH exceeds the 256-word SRAM macro");
         if (DEPTH > (1 << BUFFER_ADDR_WIDTH))
             $fatal(1, "unified_buffer DEPTH exceeds address space");
-        if (ROW_WIDTH != SRAM_DATA_WIDTH)
-            $fatal(1, "unified_buffer width must match the 64-bit SRAM macro");
+        if (SRAM_DATA_WIDTH != 32 && SRAM_DATA_WIDTH != 64)
+            $fatal(1, "unified_buffer row width must be 32 or 64 bits");
     end
 `endif
 

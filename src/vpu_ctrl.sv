@@ -3,7 +3,7 @@ module vpu_ctrl
     import tpu_pkg::*;
 #(
     parameter int COMPUTE_WIDTH   = 14,
-    parameter int META_FIFO_DEPTH = 32
+    parameter int META_FIFO_DEPTH = 4
 )(
     input  logic clk,
     input  logic rst,
@@ -41,6 +41,7 @@ module vpu_ctrl
     output accumulator_addr_type         acc_addr,
     output logic                         accumulate,
     output logic                         acc_enable,
+    input  logic                         acc_ready,
 
     output logic busy,
     output logic resource_busy
@@ -83,6 +84,9 @@ module vpu_ctrl
     logic request_fire;
     logic buffer_response_fire;
     logic result_fire;
+    logic compute_inflight, held_result_valid;
+    fp16_type [COMPUTE_WIDTH-1:0] held_result;
+
 
     logic sparsity_valid;
     logic is_skip;
@@ -111,14 +115,14 @@ module vpu_ctrl
     assign accept_inst = inst_enable && !issue_valid_cs;
 
     assign buffer_req_valid =
-        issue_valid_cs && (!fifo_full || result_fire) && !is_sparse_cs;
+        issue_valid_cs && !fifo_full && !is_sparse_cs;
 
     assign buffer_req_addr = buffer_addr_cs;
-    assign sparsity_valid = issue_valid_cs && is_sparse_cs && (!fifo_full || result_fire);
+    assign sparsity_valid = issue_valid_cs && is_sparse_cs && !fifo_full;
 
     assign request_fire = (buffer_req_valid && buffer_req_ready) || sparsity_valid;
 
-    assign sparse_input_ready = sparse_input_valid && (buffer_pending_count_cs != '0) && meta_fifo[buffer_rsp_ptr_cs].is_sparse;
+    assign sparse_input_ready = !compute_inflight && sparse_input_valid && (buffer_pending_count_cs != '0) && meta_fifo[buffer_rsp_ptr_cs].is_sparse;
     assign is_skip = sparsity_en ? (sparse_input_data == '0) : '0;
 
     assign input_data_valid =
@@ -179,19 +183,20 @@ module vpu_ctrl
         end
     end
 
-    assign buffer_rsp_ready = (buffer_pending_count_cs != '0) && !meta_fifo[buffer_rsp_ptr_cs].is_sparse;
+    assign buffer_rsp_ready = !compute_inflight && (buffer_pending_count_cs != '0) && !meta_fifo[buffer_rsp_ptr_cs].is_sparse;
     assign buffer_response_fire = (buffer_rsp_valid && buffer_rsp_ready) || sparse_input_ready;
 
     assign retire_skip = result_pending && meta_fifo[result_rsp_ptr_cs].is_skip;
-    assign retire_normal = result_pending && !meta_fifo[result_rsp_ptr_cs].is_skip && vpu_result_valid;
-    assign result_fire = retire_skip || retire_normal;
+    assign retire_normal = result_pending && !meta_fifo[result_rsp_ptr_cs].is_skip && held_result_valid;
+    assign result_fire = (retire_skip && meta_fifo[result_rsp_ptr_cs].accumulate) ||
+                         (acc_enable && acc_ready);
 
-    assign acc_data   = retire_normal ? vpu_result_data : '0;
+    assign acc_data   = retire_normal ? held_result : '0;
     assign acc_enable = retire_normal || (retire_skip && !meta_fifo[result_rsp_ptr_cs].accumulate);
-    assign acc_addr   = result_fire
+    assign acc_addr   = result_pending
         ? meta_fifo[result_rsp_ptr_cs].acc_addr
         : '0;
-    assign accumulate = result_fire
+    assign accumulate = result_pending
         ? meta_fifo[result_rsp_ptr_cs].accumulate
         : 1'b0;
 
@@ -206,6 +211,9 @@ module vpu_ctrl
 
     always_ff @(posedge clk) begin
         if (rst) begin
+            compute_inflight <= 0;
+            held_result_valid <= 0;
+            held_result <= '0;
             issue_valid_cs          <= 1'b0;
             requests_left_cs        <= '0;
             buffer_addr_cs          <= '0;
@@ -222,6 +230,15 @@ module vpu_ctrl
             buffer_pending_count_cs <= '0;
         end
         else begin
+            if (buffer_response_fire) compute_inflight <= 1;
+            if (vpu_result_valid) begin
+                held_result <= vpu_result_data;
+                held_result_valid <= 1;
+            end
+            if (result_fire) begin
+                compute_inflight <= 0;
+                held_result_valid <= 0;
+            end
             if (accept_inst) begin
                 issue_valid_cs   <= (inst.length != '0);
                 requests_left_cs <= inst.length;

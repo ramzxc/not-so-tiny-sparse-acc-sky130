@@ -1,18 +1,17 @@
 # Not-so-tiny sparse accelerator — SKY130
 
-Four-lane FP16 accelerator with an SPI host interface for Tiny Tapeout.
-The RTL was imported from `/docker/projects/egru/acc` without deleting the original.
+Experimental Tiny Tapeout SKY130 8×2 submission with one 512 B OpenRAM SRAM.
+GitHub Actions validates RTL, hardening, precheck and gate-level simulation.
 
-- Top: `tt_um_not_so_tiny_sparse_acc_ramzxc` in `src/project.v`.
-- SPI: mode 0; SCK=`ui[0]`, CS_N=`ui[1]`, MOSI=`ui[2]`, MISO=`uio[0]`.
-- Host supplies external tensor memory by servicing AXI requests over SPI.
-- [Protocol, pinout, test instructions, and implementation limits](docs/info.md).
-- Run tests with `cd test && make` after installing Verilator and `test/requirements.txt`.
-
-The original FreePDK45 SRAM dependency is replaced by synthesizable memories.
-**RTL integration is tested; fit in 8x2 tiles and SKY130 physical signoff are not verified.**
-
-![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
+- Two-lane FP16 TPU with SPI host interface.
+- Software-managed weight buffer; cache and replacement logic are disconnected.
+- One shared OpenRAM 1RW SRAM: selectable 1 KiB or 512 B; UB/ACC/WB partitioned 1/2, 1/4, 1/4.
+- Two FP16 lanes; two 32-bit rows per physical 64-bit SRAM word. Partial writes use atomic read-modify-write.
+- [Protocol and implementation limits](docs/info.md).
+- Compile SRAM libraries: `lc_shell -f syn/compile_openram.tcl`.
+- Synthesis: `ACC_SRAM_BYTES=512 dc_shell -f syn/run_dc.tcl` in the local synthesis workspace; local `syn/` and `pnr/` outputs are excluded from submission.
+- RTL tests: `make -C test SRAM_BYTES=512`; controller stress test: `make -C test -f Makefile.mem SRAM_BYTES=512`.
+- P&R configs: `src/config_1024.json` or `src/config_512.json`; `src/config.json` defaults to 512 B.
 
 # Tiny Tapeout Verilog Project Template
 

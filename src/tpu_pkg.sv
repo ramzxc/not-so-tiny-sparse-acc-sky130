@@ -5,7 +5,11 @@
 // - Accumulation Buffer (AB): Stores partial output
 // - Activation (Act): Activation functional unit
 // - Vector Processor (VPU): Vector processor
+`ifndef ACC_SRAM_BYTES
+`define ACC_SRAM_BYTES 512
+`endif
 package tpu_pkg;
+    localparam int DEFAULT_SRAM_BYTES = `ACC_SRAM_BYTES;
 
     // DRAM remains byte-addressable. BYTE_WIDTH is the addressable storage unit,
     // while every TPU architectural data element is IEEE-754 binary16 (FP16).
@@ -85,8 +89,6 @@ package tpu_pkg;
 
     // All architectural operands/results use FP16.
     typedef logic [FP16_WIDTH-1:0] fp16_type;
-    typedef longint unsigned uint64_type;
-    typedef longint signed   int64_type;
 
     // Address types for the buffers and dram
     typedef logic [BUFFER_ADDR_WIDTH-1:0]      buffer_addr_type;
@@ -116,283 +118,165 @@ package tpu_pkg;
     localparam fp16_type FP16_POS_INF = 16'h7C00;
     localparam fp16_type FP16_QNAN    = 16'h7E00;
 
-    ////////////////////////////////////
-    //                                //
-    //      SYNTHESIZABLE FP PACKER   //
-    //                                //
-    ////////////////////////////////////
-
-    // Pack an exact value sign * magnitude * 2^scale into binary16 using
-    // round-to-nearest-even. This helper keeps the FP arithmetic functions
-    // synthesizable and independent of real/shortreal simulation types.
-    function automatic fp16_type fp16_pack_scaled(
-        input logic            sign,
-        input longint unsigned magnitude,
-        input integer          scale
+    // Narrow binary16 arithmetic: 11 significand bits plus guard, round,
+    // sticky and carry fit in 16 bits. Only the exact 11x11 product is wider.
+    function automatic logic [15:0] fp16_rshift_jam(
+        input logic [15:0] value,
+        input logic [7:0] distance
     );
-        integer msb;
-        integer exp_unbiased;
-        integer exp_field;
-        integer shift;
-        integer k;
-        longint unsigned rounded;
-        longint unsigned truncated;
-        longint unsigned remainder;
-        longint unsigned halfway;
-        longint unsigned frac_value;
-        logic round_up;
+        logic [15:0] shifted;
+        logic sticky;
     begin
-        if (magnitude == 0) begin
-            fp16_pack_scaled = {sign, 15'h0000};
+        shifted = (distance < 16) ? (value >> distance) : 16'b0;
+        sticky = 1'b0;
+        for (int i = 0; i < 16; i++)
+            if (i < distance) sticky = sticky | value[i];
+        shifted[0] = shifted[0] | sticky;
+        fp16_rshift_jam = shifted;
+    end
+    endfunction
+
+    // Hidden bit at bit 13, G/R/S at bits 2:0; exponent uses bias 15.
+    function automatic fp16_type fp16_round_pack(
+        input logic sign,
+        input logic [15:0] significand,
+        input logic signed [7:0] exponent
+    );
+        logic [15:0] sig;
+        logic signed [7:0] exp_work;
+        logic [11:0] rounded;
+    begin
+        sig = significand;
+        exp_work = exponent;
+        if (sig[14]) begin
+            sig = fp16_rshift_jam(sig, 8'd1);
+            exp_work = exp_work + 8'sd1;
         end
+        // A bounded priority search followed by one shift avoids a chain of
+        // conditional one-bit shifters during cancellation normalization.
+        begin : normalize
+            logic [3:0] leading;
+            logic found;
+            leading = 4'd13;
+            found = 1'b0;
+            for (int i = 13; i >= 0; i--) begin
+                if (!found && sig[i]) begin
+                    leading = 4'(13-i);
+                    found = 1'b1;
+                end
+            end
+            sig = sig << leading;
+            exp_work = exp_work - $signed({4'b0, leading});
+        end
+        if (exp_work < 1) begin
+            sig = fp16_rshift_jam(sig, 8'(8'sd1 - exp_work));
+            exp_work = 8'sd1;
+        end
+        rounded = {1'b0, sig[13:3]} +
+                  {11'b0, (sig[2] && (sig[1] || sig[0] || sig[3]))};
+        if (rounded[11]) begin
+            rounded = rounded >> 1;
+            exp_work = exp_work + 8'sd1;
+        end
+        if (significand == 0)
+            fp16_round_pack = {sign, 15'b0};
+        else if (exp_work >= 31)
+            fp16_round_pack = {sign, 5'h1f, 10'b0};
+        else if (!rounded[10])
+            fp16_round_pack = {sign, 5'b0, rounded[9:0]};
+        else
+            fp16_round_pack = {sign, exp_work[4:0], rounded[9:0]};
+    end
+    endfunction
+
+    function automatic fp16_type fp16_add(input fp16_type a, input fp16_type b);
+        logic [15:0] big_sig, small_sig, result_sig;
+        logic [4:0] big_exp, small_exp;
+        logic big_sign, small_sign;
+        fp16_type big_value, small_value;
+    begin
+        if ((a[14:10] == 31 && a[9:0] != 0) ||
+            (b[14:10] == 31 && b[9:0] != 0))
+            fp16_add = FP16_QNAN;
+        else if (a[14:10] == 31 && b[14:10] == 31 && a[15] != b[15])
+            fp16_add = FP16_QNAN;
+        else if (a[14:10] == 31) fp16_add = a;
+        else if (b[14:10] == 31) fp16_add = b;
         else begin
-            msb = -1;
-            for (int i = 63; i >= 0; i--) begin
-                if ((msb < 0) && magnitude[i])
-                    msb = i;
-            end
-
-            exp_unbiased = msb + scale;
-
-            if (exp_unbiased > 15) begin
-                fp16_pack_scaled = {sign, 5'h1F, 10'h000};
-            end
-            else if (exp_unbiased >= -14) begin
-                shift = msb - 10;
-                if (shift > 0) begin
-                    truncated = magnitude >> shift;
-                    remainder = magnitude - (truncated << shift);
-                    halfway   = 64'd1 << (shift - 1);
-                    round_up  = (remainder > halfway) ||
-                                ((remainder == halfway) && truncated[0]);
-                    rounded = truncated + round_up;
-                end
-                else begin
-                    rounded = magnitude << (-shift);
-                end
-
-                if (rounded >= 2048) begin
-                    rounded = rounded >> 1;
-                    exp_unbiased = exp_unbiased + 1;
-                end
-
-                if (exp_unbiased > 15) begin
-                    fp16_pack_scaled = {sign, 5'h1F, 10'h000};
-                end
-                else begin
-                    exp_field = exp_unbiased + 15;
-                    fp16_pack_scaled = {
-                        sign,
-                        exp_field[4:0],
-                        rounded[9:0]
-                    };
-                end
-            end
-            else begin
-                k = scale + 24;
-                if (k >= 0) begin
-                    if (k >= 63)
-                        frac_value = 64'hFFFF_FFFF_FFFF_FFFF;
-                    else
-                        frac_value = magnitude << k;
-                end
-                else begin
-                    shift = -k;
-                    if (shift >= 64) begin
-                        frac_value = 0;
-                    end
-                    else if (shift == 0) begin
-                        frac_value = magnitude;
-                    end
-                    else begin
-                        truncated = magnitude >> shift;
-                        remainder = magnitude - (truncated << shift);
-                        halfway   = 64'd1 << (shift - 1);
-                        round_up  = (remainder > halfway) ||
-                                    ((remainder == halfway) && truncated[0]);
-                        frac_value = truncated + round_up;
-                    end
-                end
-
-                if (frac_value >= 1024)
-                    fp16_pack_scaled = {sign, 5'h01, 10'h000};
-                else
-                    fp16_pack_scaled = {sign, 5'h00, frac_value[9:0]};
-            end
+            big_value = (a[14:0] >= b[14:0]) ? a : b;
+            small_value = (a[14:0] >= b[14:0]) ? b : a;
+            big_sign = big_value[15];
+            small_sign = small_value[15];
+            big_exp = (big_value[14:10] == 0) ? 5'd1 : big_value[14:10];
+            small_exp = (small_value[14:10] == 0) ? 5'd1 : small_value[14:10];
+            big_sig = {2'b0, (big_value[14:10] != 0), big_value[9:0], 3'b0};
+            small_sig = {2'b0, (small_value[14:10] != 0), small_value[9:0], 3'b0};
+            small_sig = fp16_rshift_jam(small_sig, {3'b0,big_exp} - {3'b0,small_exp});
+            result_sig = (big_sign == small_sign) ? big_sig + small_sig : big_sig - small_sig;
+            // Preserve the previous helper's +zero for exact cancellation.
+            fp16_add = fp16_round_pack(big_sign && (result_sig != 0), result_sig,
+                                      $signed({3'b0,big_exp}));
         end
     end
     endfunction
 
-    /////////////////////
-    //                 //
-    //      FP ADDER   //
-    //                 //
-    /////////////////////
-
-    function automatic fp16_type fp16_add(
-        input fp16_type a,
-        input fp16_type b
-    );
-        logic sign_a, sign_b, sign_r;
-        logic [4:0] exp_a, exp_b;
-        logic [9:0] frac_a, frac_b;
-        longint unsigned sig_a, sig_b;
-        integer scale_a, scale_b, common_scale;
-        longint signed aligned_a, aligned_b, sum_signed;
-        longint unsigned magnitude;
+    function automatic fp16_type fp16_mul(input fp16_type a, input fp16_type b);
+        logic [10:0] sig_a, sig_b;
+        logic [21:0] product, shifted;
+        logic [15:0] sig;
+        logic signed [7:0] exp_a, exp_b, result_exp;
+        logic [4:0] msb, distance;
+        logic found, sticky;
     begin
-        sign_a = a[15]; exp_a = a[14:10]; frac_a = a[9:0];
-        sign_b = b[15]; exp_b = b[14:10]; frac_b = b[9:0];
-
-        if ((exp_a == 5'h1F && frac_a != 0) ||
-            (exp_b == 5'h1F && frac_b != 0)) begin
-            fp16_add = FP16_QNAN;
-        end
-        else if ((exp_a == 5'h1F) && (exp_b == 5'h1F) && (sign_a != sign_b)) begin
-            fp16_add = FP16_QNAN;
-        end
-        else if (exp_a == 5'h1F) begin
-            fp16_add = {sign_a, 5'h1F, 10'h000};
-        end
-        else if (exp_b == 5'h1F) begin
-            fp16_add = {sign_b, 5'h1F, 10'h000};
-        end
-        else begin
-            if (exp_a == 0) begin
-                sig_a   = uint64_type'(frac_a);
-                scale_a = -24;
-            end
-            else begin
-                sig_a   = 64'd1024 + uint64_type'(frac_a);
-                scale_a = integer'(exp_a) - 25;
-            end
-
-            if (exp_b == 0) begin
-                sig_b   = uint64_type'(frac_b);
-                scale_b = -24;
-            end
-            else begin
-                sig_b   = 64'd1024 + uint64_type'(frac_b);
-                scale_b = integer'(exp_b) - 25;
-            end
-
-            common_scale = (scale_a < scale_b) ? scale_a : scale_b;
-            aligned_a = int64_type'(sig_a << (scale_a - common_scale));
-            aligned_b = int64_type'(sig_b << (scale_b - common_scale));
-            if (sign_a) aligned_a = -aligned_a;
-            if (sign_b) aligned_b = -aligned_b;
-
-            sum_signed = aligned_a + aligned_b;
-            sign_r = (sum_signed < 0);
-            if (sum_signed < 0)
-                magnitude = uint64_type'(-sum_signed);
-            else
-                magnitude = uint64_type'(sum_signed);
-
-            fp16_add = fp16_pack_scaled(sign_r, magnitude, common_scale);
-        end
-    end
-    endfunction
-
-    //////////////////////////
-    //                      //
-    //      FP MULTIPLIER   //
-    //                      //
-    //////////////////////////
-
-    function automatic fp16_type fp16_mul(
-        input fp16_type a,
-        input fp16_type b
-    );
-        logic sign_r;
-        logic [4:0] exp_a, exp_b;
-        logic [9:0] frac_a, frac_b;
-        longint unsigned sig_a, sig_b, product;
-        integer scale_a, scale_b;
-    begin
-        sign_r = a[15] ^ b[15];
-        exp_a = a[14:10]; frac_a = a[9:0];
-        exp_b = b[14:10]; frac_b = b[9:0];
-
-        if ((exp_a == 5'h1F && frac_a != 0) ||
-            (exp_b == 5'h1F && frac_b != 0)) begin
+        if ((a[14:10] == 31 && a[9:0] != 0) ||
+            (b[14:10] == 31 && b[9:0] != 0) ||
+            (a[14:10] == 31 && b[14:0] == 0) ||
+            (b[14:10] == 31 && a[14:0] == 0))
             fp16_mul = FP16_QNAN;
-        end
-        else if (((exp_a == 5'h1F) && ((exp_b == 0) && (frac_b == 0))) ||
-                 ((exp_b == 5'h1F) && ((exp_a == 0) && (frac_a == 0)))) begin
-            fp16_mul = FP16_QNAN;
-        end
-        else if ((exp_a == 5'h1F) || (exp_b == 5'h1F)) begin
-            fp16_mul = {sign_r, 5'h1F, 10'h000};
-        end
-        else if (((exp_a == 0) && (frac_a == 0)) ||
-                 ((exp_b == 0) && (frac_b == 0))) begin
-            fp16_mul = {sign_r, 15'h0000};
-        end
+        else if (a[14:10] == 31 || b[14:10] == 31)
+            fp16_mul = {a[15]^b[15], 5'h1f, 10'b0};
         else begin
-            if (exp_a == 0) begin
-                sig_a   = uint64_type'(frac_a);
-                scale_a = -24;
-            end
-            else begin
-                sig_a   = 64'd1024 + uint64_type'(frac_a);
-                scale_a = integer'(exp_a) - 25;
-            end
-
-            if (exp_b == 0) begin
-                sig_b   = uint64_type'(frac_b);
-                scale_b = -24;
-            end
-            else begin
-                sig_b   = 64'd1024 + uint64_type'(frac_b);
-                scale_b = integer'(exp_b) - 25;
-            end
-
+            sig_a = {(a[14:10] != 0), a[9:0]};
+            sig_b = {(b[14:10] != 0), b[9:0]};
+            exp_a = (a[14:10] == 0) ? 8'sd1 : $signed({3'b0,a[14:10]});
+            exp_b = (b[14:10] == 0) ? 8'sd1 : $signed({3'b0,b[14:10]});
             product = sig_a * sig_b;
-            fp16_mul = fp16_pack_scaled(sign_r, product, scale_a + scale_b);
+            msb = 0;
+            found = 0;
+            for (int i = 21; i >= 0; i--) begin
+                if (!found && product[i]) begin
+                    msb = 5'(i);
+                    found = 1;
+                end
+            end
+            result_exp = exp_a + exp_b - 8'sd35 + $signed({3'b0,msb});
+            sticky = 0;
+            distance = (msb > 13) ? msb - 5'd13 : 0;
+            shifted = product >> distance;
+            for (int i = 0; i < 22; i++)
+                if (i < distance) sticky = sticky | product[i];
+            sig = (msb > 13) ? shifted[15:0] : (product[15:0] << (5'd13-msb));
+            sig[0] = sig[0] | sticky;
+            fp16_mul = fp16_round_pack(a[15]^b[15], sig, result_exp);
         end
     end
     endfunction
 
-    /////////////////////////////
-    //                         //
-    //      FP RIGHT SHIFTER   //
-    //                         //
-    /////////////////////////////
-
-    function automatic fp16_type fp16_shift_right(
-        input fp16_type a,
-        input integer   k
-    );
-        logic           sign_a;
-        logic [4:0]     exp_a;
-        logic [9:0]     frac_a;
-        longint unsigned sig_a;
-        integer         scale_a;
+    function automatic fp16_type fp16_shift_right(input fp16_type a, input integer k);
+        logic [15:0] sig;
+        logic signed [7:0] exponent;
     begin
-        sign_a = a[15];
-        exp_a  = a[14:10];
-        frac_a = a[9:0];
-
-        if ((exp_a == 5'h1F) && (frac_a != 0)) begin
+        if (a[14:10] == 31 && a[9:0] != 0)
             fp16_shift_right = FP16_QNAN;
-        end
-        else if (exp_a == 5'h1F) begin
+        else if (a[14:10] == 31 || a[14:0] == 0)
             fp16_shift_right = a;
-        end
-        else if ((exp_a == 0) && (frac_a == 0)) begin
-            fp16_shift_right = a;
-        end
+        // Saturate before narrowing the public integer shift argument.
+        else if (k > 64) fp16_shift_right = {a[15],15'b0};
+        else if (k < -64) fp16_shift_right = {a[15],5'h1f,10'b0};
         else begin
-            if (exp_a == 0) begin
-                sig_a   = uint64_type'(frac_a);
-                scale_a = -24;
-            end
-            else begin
-                sig_a   = 64'd1024 + uint64_type'(frac_a);
-                scale_a = integer'(exp_a) - 25;
-            end
-            fp16_shift_right = fp16_pack_scaled(sign_a, sig_a, scale_a - k);
+            sig = {2'b0, (a[14:10] != 0), a[9:0], 3'b0};
+            exponent = (a[14:10] == 0) ? 8'sd1 : $signed({3'b0,a[14:10]});
+            fp16_shift_right = fp16_round_pack(a[15], sig, exponent - 8'(k));
         end
     end
     endfunction

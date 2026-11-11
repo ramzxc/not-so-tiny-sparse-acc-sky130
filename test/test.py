@@ -1,4 +1,5 @@
 # SPI pin-level integration tests. No hierarchical access to the accelerator.
+import os
 import cocotb
 from cocotb.triggers import Timer
 
@@ -93,6 +94,12 @@ async def test_spi_dma_roundtrip(dut):
     await h.reset()
     assert await h.read(63) == 0xA1
     assert await h.read(0) == 8
+
+    capacity = int(os.environ.get('SRAM_BYTES', '512'))
+    assert await h.read_word(30, 2) == capacity
+    assert await h.read_word(32, 2) == capacity // 8
+    assert await h.read_word(34, 2) == capacity // 16
+    assert await h.read_word(36, 2) == capacity // 16
     # Abort an incomplete write; no command may be submitted.
     h.pins = 0
     dut.ui_in.value = 0
@@ -106,9 +113,9 @@ async def test_spi_dma_roundtrip(dut):
     await h.wait_status(0x20)
     await h.action(0x40)
     assert not ((await h.read(0)) & 0x20)
-    # Two-row DRAM -> UB -> DRAM round trip, including AXI backpressure.
+    # Four 32-bit rows packed into two 64-bit AXI beats, including backpressure.
     words = [0x4400420040003C00, 0xC400C200C000BC00]
-    await h.instruction((0x1000 << 32) | (2 << 8) | 0x40)
+    await h.instruction((0x1000 << 32) | (4 << 8) | 0x40)
     await h.wait_status(4)
     assert await h.read_word(9, 4) == 0x1000
     assert await h.read(13) == 1
@@ -120,7 +127,7 @@ async def test_spi_dma_roundtrip(dut):
     await h.action(4)
     for i, word in enumerate(words):
         await h.response(word, last=i == len(words)-1, rid=ar_meta >> 4)
-    await h.instruction((0x2000 << 32) | (2 << 8) | 0x42)
+    await h.instruction((0x2000 << 32) | (4 << 8) | 0x42)
     await h.wait_status(1)
     assert await h.read_word(2, 4) == 0x2000
     assert await h.read(6) == 1
@@ -149,11 +156,41 @@ async def test_spi_dma_roundtrip(dut):
     aw_meta = await h.read(7)
     await h.action(1)
     await h.wait_status(2)
-    assert await h.read_word(16, 8) == 0x4800460044004000  # [2,4,6,8]
+    assert (await h.read_word(16, 8)) & 0xFFFFFFFF == 0x44004000  # [2,4]
+    assert await h.read(24) == 0x0F  # One 32-bit row: partial AXI beat
     assert await h.read(25) == 1
     await h.action(2)
     await h.write(17, aw_meta >> 4)
     await h.action(16)
+    await h.instruction(0xFF)
+    await h.wait_status(0x20)
+    # Explicit WB preload: four 32-bit SRAM rows, followed by scalar multiply.
+    await h.action(0x40)
+    await h.instruction((0x4000 << 32) | (5 << 16) | (4 << 8) | 0x41)
+    await h.wait_status(4)
+    assert await h.read_word(9, 4) == 0x4000
+    assert await h.read(13) == 1
+    ar_meta = await h.read(14)
+    await h.action(4)
+    for i, word in enumerate(words):
+        await h.response(word, last=i == 1, rid=ar_meta >> 4)
+    rows = [(word >> shift) & 0xFFFFFFFF for word in words for shift in (0, 32)]
+    for i, word in enumerate(rows):
+        await h.instruction(0x10)  # INPUT scalar UB element 0 = FP16 1.0
+        await h.instruction(((5+i) << 25) | 0x08)  # WEIGHT from WB row 5+i
+        await h.instruction(((4+i) << 16) | (1 << 8) | 0x30)
+        await h.instruction(((0x5000+8*i) << 32) | ((4+i) << 16) | (1 << 8) | 0x43)
+        await h.wait_status(1)
+        assert await h.read_word(2, 4) == 0x5000+8*i
+        aw_meta = await h.read(7)
+        await h.action(1)
+        await h.wait_status(2)
+        assert (await h.read_word(16, 8)) & 0xFFFFFFFF == word
+        assert await h.read(24) == 0x0F
+        assert await h.read(25) == 1
+        await h.action(2)
+        await h.write(17, aw_meta >> 4)
+        await h.action(16)
     await h.instruction(0xFF)
     await h.wait_status(0x20)
     # Invalid acknowledgement is visible, clearable, and reset recovers state.
@@ -168,3 +205,61 @@ async def test_spi_dma_roundtrip(dut):
     await h.cycles(8)
     assert await h.read(63) == 0xA1
     assert await h.read(0) == 8
+
+
+@cocotb.test()
+async def test_shared_memory_compute_and_activation(dut):
+    """Multi-row MAC results must wait safely for shared-memory write grants."""
+    h = Host(dut)
+    await h.reset()
+
+    async def load(addr, opcode, words, row=0):
+        await h.instruction((addr << 32) | (row << 16) | ((len(words)*2) << 8) | opcode)
+        await h.wait_status(4)
+        meta = await h.read(14)
+        assert await h.read(13) == len(words)-1
+        await h.action(4)
+        for i, word in enumerate(words):
+            await h.response(word, last=i == len(words)-1, rid=meta >> 4)
+
+    async def store(addr, opcode, expected, row=0):
+        await h.instruction((addr << 32) | (row << 16) | ((len(expected)*2) << 8) | opcode)
+        await h.wait_status(1)
+        meta = await h.read(7)
+        assert await h.read(6) == len(expected)-1
+        await h.action(1)
+        for i, word in enumerate(expected):
+            await h.wait_status(2)
+            assert await h.read_word(16, 8) == word
+            assert await h.read(24) == 255
+            assert await h.read(25) == int(i == len(expected)-1)
+            await h.cycles(30)
+            assert await h.read_word(16, 8) == word
+            await h.action(2)
+        await h.write(17, meta >> 4)
+        await h.action(16)
+
+    await load(0x1000, 0x40, [0x4400420040003C00, 0xC400C200C000BC00])
+    await h.instruction(0x108)  # UB row 0 -> weights [1,2]
+    await h.instruction((4 << 8) | 0x22)  # four rows, vector add -> ACC[0:3]
+    await store(0x2000, 0x43, [0x4600440044004000, 0xC000C00000000000])
+    await h.instruction((4 << 8) | 0x23)  # same results accumulated into ACC
+    await store(0x2100, 0x43, [0x4A00480048004400, 0xC400C40000000000])
+    await h.instruction((8 << 24) | (4 << 8) | 0x81)  # ReLU ACC[0:3] -> UB[8:11]
+    await store(0x2200, 0x42, [0x4A00480048004400, 0], row=8)
+    # ACC restore also shares the same physical port and address mapping.
+    await load(0x3000, 0x44, [0x40003C0044004200], row=12)
+    await store(0x3100, 0x43, [0x40003C0044004200], row=12)
+    # Sixteen rows exceed the small metadata FIFOs several times. Exercise
+    # full/backpressure, pointer wrap, ordered results and activation writes.
+    await load(0x4000, 0x40, [0x4400420040003C00, 0xC400C200C000BC00] * 4)
+    await h.instruction(0x108)
+    await h.instruction((16 << 8) | 0x22)
+    await store(0x4100, 0x43, [0x4600440044004000, 0xC000C00000000000] * 4)
+    await h.instruction((16 << 8) | 0x23)
+    await store(0x4200, 0x43, [0x4A00480048004400, 0xC400C40000000000] * 4)
+    await h.instruction((32 << 24) | (16 << 8) | 0x81)
+    await store(0x4300, 0x42, [0x4A00480048004400, 0] * 4, row=32)
+
+    await h.instruction(0xFF)
+    await h.wait_status(0x20)

@@ -26,7 +26,7 @@ module register_file
     input  logic                         read_rsp_ready
 );
 
-    localparam int SRAM_DATA_WIDTH = 64;
+    localparam int SRAM_DATA_WIDTH = COMPUTE_WIDTH * FP16_WIDTH;
     localparam int SRAM_ADDR_WIDTH = 8;
 
     logic [SRAM_DATA_WIDTH-1:0] sram_write_data;
@@ -103,7 +103,7 @@ module register_file
         ? write_addr
         : (read_req_fire ? read_req_addr : read_rsp_addr_cs);
 
-    acc_memory_1r1w_64x256 accumulation_sram (
+    acc_memory_1r1w_64x256 #(.DATA_WIDTH(SRAM_DATA_WIDTH)) accumulation_sram (
         .clk0  (clk),
         .csb0  (!sram_write_enable),
         .addr0 (result_addr_cs),
@@ -122,8 +122,8 @@ module register_file
             $fatal(1, "register_file REGISTER_DEPTH must be positive");
         if (REGISTER_DEPTH > (1 << ACCUMULATOR_ADDR_WIDTH))
             $fatal(1, "register_file depth exceeds accumulator address space");
-        if ((COMPUTE_WIDTH * FP16_WIDTH) != SRAM_DATA_WIDTH)
-            $fatal(1, "register_file width must match the 64-bit SRAM macro");
+        if (SRAM_DATA_WIDTH != 32 && SRAM_DATA_WIDTH != 64)
+            $fatal(1, "register_file row width must be 32 or 64 bits");
     end
 `endif
 

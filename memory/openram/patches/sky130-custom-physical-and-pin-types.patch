@@ -1,0 +1,189 @@
+diff --git a/compiler/base/hierarchy_layout.py b/compiler/base/hierarchy_layout.py
+index 4d8eb91..d771bac 100644
+--- a/compiler/base/hierarchy_layout.py
++++ b/compiler/base/hierarchy_layout.py
+@@ -2195,7 +2195,11 @@ class layout():
+                       width=ur.x - ll.x)
+ 
+         # Add the moat
+-        self.add_path("nwell", [ll, lr, ur, ul, ll - vector(0, 0.5 * self.nwell_width)])
++        # SKY130 nwell.5a/7 requires >=1.03um inside and >=0.4um
++        # outside the deep-nwell edge. A centered min-width moat is too
++        # narrow: use 1.05um per side including 0.02um grid margin.
++        moat_width = max(self.nwell_width, 2.10) if OPTS.tech_name == "sky130" else self.nwell_width
++        self.add_path("nwell", [ll, lr, ur, ul, ll - vector(0, 0.5 * moat_width)], width=moat_width)
+ 
+         # Add the taps
+         layer_stack = self.active_stack
+diff --git a/compiler/modules/pinv_tapped.py b/compiler/modules/pinv_tapped.py
+new file mode 100644
+index 0000000..2095c11
+--- /dev/null
++++ b/compiler/modules/pinv_tapped.py
+@@ -0,0 +1,59 @@
++"""Parallel, individually tapped inverter slices for SKY130 latch-up spacing."""
++from math import ceil
++from openram import OPTS
++from openram.base import vector
++from openram.sram_factory import factory
++from openram.modules.pinv import pinv
++
++class pinv_tapped(pinv):
++    def __init__(self, name, size=1, **kwargs):
++        self.slice_count=max(1,ceil(size/24))
++        super().__init__(name,size=size,**kwargs)
++
++    def create_netlist(self):
++        if self.slice_count==1:
++            return super().create_netlist()
++        self.add_pins()
++        self.slice=factory.create(module_type='pinv_leaf',size=self.size/self.slice_count,
++                                  beta=self.beta,height=self.height,add_wells=True)
++        self.parts=[]
++        for i in range(self.slice_count):
++            self.parts.append(self.add_inst(name=f'slice{i}',mod=self.slice))
++            self.connect_inst(['A','Z','vdd','gnd'])
++        self.nmos_width=self.slice.nmos_width
++        self.pmos_width=self.slice.pmos_width
++        self.tx_mults=self.slice.tx_mults*self.slice_count
++
++    def create_layout(self):
++        if self.slice_count==1:
++            return super().create_layout()
++        for i,inst in enumerate(self.parts):inst.place(vector(i*self.slice.width,0))
++        self.width=self.slice.width*self.slice_count
++        self.height=self.slice.height
++        for net,metal,y in [('A','m2',0.9),('Z','m3',self.height-0.9)]:
++            points=[]
++            for inst in self.parts:
++                pin=inst.get_pin(net);c=pin.center();dst=vector(c.x,y)
++                self.add_via_stack_center(from_layer=pin.layer,to_layer=metal,offset=c)
++                self.add_path(metal,[c,dst])
++                width=2*getattr(self,metal+'_width')
++                self.add_rect_center(metal,dst,width=width,height=width)
++                points.append(dst)
++            self.add_path(metal,[points[0],points[-1]])
++        self.copy_layout_pin(self.parts[0],'A')
++        self.copy_layout_pin(self.parts[-1],'Z')
++        for inst in self.parts:
++            self.copy_layout_pin(inst,'vdd');self.copy_layout_pin(inst,'gnd')
++        self.add_boundary()
++
++    def get_on_resistance(self):
++        if self.slice_count==1:return super().get_on_resistance()
++        return self.slice.get_on_resistance()/self.slice_count
++
++    def get_input_capacitance(self):
++        if self.slice_count==1:return super().get_input_capacitance()
++        return self.slice.get_input_capacitance()*self.slice_count
++
++    def get_intrinsic_capacitance(self):
++        if self.slice_count==1:return super().get_intrinsic_capacitance()
++        return self.slice.get_intrinsic_capacitance()*self.slice_count
+diff --git a/compiler/verify/magic.py b/compiler/verify/magic.py
+index 6d06055..2885965 100644
+--- a/compiler/verify/magic.py
++++ b/compiler/verify/magic.py
+@@ -358,7 +358,7 @@ def run_lvs(cell_name, gds_name, sp_name, final_verification=False, output_path=
+             final_results.insert(0, line)
+ 
+     # There were property errors in any module.
+-    test = re.compile("Property errors were found.")
++    test = re.compile(r"Property errors were found\.|The following cells had property errors:|Netlists match uniquely with property errors\.")
+     propertyerrors = list(filter(test.search, results))
+     total_errors += len(propertyerrors)
+ 
+diff --git a/technology/sky130/lvs_lib/sky130_custom_cell.sp b/technology/sky130/lvs_lib/sky130_custom_cell.sp
+new file mode 100644
+index 0000000..30667f3
+--- /dev/null
++++ b/technology/sky130/lvs_lib/sky130_custom_cell.sp
+@@ -0,0 +1,13 @@
++* Explicit SI units for LVS; SPICE simulation uses the separate sp_lib view.
++* SPICE3 file created from sky130_custom_cell.ext - technology: sky130A
++
++.subckt sky130_custom_cell BL BR WL VPWR VGND
++X1 VGND Q Qbar VGND sky130_fd_pr__nfet_01v8 ad=0.09795p pd=0.915u as=0.0777p ps=0.79u w=0.42u l=0.15u
++X3 VPWR Q Qbar VPWR sky130_fd_pr__pfet_01v8 ad=0.0882p pd=0.84u as=0.1197p ps=1.41u w=0.42u l=0.15u
++X4 Q Qbar VPWR VPWR sky130_fd_pr__pfet_01v8 ad=0.1218p pd=1.42u as=0.0882p ps=0.84u w=0.42u l=0.15u
++X5 Q Qbar VGND VGND sky130_fd_pr__nfet_01v8 ad=0.0756p pd=0.78u as=0.09795p ps=0.915u w=0.42u l=0.15u
++
++X0 BL WL Q VGND sky130_fd_pr__nfet_01v8 ad=0.1428p pd=1.52u as=0.0756p ps=0.78u w=0.42u l=0.15u
++X2 Qbar WL BR VGND sky130_fd_pr__nfet_01v8 ad=0.0777p pd=0.79u as=0.1218p ps=1.42u w=0.42u l=0.15u
++
++.ends
+diff --git a/technology/sky130/lvs_lib/sky130_custom_dummy.sp b/technology/sky130/lvs_lib/sky130_custom_dummy.sp
+new file mode 100644
+index 0000000..d926a11
+--- /dev/null
++++ b/technology/sky130/lvs_lib/sky130_custom_dummy.sp
+@@ -0,0 +1,11 @@
++* Explicit SI units for LVS; SPICE simulation uses the separate sp_lib view.
++* SPICE3 file created from sky130_custom_dummy.ext - technology: sky130A
++
++.subckt sky130_custom_dummy BL BR WL VPWR VGND
++X0 a_290_377# a_30_347# VPWR VPWR sky130_fd_pr__pfet_01v8 ad=0.1218p pd=1.42u as=0.0882p ps=0.84u w=0.42u l=0.15u
++X1 a_56_159# WL BR VGND sky130_fd_pr__nfet_01v8 ad=0.0777p pd=0.79u as=0.1218p ps=1.42u w=0.42u l=0.15u
++X2 a_56_377# a_30_347# VGND VGND sky130_fd_pr__nfet_01v8 ad=0.0756p pd=0.78u as=0.09795p ps=0.915u w=0.42u l=0.15u
++X3 VPWR a_30_233# a_290_176# VPWR sky130_fd_pr__pfet_01v8 ad=0.0882p pd=0.84u as=0.1197p ps=1.41u w=0.42u l=0.15u
++X4 VGND a_30_233# a_56_159# VGND sky130_fd_pr__nfet_01v8 ad=0.09795p pd=0.915u as=0.0777p ps=0.79u w=0.42u l=0.15u
++X5 BL WL a_56_377# VGND sky130_fd_pr__nfet_01v8 ad=0.1428p pd=1.52u as=0.0756p ps=0.78u w=0.42u l=0.15u
++.ends
+diff --git a/technology/sky130/lvs_lib/sky130_custom_nand2_dec.sp b/technology/sky130/lvs_lib/sky130_custom_nand2_dec.sp
+new file mode 100644
+index 0000000..b34b61a
+--- /dev/null
++++ b/technology/sky130/lvs_lib/sky130_custom_nand2_dec.sp
+@@ -0,0 +1,9 @@
++* Explicit SI units for LVS; SPICE simulation uses the separate sp_lib view.
++* NGSPICE file created from sky130_fd_bd_sram__openram_sp_custom_nand2_dec.ext - technology: sky130A
++
++.subckt sky130_custom_nand2_dec A B Z VDD GND
++X0 Z A VDD VDD sky130_fd_pr__pfet_01v8 w=1.12u l=0.15u
++X1 VDD B Z VDD sky130_fd_pr__pfet_01v8 w=1.12u l=0.15u
++X2 a_196_224# B GND GND sky130_fd_pr__nfet_01v8 w=0.74u l=0.15u
++X3 Z A a_196_224# GND sky130_fd_pr__nfet_01v8 w=0.74u l=0.15u
++.ends
+diff --git a/technology/sky130/lvs_lib/sky130_custom_replica.sp b/technology/sky130/lvs_lib/sky130_custom_replica.sp
+new file mode 100644
+index 0000000..9568b7e
+--- /dev/null
++++ b/technology/sky130/lvs_lib/sky130_custom_replica.sp
+@@ -0,0 +1,11 @@
++* Explicit SI units for LVS; SPICE simulation uses the separate sp_lib view.
++* SPICE3 file created from sky130_custom_replica.ext - technology: sky130A
++
++.subckt sky130_custom_replica BL BR WL VPWR VGND
++X0 BL WL Q VGND sky130_fd_pr__nfet_01v8 ad=0.1428p pd=1.52u as=0.0756p ps=0.78u w=0.42u l=0.15u
++X1 VGND Q VPWR VGND sky130_fd_pr__nfet_01v8 ad=0.09795p pd=0.915u as=0.0777p ps=0.79u w=0.42u l=0.15u
++X2 VPWR WL BR VGND sky130_fd_pr__nfet_01v8 ad=0.0777p pd=0.79u as=0.1218p ps=1.42u w=0.42u l=0.15u
++X3 VPWR Q VPWR VPWR sky130_fd_pr__pfet_01v8 ad=0.0882p pd=0.84u as=0.2961p ps=3.09u w=0.42u l=0.15u
++X4 Q VPWR VPWR VPWR sky130_fd_pr__pfet_01v8 ad=0.1218p pd=1.42u as=0.0882p ps=0.84u w=0.42u l=0.15u
++X5 Q VPWR VGND VGND sky130_fd_pr__nfet_01v8 ad=0.0756p pd=0.78u as=0.09795p ps=0.915u w=0.42u l=0.15u
++.ends
+diff --git a/technology/sky130/tech/tech_configs/tech_custom_cell.py b/technology/sky130/tech/tech_configs/tech_custom_cell.py
+index 31709bf..bc2fa53 100644
+--- a/technology/sky130/tech/tech_configs/tech_custom_cell.py
++++ b/technology/sky130/tech/tech_configs/tech_custom_cell.py
+@@ -23,6 +23,9 @@ File containing the process technology parameters for Skywater 130nm.
+ # implementation in '$OPENRAM_TECHDIR/modules/'
+ # For example: tech_modules["contact"] = "contact_freepdk45"
+ tech_modules = d.module_type()
++# Keep diffusion close to body taps without reducing aggregate drive.
++tech_modules["pinv"] = "pinv_tapped"
++tech_modules["pinv_leaf"] = "pinv"
+ 
+ 
+ # These modules have been hand designed and provided in this repository.
+@@ -81,8 +84,10 @@ cell_properties.bitcell_1port.end_caps = False
+ cell_properties.bitcell_1port.has_corners = True
+ 
+ cell_properties.bitcell_1port.boundary_layer = "boundary"
++# Match the actual custom six-transistor cell SPICE node names.
++cell_properties.bitcell_1port.storage_nets = ["Q", "Qbar"]
+ cell_properties.bitcell_1port.port_order = ['bl', 'br', 'wl', 'vdd', 'gnd']
+-cell_properties.bitcell_1port.port_types = ["INPUT", "INPUT", "GROUND", "POWER", "OUTPUT"]
++cell_properties.bitcell_1port.port_types = ["OUTPUT", "OUTPUT", "INPUT", "POWER", "GROUND"]
+ cell_properties.bitcell_1port.port_map = {'bl': 'BL',
+                                           'br': 'BR',
+                                           'gnd': 'VGND',

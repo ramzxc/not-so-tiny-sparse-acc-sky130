@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// Weight-load flow controller with Sparsity Gating & Dynamic Burst Length Support.
+// Weight-load flow controller with Sparsity Gating.
 // -----------------------------------------------------------------------------
 module weight_load_ctrl
     import tpu_pkg::*;
@@ -26,11 +26,10 @@ module weight_load_ctrl
     input  logic              sparse_rsp_data,
     input  logic              sparse_rsp_valid,
 
-    // Address & Length read request -> weight cache
+    // Address-only read request -> weight buffer
     output logic              weight_req_valid,
     input  logic              weight_req_ready,
     output weight_addr_type   weight_req_addr,
-    output logic [7:0]        weight_req_len,
 
     // Address-only request -> unified buffer
     output buffer_addr_type   unified_req_addr,
@@ -42,7 +41,7 @@ module weight_load_ctrl
     input  logic                         unified_rsp_valid,
     output logic                         unified_rsp_ready,
 
-    // Data-only response <- weight cache
+    // Data-only response <- weight buffer
     input  fp16_type [COMPUTE_WIDTH-1:0] weight_rsp_data,
     input  logic                         weight_rsp_valid,
 
@@ -76,13 +75,12 @@ module weight_load_ctrl
     assign sparse_req_valid = IR_valid && !is_unified_cs;
     assign sparse_req_fire  = sparse_req_valid && sparse_req_ready;
 
-    // Stage 2: Non-zero이면 Cache에 요청
+    // Stage 2: Non-zero이면 Weight buffer에 요청
     assign weight_req_valid = is_dense_cs && !pending;
     assign weight_req_addr  = weight_addr_cs;
-    assign weight_req_len   = COMPUTE_WIDTH;
     assign weight_req_fire  = weight_req_valid && weight_req_ready;
 
-    // Zero이면 Cache 요청 없이 Skip
+    // Zero이면 Weight buffer 요청 없이 Skip
     assign skip_fire =
         sparse_req_fire && sparse_rsp_valid && (sparse_rsp_data == 1'b0);
 
@@ -145,7 +143,7 @@ module weight_load_ctrl
                 pending  <= 1'b1;
             end
 
-            // Cache request 발사 후 response 대기
+            // Weight buffer request 발사 후 response 대기
             if (weight_req_fire) begin
                 is_dense_cs <= 1'b0;
                 pending     <= 1'b1;

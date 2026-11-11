@@ -11,3 +11,46 @@ test/sim_build
 test/__pycache__/
 test/results.xml
 test/gate_level_netlist.v
+
+# Synopsys local run artifacts
+/command.log
+/default.svf
+/filenames*.log
+
+# Reproducible sizing executables and bulky raw traces
+/sizing/build/
+/sizing/__pycache__/
+/sizing/results/*/*.bin
+/sizing/results/*/run_cache*.csv
+/sizing/results/*/*.log
+/sizing/results/selection.log
+/sizing/results/candidates.csv
+/sizing/results/common_candidates.csv
+/sizing/results/layouts.json
+
+# OpenRAM exploratory runs (selected deliverables are stored separately)
+/memory/openram/runs/
+/memory/openram/__pycache__/
+
+/memory/openram/**/__pycache__/
+/memory/openram/archive/
+
+# Local synthesis / place-and-route experiments (not submission inputs)
+/syn/
+/pnr/
+/sizing/
+/src/macros/
+/test/sim_build*/
+/test/results*.xml
+/memory/openram/generated/**/*.db
+/memory/openram/generated/**/*.log
+/memory/openram/generated/**/*.out
+/memory/openram/generated/**/*.report
+/memory/openram/generated/**/*.err
+/memory/openram/generated/**/run_*.sh
+/memory/openram/generated/**/setup.tcl
+/memory/openram/generated/**/*.drc.tcl
+
+/memory/openram/debug/
+/memory/openram/experiments/
+/memory/openram/generated/**/.magicrc

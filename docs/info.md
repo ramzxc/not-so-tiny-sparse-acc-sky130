@@ -1,22 +1,55 @@
 ## How it works
 
-Four-lane FP16 sparse accelerator imported from `/docker/projects/egru/acc/rtl`
-(with `lib/tpu_pkg.sv`). The original source directory is preserved. The TPU,
-instruction FIFO, DMA, weight cache, vector unit, and activation unit are connected
-through an SPI host bridge. The host supplies external memory: SPI does not connect
-directly to an SPI flash or PSRAM chip.
+Two-lane FP16 sparse accelerator imported from `/docker/projects/egru/acc/rtl`
+(with `lib/tpu_pkg.sv`). The original directory is preserved. The imported
+weight-cache version has been changed to a software-managed `weight_buffer`:
+`OPCODE_DRAM_TO_WEIGHT` (0x41) explicitly loads rows through DMA; a WEIGHT
+instruction then reads a local WB row, with no tags, replacement, or demand refill.
+The cache and replacement-policy files are retained for reference but excluded
+from both source manifests and the instantiated hierarchy.
 
-The original FreePDK45 SRAM instances in the unified buffer, weight buffer, and
-accumulator are replaced by `acc_memory_1r1w_64x256`, a synthesizable 256 x 64-bit
-memory with a synchronous read port and independent write port. Memory contents
-are not reset; software must load operands before using them. Same-address
-simultaneous reads and writes return the old word; the existing core forwarding
-logic handles dependencies.
+WB, UB and ACC now share one generated OpenRAM 64-bit 1RW macro through
+`mem_ctrl`. The compute width remains two FP16 lanes. Logical addresses are
+32-bit row indices within each region; even/odd rows occupy the low/high half
+of one physical word. The instruction format and 64-bit AXI interface are unchanged.
 
-This is an RTL integration, not a verified 8x2-tile physical implementation.
-Portable memories map to standard cells, and the full-size FP16 core and cache
-may require substantial area reduction or a supported SKY130 SRAM integration.
-No SKY130 synthesis, timing closure, place-and-route, DRC, or LVS result is claimed.
+| Capacity | UB | ACC | WB | Physical words |
+|---|---|---|---|---|
+| 1 KiB | 512 B / 128 rows | 256 B / 64 rows | 256 B / 64 rows | 128 x 64 bits |
+| 512 B | 256 B / 64 rows | 128 B / 32 rows | 128 B / 32 rows | 64 x 64 bits |
+
+Physical word bases are UB=0, ACC=64, WB=96 for 1 KiB and UB=0, ACC=32,
+WB=48 for 512 B. These physical bases are hidden from software. Programs whose
+logical addresses fit the smaller partitions run unchanged on both sizes.
+
+Instruction, DMA, VPU metadata and activation metadata FIFO depths are all 4.
+DMA uses a data-only row FIFO and sequential local addresses. External DMA
+addresses must be 8-byte aligned; odd row counts use partial final beats.
+The controller round-robins twelve request channels. Read responses are registered on the clock edge after request acceptance. Each client has a response holding slot;
+backpressure on one client does not block the other clients. A write reads a
+physical word, optionally adds the two FP16 accumulator operands, and commits
+an updated word while preserving the other 32-bit row. This transaction occupies
+three clock edges and cannot interleave with another access. The macro has no
+byte write mask. VPU results are held until accepted; at most one VPU computation
+is in flight, so the old fully pipelined throughput is not retained.
+
+Instruction dependency checks and SYNC include pending memory operations.
+Memory contents are not reset. Reset cancels uncommitted controller requests;
+it does not undo writes already captured by the macro. Out-of-range requests
+never wrap into another region: reads return zero, writes are discarded, and
+status bit 6 latches an error until reset. Software must regard that transfer as
+failed and check bounds before submitting a multi-row command (earlier valid
+rows in an out-of-range burst may already have committed).
+
+Select `ACC_SRAM_BYTES=512` or `1024` at compile time; the default is 512.
+Simulation uses `make -C test SRAM_BYTES=512` / `1024`. DC uses the environment
+variable with the same name. P&R uses `src/config_512.json` / `config_1024.json`,
+which select the matching define and GDS/LEF/Liberty/blackbox. `config.json` is the
+512 B default. No RTL edit or request-interface change is needed to switch.
+
+The generated macros pass macro-level DRC/LVS, but their TT Liberty timing is
+an analytical estimate, not SPICE characterization. Full-chip placement,
+routing, PDN and timing signoff are not done. See `memory/openram/README.md`.
 
 The top module is `tt_um_not_so_tiny_sparse_acc_ramzxc`. `rst_n=0` resets the
 interface and accelerator. `ena=0` also holds them in reset; deselection discards
@@ -39,7 +72,8 @@ The default RTL simulator is Verilator because the source uses SystemVerilog
 packages, packed structures, and casts. Gate-netlist simulation can use
 `make GATES=yes SIM=icarus`. The pin-level test checks SPI ID, reset, aborted
 transactions, synchronization, a two-beat DMA round trip with backpressure,
-FP16 vector addition and accumulator readout, error reporting, and deselection.
+FP16 vector addition and accumulator readout, explicit two-row WB preloading,
+WB-based scalar multiplication, error reporting, and deselection.
 The imported core has width-conversion lint warnings; these are nonfatal in the
 simulation Makefile. The simulation is not a complete accelerator ISA regression.
 
@@ -92,7 +126,7 @@ it. Check the pending bits before submitting another response.
 
 | Address | Value |
 | --- | --- |
-| 0 | `[7]=host_error`, `[6]=axi_error`, `[5]=sync_seen`, `[4]=FIFO full`, `[3]=FIFO empty`, `[2]=ARVALID`, `[1]=WVALID`, `[0]=AWVALID` |
+| 0 | `[7]=host_error`, `[6]=axi_error OR memory bounds error`, `[5]=sync_seen`, `[4]=FIFO full`, `[3]=FIFO empty`, `[2]=ARVALID`, `[1]=WVALID`, `[0]=AWVALID` |
 | 1 | `[3]=BREADY`, `[2]=RREADY`, `[1]=B pending`, `[0]=R pending` |
 | 2–5 | AWADDR, little-endian |
 | 6 | AWLEN (beats minus one) |
@@ -109,6 +143,10 @@ it. Check the pending bits before submitting another response.
 | 27 | `[7:4]=AWREGION`, `[3:0]=AWQOS` |
 | 28 | `[7:4]=ARCACHE`, `[3:1]=ARPROT`, `[0]=ARLOCK` |
 | 29 | `[7:4]=ARREGION`, `[3:0]=ARQOS` |
+| 30–31 | Shared SRAM capacity in bytes, little endian |
+| 32–33 | UB capacity in 32-bit logical rows, little endian |
+| 34–35 | ACC capacity in 32-bit logical rows, little endian |
+| 36–37 | WB capacity in 32-bit logical rows, little endian |
 | 63 | Device/protocol ID `0xA1` |
 
 Read channel payload only while its VALID status bit is set. It remains stable
@@ -148,8 +186,14 @@ are generated by the original adapter and cleared by reset.
 4. Clear `sync_seen`, submit the 64-bit instruction `0x00000000000000FF`, continue
    servicing memory requests, and poll `sync_seen` for completion.
 
-For example, `0x0000100000000240` loads two four-element FP16 rows from byte
-address `0x1000` into unified-buffer rows 0 and 1. Each AXI beat is 64 bits.
+Weights must be preloaded with opcode 0x41 before a WEIGHT instruction selects
+a WB row. For example, `(dram_addr << 32) | (wb_row << 16) | (rows << 8) | 0x41`
+loads `rows` 32-bit rows, and `(wb_row << 25) | 0x08` selects the local WB row.
+The existing INPUT/sparsity stream supplies the associated scalar and mask.
+
+For example, `0x0000100000000240` loads two two-element FP16 rows from byte
+address `0x1000` into unified-buffer rows 0 and 1. Each AXI beat is 64 bits,
+so these two rows share one beat; a single-row store uses byte strobe 0x0F.
 `test/test.py` contains a working pin-level host implementation and examples.
 
 ## External hardware
@@ -157,3 +201,24 @@ address `0x1000` into unified-buffer rows 0 and 1. Each AXI beat is 64 bits.
 An SPI master (microcontroller or FPGA) plus a continuous system clock and reset.
 The host must run the memory-service protocol above and provide storage for the
 TPU's external tensors. Use IO levels appropriate to the Tiny Tapeout carrier.
+
+### Local synthesis
+
+Compile the generated analytical SRAM libraries with
+`lc_shell -f syn/compile_openram.tcl`, then run
+`ACC_SRAM_BYTES=1024 dc_shell -f syn/run_dc.tcl` or select `512`.
+The flow checks that the design contains exactly one selected OpenRAM macro and
+two MAC instances. Reports are saved in `syn/runs/shared_fifo4_<bytes>_tt/`.
+Standard-cell and SRAM areas are reported separately. The earlier three-SRAM
+baseline is preserved in `syn/runs/fp16_fifo4_lane2_tt/`.
+
+Current pre-layout results (100 ns, analytical TT SRAM timing):
+
+| Capacity | Standard cells (um2) | SRAM (um2) | Total (um2) | 8x2 tile |
+|---|---:|---:|---:|---:|
+| 1 KiB | 141172.893 | 180155.734 | 321328.627 | 103.28% |
+| 512 B | 141104.077 | 97582.711 | 238686.788 | 76.72% |
+
+Both variants passed integration and memory-controller stress tests. Setup
+WNS/TNS is 0/0 ns; hold and max-transition violations remain. The 512 B total
+is only a raw cell-area sum, not proof that placement/routing will fit.

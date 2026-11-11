@@ -1,0 +1,29 @@
+{
+  "name": "tt_sram_1rw_64x64_sky130",
+  "usable_bytes": 512,
+  "word_bits": 64,
+  "words": 64,
+  "words_per_row": 2,
+  "bitcell": "sky130_custom_cell",
+  "physical_data_port_bits": 65,
+  "spare_column": "unused; spare_wen0 tied low",
+  "ports": "1RW",
+  "width_um": 520.455,
+  "height_um": 187.495,
+  "area_um2": 97582.71022500002,
+  "outline_fits_8x2": true,
+  "outline_vertical_margin_each_um": 19.132499999999993,
+  "physical_checks": {
+    "drc_errors": 0,
+    "lvs_errors": 0,
+    "lvs_property_errors": false,
+    "final_verification": true,
+    "checked_sha256": {
+      ".gds": "e254d7afac33985cfa03bab5195e1c92032a2ab7bd8217c5a7aaa5ef5e47d1f6",
+      ".lvs.sp": "7bf25952289f601bf6fcfaaafd75a5fe2a5beabc5cc0d2d64b7cc4ead0a1be94"
+    }
+  },
+  "release_status": "macro-level DRC/LVS PASS; top-level P&R and timing signoff not performed",
+  "liberty": "analytical TT estimate, not SPICE timing characterization",
+  "top_level_pnr": "not performed"
+}

@@ -10,12 +10,18 @@ endif
 FST ?= -fst # Use more efficient FST format
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(CURDIR)/../src
-PROJECT_SOURCES = project.v tpu_pkg.sv acc_host.sv acc_memory_1r1w_64x256.sv acc_spi.sv activation.sv activation_ctrl.sv axi_master_adapter.sv dma.sv inst_decoder.sv inst_fifo.sv mac_unit.sv register_file.sv replacement_policy.sv sparsity_ctrl.sv tpu.sv tpu_core.sv unified_buffer.sv vpu.sv vpu_ctrl.sv weight_buffer.sv weight_cache.sv weight_load_ctrl.sv
+PROJECT_SOURCES = project.v tpu_pkg.sv acc_host.sv mem_ctrl.sv shared_sram.sv acc_spi.sv activation.sv activation_ctrl.sv axi_master_adapter.sv dma.sv inst_decoder.sv inst_fifo.sv mac_unit.sv sparsity_ctrl.sv tpu.sv tpu_core.sv vpu.sv vpu_ctrl.sv weight_load_ctrl.sv
+
+SRAM_BYTES ?= 512
+export SRAM_BYTES
+COMPILE_ARGS += -DACC_SRAM_BYTES=$(SRAM_BYTES)
+VERILOG_SOURCES += $(SRC_DIR)/../memory/openram/generated/tt_sram_1rw_64x128_sky130/tt_sram_1rw_64x128_sky130.v
+VERILOG_SOURCES += $(SRC_DIR)/../memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.v
 
 ifneq ($(GATES),yes)
 
 # RTL simulation:
-SIM_BUILD				= sim_build/rtl
+SIM_BUILD				= sim_build/shared_$(SRAM_BYTES)
 VERILOG_SOURCES += $(addprefix $(SRC_DIR)/,$(PROJECT_SOURCES))
 
 else
@@ -39,7 +45,7 @@ endif
 COMPILE_ARGS 		+= -I$(SRC_DIR)
 
 ifeq ($(SIM),verilator)
-COMPILE_ARGS += -Wno-fatal
+COMPILE_ARGS += -Wno-fatal --timing --timescale-override 1ns/1ps
 endif
 
 # Include the testbench sources:
@@ -50,4 +56,5 @@ TOPLEVEL = tb
 COCOTB_TEST_MODULES = test
 
 # include cocotb's make rules to take care of the simulator setup
+COCOTB_RESULTS_FILE ?= $(CURDIR)/results.xml
 include $(shell cocotb-config --makefiles)/Makefile.sim

@@ -3,25 +3,22 @@
 // Responsibilities:
 //   * Decode and dispatch 64-bit instructions with resource dependencies
 //   * Connect the weight, VPU, activation, and element-wise VPU pipelines
-//   * Connect DMA traffic to the weight cache, unified, and accumulation memories
+//   * Connect DMA traffic to the weight, unified, and accumulation memories
 module tpu_core
     import tpu_pkg::*;
 #(
-    parameter int COMPUTE_WIDTH                = 4,
+    parameter int COMPUTE_WIDTH                = 2,
+    parameter int SRAM_BYTES                   = DEFAULT_SRAM_BYTES,
     parameter int MAX_COLUMN_ROWS              = COMPUTE_WIDTH,
-    parameter int WEIGHT_BUFFER_DEPTH          = 256,
-    parameter int UNIFIED_BUFFER_DEPTH         = 256,
-    parameter int REGISTER_DEPTH               = 1 << ACCUMULATOR_ADDR_WIDTH,
+    parameter int WEIGHT_BUFFER_DEPTH          = SRAM_BYTES / 16,
+    parameter int UNIFIED_BUFFER_DEPTH         = SRAM_BYTES / 8,
+    parameter int REGISTER_DEPTH               = SRAM_BYTES / 16,
     parameter int WEIGHT_REQ_FIFO_DEPTH        = 8,
-    parameter int VPU_META_FIFO_DEPTH          = 32,
-    parameter int ACTIVATION_META_FIFO_DEPTH   = 32,
+    parameter int VPU_META_FIFO_DEPTH          = 4,
+    parameter int ACTIVATION_META_FIFO_DEPTH   = 4,
     parameter int WEIGHT_CTR_WIDTH =
         (COMPUTE_WIDTH > 1) ? $clog2(COMPUTE_WIDTH) : 1,
     
-    // Weight Cache Parameters
-    parameter int CACHE_LINES                  = 128,
-    parameter int CACHE_WAY_COUNT              = 32,
-    parameter repl_policy_e CACHE_POLICY       = POLICY_CUSTOM,
     parameter bit SPARSITY_EN                  = 1'b1
 )(
     input logic clk,
@@ -40,16 +37,11 @@ module tpu_core
     output dram_inst_type dma_inst,
     output logic          dma_inst_enable,
 
-    // -----------------------------------------------------------------
-    // DMA <-> Weight Cache Refill Channel (Multi-Row Burst)
-    // -----------------------------------------------------------------
-    output logic                         dma_cache_refill_req_valid,
-    input  logic                         dma_cache_refill_req_ready,
-    output dram_addr_type                dma_cache_refill_dram_addr,
-    output logic [7:0]                   dma_cache_refill_len,
-    input  fp16_type [COMPUTE_WIDTH-1:0] dma_cache_refill_rsp_data,
-    input  logic                         dma_cache_refill_rsp_valid,
-    output logic                         dma_cache_refill_rsp_ready,
+    // DMA -> explicitly preloaded weight buffer.
+    input weight_addr_type dma_weight_write_addr,
+    input fp16_type [COMPUTE_WIDTH-1:0] dma_weight_write_data,
+    input logic dma_weight_write_valid,
+    output logic dma_weight_write_ready,
 
     // DMA -> unified-buffer load-write path.
     input  buffer_addr_type              dma_buffer_write_addr,
@@ -79,6 +71,7 @@ module tpu_core
     input  logic                         dma_acc_write_valid,
     output logic                         dma_acc_write_ready,
 
+    output logic memory_error,
     output logic busy,
     output logic synchronize
 );
@@ -89,7 +82,7 @@ module tpu_core
     logic            sparsity_en;
 
     // ---------------------------------------------------------------------
-    // Weight-cache / Flow-ctrl -> VPU path
+    // Weight-buffer / Flow-ctrl -> VPU path
     // ---------------------------------------------------------------------
 
     fp16_type        sparse_vpu_input_data;
@@ -105,7 +98,6 @@ module tpu_core
     logic            weight_req_valid;
     logic            weight_req_ready;
     weight_addr_type weight_req_addr;
-    logic [7:0]      weight_req_len;
     fp16_type [COMPUTE_WIDTH-1:0] weight_rsp_data;
     logic                         weight_rsp_valid;
 
@@ -163,18 +155,6 @@ module tpu_core
     // Physical accumulation-buffer write port arbitration
     // ---------------------------------------------------------------------
 
-    fp16_type [COMPUTE_WIDTH-1:0] rf_write_data;
-    accumulator_addr_type         rf_write_addr;
-    logic                         rf_write_en;
-    logic                         rf_accumulate;
-
-    accumulator_addr_type         rf_read_req_addr;
-    logic                         rf_read_req_valid;
-    logic                         rf_read_req_ready;
-    fp16_type [COMPUTE_WIDTH-1:0] rf_read_rsp_data;
-    logic                         rf_read_rsp_valid;
-    logic                         rf_read_rsp_ready;
-
     accumulator_addr_type         activation_acc_req_addr;
     logic                         activation_acc_req_valid;
     logic                         activation_acc_req_ready;
@@ -214,6 +194,8 @@ module tpu_core
     logic input_resource_busy;
     logic vpu_busy;
     logic vpu_resource_busy;
+    logic mem_busy;
+    logic vpu_acc_write_ready;
     logic activation_busy;
     logic activation_resource_busy;
 
@@ -245,10 +227,10 @@ module tpu_core
         .vpu_resource_busy           (vpu_resource_busy),
         .activation_busy             (activation_busy),
         .activation_resource_busy    (activation_resource_busy),
-        .dma_busy                    (dma_busy),
-        .dma_weight_resource_busy    (dma_weight_resource_busy),
-        .dma_buffer_resource_busy    (dma_buffer_resource_busy),
-        .dma_acc_resource_busy       (dma_acc_resource_busy),
+        .dma_busy                    (dma_busy || mem_busy),
+        .dma_weight_resource_busy    (dma_weight_resource_busy || mem_busy),
+        .dma_buffer_resource_busy    (dma_buffer_resource_busy || mem_busy),
+        .dma_acc_resource_busy       (dma_acc_resource_busy || mem_busy),
         .dispatch_inst               (dispatch_inst),
         .dispatch_weight_en          (dispatch_weight_en),
         .dispatch_input_en          (dispatch_input_en),
@@ -304,7 +286,6 @@ module tpu_core
         .weight_req_valid  (weight_req_valid),
         .weight_req_ready  (weight_req_ready),
         .weight_req_addr   (weight_req_addr),
-        .weight_req_len    (weight_req_len),
         .weight_rsp_data   (weight_rsp_data),
         .weight_rsp_valid  (weight_rsp_valid),
         .unified_req_addr  (weight_buffer_req_addr),
@@ -315,78 +296,6 @@ module tpu_core
         .unified_rsp_ready (weight_buffer_rsp_ready),
         .vpu_weight_data   (vpu_weight_data),
         .vpu_weight_valid  (vpu_weight_valid)
-    );
-
-    // =====================================================================
-    // 32-Way Ultra-Low Power Sequential Weight Cache (Dynamic Multi-Row Burst Fill)
-    // =====================================================================
-    assign dma_cache_refill_rsp_ready = 1'b1;
-
-    weight_cache #(
-        .COMPUTE_WIDTH   (COMPUTE_WIDTH),
-        .MAX_COLUMN_ROWS (MAX_COLUMN_ROWS),
-        .CACHE_LINES     (CACHE_LINES),
-        .WAY_COUNT       (CACHE_WAY_COUNT),
-        .POLICY          (CACHE_POLICY)
-    ) weight_cache_core (
-        .clk                  (clk),
-        .rst                  (rst),
-        .read_req_addr        (weight_req_addr),
-        .read_req_len         (weight_req_len),
-        .read_req_valid       (weight_req_valid),
-        .read_req_ready       (weight_req_ready),
-        .read_rsp_data        (weight_rsp_data),
-        .read_rsp_valid       (weight_rsp_valid),
-        .dma_refill_req_valid (dma_cache_refill_req_valid),
-        .dma_refill_req_ready (dma_cache_refill_req_ready),
-        .dma_refill_dram_addr (dma_cache_refill_dram_addr),
-        .dma_refill_len       (dma_cache_refill_len),
-        .dma_refill_rsp_data  (dma_cache_refill_rsp_data),
-        .dma_refill_rsp_valid (dma_cache_refill_rsp_valid)
-    );
-
-    // ---------------------------------------------------------------------
-    // Unified buffer
-    // ---------------------------------------------------------------------
-
-    unified_buffer #(
-        .COMPUTE_WIDTH (COMPUTE_WIDTH),
-        .DEPTH         (UNIFIED_BUFFER_DEPTH)
-    ) unified_buffer_core (
-        .clk                   (clk),
-        .rst                   (rst),
-        .vpu_read_req_addr     (vpu_buffer_req_addr),
-        .vpu_read_req_valid    (vpu_buffer_req_valid),
-        .vpu_read_req_ready    (vpu_buffer_req_ready),
-        .vpu_read_rsp_data     (vpu_buffer_rsp_data),
-        .vpu_read_rsp_valid    (vpu_buffer_rsp_valid),
-        .vpu_read_rsp_ready    (vpu_buffer_rsp_ready),
-        .weight_read_req_addr  (weight_buffer_req_addr),
-        .weight_read_req_valid (weight_buffer_req_valid),
-        .weight_read_req_ready (weight_buffer_req_ready),
-        .weight_read_rsp_data  (weight_buffer_rsp_data),
-        .weight_read_rsp_valid (weight_buffer_rsp_valid),
-        .weight_read_rsp_ready (weight_buffer_rsp_ready),
-        .sparse_read_req_addr  (sparse_buffer_req_addr),
-        .sparse_read_req_valid (sparse_buffer_req_valid),
-        .sparse_read_req_ready (sparse_buffer_req_ready),
-        .sparse_read_rsp_data  (sparse_buffer_rsp_data),
-        .sparse_read_rsp_valid (sparse_buffer_rsp_valid),
-        .sparse_read_rsp_ready (sparse_buffer_rsp_ready),
-        .store_read_req_addr   (dma_buffer_read_req_addr),
-        .store_read_req_valid  (dma_buffer_read_req_valid),
-        .store_read_req_ready  (dma_buffer_read_req_ready),
-        .store_read_rsp_data   (dma_buffer_read_rsp_data),
-        .store_read_rsp_valid  (dma_buffer_read_rsp_valid),
-        .store_read_rsp_ready  (dma_buffer_read_rsp_ready),
-        .activation_write_addr (activation_buffer_write_addr),
-        .activation_write_data (activation_buffer_write_data),
-        .activation_write_valid(activation_buffer_write_valid),
-        .activation_write_ready(activation_buffer_write_ready),
-        .load_write_addr       (dma_buffer_write_addr),
-        .load_write_data       (dma_buffer_write_data),
-        .load_write_valid      (dma_buffer_write_valid),
-        .load_write_ready      (dma_buffer_write_ready)
     );
 
     // ---------------------------------------------------------------------
@@ -421,6 +330,7 @@ module tpu_core
         .acc_addr            (vpu_acc_write_addr),
         .accumulate          (vpu_acc_accumulate),
         .acc_enable          (vpu_acc_write_valid),
+        .acc_ready           (vpu_acc_write_ready),
         .busy                (vpu_busy),
         .resource_busy       (vpu_resource_busy)
     );
@@ -438,62 +348,6 @@ module tpu_core
         .last_sum_valid  (last_sum_valid),
         .result          (vpu_result_data),
         .result_valid    (vpu_result_valid)
-    );
-
-    // ---------------------------------------------------------------------
-    // Accumulation-buffer write arbitration
-    // ---------------------------------------------------------------------
-    assign dma_acc_write_ready = !vpu_acc_write_valid;
-
-    always_comb begin
-        rf_write_addr = vpu_acc_write_addr;
-        rf_write_data = vpu_acc_write_data;
-        rf_write_en   = vpu_acc_write_valid;
-        rf_accumulate = vpu_acc_accumulate;
-
-        if (!vpu_acc_write_valid && dma_acc_write_valid) begin
-            rf_write_addr = dma_acc_write_addr;
-            rf_write_data = dma_acc_write_data;
-            rf_write_en   = 1'b1;
-            rf_accumulate = 1'b0;
-        end
-    end
-
-    assign rf_read_req_addr = dma_acc_resource_busy
-        ? dma_acc_read_req_addr : activation_acc_req_addr;
-    assign rf_read_req_valid = dma_acc_resource_busy
-        ? dma_acc_read_req_valid : activation_acc_req_valid;
-    assign rf_read_rsp_ready = dma_acc_resource_busy
-        ? dma_acc_read_rsp_ready : activation_acc_rsp_ready;
-
-    assign activation_acc_req_ready =
-        !dma_acc_resource_busy && rf_read_req_ready;
-    assign dma_acc_read_req_ready =
-        dma_acc_resource_busy && rf_read_req_ready;
-
-    assign activation_acc_rsp_data = rf_read_rsp_data;
-    assign dma_acc_read_rsp_data    = rf_read_rsp_data;
-    assign activation_acc_rsp_valid =
-        rf_read_rsp_valid && activation_resource_busy;
-    assign dma_acc_read_rsp_valid =
-        rf_read_rsp_valid && dma_acc_resource_busy;
-
-    register_file #(
-        .COMPUTE_WIDTH   (COMPUTE_WIDTH),
-        .REGISTER_DEPTH  (REGISTER_DEPTH)
-    ) accumulation_buffer (
-        .clk                  (clk),
-        .rst                  (rst),
-        .write_addr           (rf_write_addr),
-        .data_in              (rf_write_data),
-        .write_enable         (rf_write_en),
-        .accumulate           (rf_accumulate),
-        .read_req_addr        (rf_read_req_addr),
-        .read_req_valid       (rf_read_req_valid),
-        .read_req_ready       (rf_read_req_ready),
-        .read_rsp_data        (rf_read_rsp_data),
-        .read_rsp_valid       (rf_read_rsp_valid),
-        .read_rsp_ready       (rf_read_rsp_ready)
     );
 
     // ---------------------------------------------------------------------
@@ -543,4 +397,129 @@ module tpu_core
         .data_out_ready      (activation_output_ready)
     );
 
+    // One request channel per former WB/UB/ACC client.
+    logic [11:0] m_valid, m_ready, m_write, m_accumulate, m_rsp_valid, m_rsp_ready;
+    logic [11:0][1:0] m_region;
+    logic [11:0][23:0] m_addr;
+    logic [11:0][31:0] m_wdata, m_rdata;
+    assign m_valid[0] = weight_req_valid;
+    assign weight_req_ready = m_ready[0];
+    assign m_region[0] = 2'd2;
+    assign m_addr[0] = 24'(weight_req_addr);
+    assign m_write[0] = 1'b0;
+    assign m_wdata[0] = '0;
+    assign m_accumulate[0] = '0;
+    assign m_rsp_ready[0] = 1'b1;
+    assign weight_rsp_valid = m_rsp_valid[0];
+    assign weight_rsp_data = m_rdata[0];
+    assign m_valid[1] = dma_weight_write_valid;
+    assign dma_weight_write_ready = m_ready[1];
+    assign m_region[1] = 2'd2;
+    assign m_addr[1] = 24'(dma_weight_write_addr);
+    assign m_write[1] = 1'b1;
+    assign m_wdata[1] = dma_weight_write_data;
+    assign m_accumulate[1] = '0;
+    assign m_rsp_ready[1] = '1;
+    assign m_valid[2] = vpu_buffer_req_valid;
+    assign vpu_buffer_req_ready = m_ready[2];
+    assign m_region[2] = 2'd0;
+    assign m_addr[2] = 24'(vpu_buffer_req_addr);
+    assign m_write[2] = 1'b0;
+    assign m_wdata[2] = '0;
+    assign m_accumulate[2] = '0;
+    assign m_rsp_ready[2] = vpu_buffer_rsp_ready;
+    assign vpu_buffer_rsp_valid = m_rsp_valid[2];
+    assign vpu_buffer_rsp_data = m_rdata[2];
+    assign m_valid[3] = weight_buffer_req_valid;
+    assign weight_buffer_req_ready = m_ready[3];
+    assign m_region[3] = 2'd0;
+    assign m_addr[3] = 24'(weight_buffer_req_addr);
+    assign m_write[3] = 1'b0;
+    assign m_wdata[3] = '0;
+    assign m_accumulate[3] = '0;
+    assign m_rsp_ready[3] = weight_buffer_rsp_ready;
+    assign weight_buffer_rsp_valid = m_rsp_valid[3];
+    assign weight_buffer_rsp_data = m_rdata[3];
+    assign m_valid[4] = sparse_buffer_req_valid;
+    assign sparse_buffer_req_ready = m_ready[4];
+    assign m_region[4] = 2'd0;
+    assign m_addr[4] = 24'(sparse_buffer_req_addr);
+    assign m_write[4] = 1'b0;
+    assign m_wdata[4] = '0;
+    assign m_accumulate[4] = '0;
+    assign m_rsp_ready[4] = sparse_buffer_rsp_ready;
+    assign sparse_buffer_rsp_valid = m_rsp_valid[4];
+    assign sparse_buffer_rsp_data = m_rdata[4][15:0];
+    assign m_valid[5] = dma_buffer_read_req_valid;
+    assign dma_buffer_read_req_ready = m_ready[5];
+    assign m_region[5] = 2'd0;
+    assign m_addr[5] = 24'(dma_buffer_read_req_addr);
+    assign m_write[5] = 1'b0;
+    assign m_wdata[5] = '0;
+    assign m_accumulate[5] = '0;
+    assign m_rsp_ready[5] = dma_buffer_read_rsp_ready;
+    assign dma_buffer_read_rsp_valid = m_rsp_valid[5];
+    assign dma_buffer_read_rsp_data = m_rdata[5];
+    assign m_valid[6] = activation_buffer_write_valid;
+    assign activation_buffer_write_ready = m_ready[6];
+    assign m_region[6] = 2'd0;
+    assign m_addr[6] = 24'(activation_buffer_write_addr);
+    assign m_write[6] = 1'b1;
+    assign m_wdata[6] = activation_buffer_write_data;
+    assign m_accumulate[6] = '0;
+    assign m_rsp_ready[6] = '1;
+    assign m_valid[7] = dma_buffer_write_valid;
+    assign dma_buffer_write_ready = m_ready[7];
+    assign m_region[7] = 2'd0;
+    assign m_addr[7] = 24'(dma_buffer_write_addr);
+    assign m_write[7] = 1'b1;
+    assign m_wdata[7] = dma_buffer_write_data;
+    assign m_accumulate[7] = '0;
+    assign m_rsp_ready[7] = '1;
+    assign m_valid[8] = activation_acc_req_valid;
+    assign activation_acc_req_ready = m_ready[8];
+    assign m_region[8] = 2'd1;
+    assign m_addr[8] = 24'(activation_acc_req_addr);
+    assign m_write[8] = 1'b0;
+    assign m_wdata[8] = '0;
+    assign m_accumulate[8] = '0;
+    assign m_rsp_ready[8] = activation_acc_rsp_ready;
+    assign activation_acc_rsp_valid = m_rsp_valid[8];
+    assign activation_acc_rsp_data = m_rdata[8];
+    assign m_valid[9] = dma_acc_read_req_valid;
+    assign dma_acc_read_req_ready = m_ready[9];
+    assign m_region[9] = 2'd1;
+    assign m_addr[9] = 24'(dma_acc_read_req_addr);
+    assign m_write[9] = 1'b0;
+    assign m_wdata[9] = '0;
+    assign m_accumulate[9] = '0;
+    assign m_rsp_ready[9] = dma_acc_read_rsp_ready;
+    assign dma_acc_read_rsp_valid = m_rsp_valid[9];
+    assign dma_acc_read_rsp_data = m_rdata[9];
+    assign m_valid[10] = vpu_acc_write_valid;
+    assign vpu_acc_write_ready = m_ready[10];
+    assign m_region[10] = 2'd1;
+    assign m_addr[10] = 24'(vpu_acc_write_addr);
+    assign m_write[10] = 1'b1;
+    assign m_wdata[10] = vpu_acc_write_data;
+    assign m_accumulate[10] = vpu_acc_accumulate;
+    assign m_rsp_ready[10] = '1;
+    assign m_valid[11] = dma_acc_write_valid;
+    assign dma_acc_write_ready = m_ready[11];
+    assign m_region[11] = 2'd1;
+    assign m_addr[11] = 24'(dma_acc_write_addr);
+    assign m_write[11] = 1'b1;
+    assign m_wdata[11] = dma_acc_write_data;
+    assign m_accumulate[11] = '0;
+    assign m_rsp_ready[11] = '1;
+    mem_ctrl #(.SRAM_BYTES(SRAM_BYTES), .UB_ROWS(UNIFIED_BUFFER_DEPTH),
+               .ACC_ROWS(REGISTER_DEPTH), .WB_ROWS(WEIGHT_BUFFER_DEPTH)) memory_controller (
+        .clk(clk), .rst(rst), .req_valid(m_valid), .req_ready(m_ready),
+        .req_write(m_write), .req_accumulate(m_accumulate), .req_region(m_region),
+        .req_addr(m_addr), .req_data(m_wdata), .rsp_valid(m_rsp_valid),
+        .rsp_ready(m_rsp_ready), .rsp_data(m_rdata), .busy(mem_busy), .error(memory_error)
+    );
+`ifndef SYNTHESIS
+    initial if (COMPUTE_WIDTH != 2) $fatal(1,"Shared memory currently requires two FP16 lanes");
+`endif
 endmodule

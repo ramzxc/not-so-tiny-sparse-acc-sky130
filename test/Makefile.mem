@@ -1,0 +1,12 @@
+SIM = verilator
+TOPLEVEL_LANG = verilog
+TOPLEVEL = mem_ctrl
+COCOTB_TEST_MODULES = test_mem_ctrl
+SRAM_BYTES ?= 1024
+SIM_BUILD = sim_build/mem_$(SRAM_BYTES)
+VERILOG_SOURCES = $(CURDIR)/../src/tpu_pkg.sv $(CURDIR)/../src/shared_sram.sv $(CURDIR)/../src/mem_ctrl.sv
+VERILOG_SOURCES += $(wildcard $(CURDIR)/../memory/openram/generated/*/tt_sram*.v)
+COMPILE_ARGS += -DACC_SRAM_BYTES=$(SRAM_BYTES) -Wno-fatal --timing --timescale-override 1ns/1ps
+export SRAM_BYTES
+COCOTB_RESULTS_FILE = $(CURDIR)/$(SIM_BUILD)/results.xml
+include $(shell cocotb-config --makefiles)/Makefile.sim

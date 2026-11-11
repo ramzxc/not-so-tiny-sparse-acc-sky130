@@ -1,0 +1,65 @@
+{
+  "openram": {
+    "path": "/tmp/tt-openram-dev",
+    "commit": "d93bdaa3c61530e1ed9e9f38a8f7904793f71795",
+    "patch": "patches/sky130-custom-physical-and-pin-types.patch",
+    "patch_sha256": "bd875fef5441e05e63773edbf2d59acb326cc463366dcb09edba8237d2ea7b7e"
+  },
+  "sram_cells": {
+    "path": "/tmp/tt-openram-pdk/sky130_fd_bd_sram",
+    "commit": "fc63b12883b4bf458ee8c756ba64c37063e1ffb9"
+  },
+  "pdk_sources": "open_pdks 12df12e2e74145e31c5a13de02f9a1e176b56e67\n",
+  "conditions": {
+    "word_size": 64,
+    "rw_ports": 1,
+    "spare_columns": 1,
+    "corner": "TT 1.8V 25C",
+    "liberty": "analytical estimate, not SPICE-characterized",
+    "target_tile_um": [
+      1378.16,
+      225.76
+    ],
+    "bitcell": "sky130_custom_cell"
+  },
+  "magic": {
+    "commit": "0cdada32138a376f3b0339ef4753b1f2f47d7f09",
+    "version": "8.3.696"
+  },
+  "previous_rejected_generation": {
+    "openram": {
+      "path": "/tmp/tt-openram",
+      "commit": "2f7b3866418ac1ce17ad959207a1489033d8c577"
+    },
+    "sram_cells": {
+      "path": "/tmp/tt-openram-pdk/sky130_fd_bd_sram",
+      "commit": "fc63b12883b4bf458ee8c756ba64c37063e1ffb9"
+    },
+    "pdk_sources": "open_pdks 12df12e2e74145e31c5a13de02f9a1e176b56e67\n",
+    "conditions": {
+      "word_size": 64,
+      "rw_ports": 1,
+      "spare_columns": 1,
+      "corner": "TT 1.8V 25C",
+      "liberty": "analytical estimate, not SPICE-characterized",
+      "target_tile_um": [
+        1378.16,
+        225.76
+      ],
+      "bitcell": "sky130 Cypress single-port"
+    },
+    "magic": {
+      "commit": "0cdada32138a376f3b0339ef4753b1f2f47d7f09",
+      "version": "8.3.696"
+    }
+  },
+  "netgen": {
+    "version": "1.5.328",
+    "commit": "9f31fb288e85e7d2a5fa01c74e2dcc960925dd88"
+  },
+  "verification_rules": {
+    "/tmp/tt-openram-pdk/sky130A/libs.tech/magic/sky130A.tech": "3d7927f22f6e6ae1df416c8a3a2c803057de96345dd8fd6d745361bc3b45d75a",
+    "/tmp/tt-openram-pdk/sky130A/libs.tech/netgen/setup.tcl": "23d89d7609d56b8c6ef107dbf6243d1b90ad972d50eefca2baed38aa7f185ec3"
+  },
+  "generation_note": "The two custom_tapped builds were started before LVS unit-view installation. Their four custom-cell LVS definitions were refreshed from patched lvs_lib using debug/refresh_lvs_views.py before verification. Fresh builds with the complete patch use these views directly."
+}
