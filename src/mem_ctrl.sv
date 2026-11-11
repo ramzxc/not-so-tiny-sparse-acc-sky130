@@ -1,6 +1,6 @@
 // Shared WB/UB/ACC controller. Logical addresses are 32-bit row indices.
 // Region 0=UB, 1=ACC, 2=WB. Each physical word holds two logical rows.
-// Round-robin arbitration; one response slot per client. Writes are atomic
+// Round-robin arbitration; two shared tagged response slots. Writes are atomic
 // read-modify-write transactions because the macro has no byte write mask.
 module mem_ctrl
     import tpu_pkg::*;
@@ -26,7 +26,7 @@ module mem_ctrl
 );
     typedef enum logic [1:0] {IDLE, READ_RESULT, ACC_UPPER, WRITE_COMMIT} state_t;
     state_t state;
-    logic [CW-1:0] next_client, selected, owner;
+    logic [CW-1:0] next_client, selected;
     logic selected_valid, address_ok;
     logic [AW-1:0] mapped_addr, saved_addr;
     logic selected_half, saved_half, saved_write, saved_accumulate;
@@ -42,8 +42,30 @@ module mem_ctrl
     logic selected_write, selected_accumulate;
     logic [15:0] add_a, add_b, add_result;
 
+    logic [1:0] slot_valid;
+    logic [1:0][CW-1:0] slot_owner;
+    logic [1:0][31:0] slot_data;
+    logic free_slot, saved_slot, slot_available;
+    assign slot_available = !(&slot_valid);
+    assign free_slot = slot_valid[0];
+
+    // Independent slots: a stalled response does not block the other slot.
     always_comb begin
-        eligible = req_valid & ~rsp_valid;
+        rsp_valid = '0;
+        rsp_data = '0;
+        for (int i=0; i<CLIENTS; i++) begin
+            for (int j=0; j<2; j++) begin
+                if (slot_valid[j] && slot_owner[j] == CW'(i)) begin
+                    rsp_valid[i] = 1;
+                    rsp_data[i] = slot_data[j];
+                end
+            end
+        end
+    end
+
+    always_comb begin
+        // Full response slots block reads only. Writes can still make progress.
+        eligible = req_valid & ~rsp_valid & (req_write | {CLIENTS{slot_available}});
         for (int i=0;i<CLIENTS;i++) upper_eligible[i] = eligible[i] && (CW'(i) >= next_client);
         grant = '0;
         selected = '0;
@@ -103,31 +125,35 @@ module mem_ctrl
         if (rst) begin
             state <= IDLE;
             next_client <= '0;
-            owner <= '0;
+            saved_slot <= 0;
+            slot_valid <= '0;
+            slot_owner <= '0;
+            slot_data <= '0;
             saved_addr <= '0;
             saved_half <= 0;
             saved_write <= 0;
             saved_accumulate <= 0;
             saved_data <= '0;
             write_word <= '0;
-            rsp_valid <= '0;
-            rsp_data <= '0;
             error <= 0;
         end else begin
-            for (int i = 0; i < CLIENTS; i++)
-                if (rsp_valid[i] && rsp_ready[i]) rsp_valid[i] <= 0;
+            for (int j=0; j<2; j++)
+                if (slot_valid[j] && rsp_ready[slot_owner[j]]) slot_valid[j] <= 0;
             case (state)
                 IDLE: if (selected_valid) begin
                     next_client <= selected == CW'(CLIENTS-1) ? '0 : selected + 1'b1;
+                    if (!selected_write) begin
+                        saved_slot <= free_slot;
+                        slot_owner[free_slot] <= selected;
+                    end
                     if (!address_ok) begin
                         // Never truncate an out-of-range address into another region.
                         error <= 1;
                         if (!selected_write) begin
-                            rsp_valid[selected] <= 1;
-                            rsp_data[selected] <= '0;
+                            slot_valid[free_slot] <= 1;
+                            slot_data[free_slot] <= '0;
                         end
                     end else begin
-                        owner <= selected;
                         saved_addr <= mapped_addr;
                         saved_half <= selected_half;
                         saved_write <= selected_write;
@@ -149,8 +175,8 @@ module mem_ctrl
                             state <= WRITE_COMMIT;
                         end
                     end else begin
-                        rsp_valid[owner] <= 1;
-                        rsp_data[owner] <= old_row;
+                        slot_valid[saved_slot] <= 1;
+                        slot_data[saved_slot] <= old_row;
                         state <= IDLE;
                     end
                 end

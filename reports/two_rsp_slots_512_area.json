@@ -1,0 +1,58 @@
+{
+  "sram_bytes": 512,
+  "architectural_lanes": 2,
+  "physical_macs": 1,
+  "response_slots": 2,
+  "baseline_commit": "11190cd",
+  "dc_corner": "sky130_fd_sc_hd TT 1.8V 25C",
+  "clock_ns": 100,
+  "area_unit": "um^2",
+  "before_dc": {
+    "spi": 1517.705553,
+    "instruction_fifo": 8843.48134,
+    "decoder": 2105.769535,
+    "sparsity_flow_controller": 7669.855801,
+    "weight_flow_controller": 1674.105556,
+    "vpu_flow_controller": 6309.801455,
+    "vpu_core": 14782.92768,
+    "activation_flow_controller": 3824.918313,
+    "activation_core": 13250.207849,
+    "SRAM": 97582.710938,
+    "memory_controller": 16540.863642,
+    "glue": 110.1056,
+    "dma_engine": 12549.535711,
+    "axi_adapter": 6162.159815,
+    "host": 7808.738982
+  },
+  "after_dc": {
+    "spi": 1517.705553,
+    "instruction_fifo": 8843.48134,
+    "decoder": 2105.769535,
+    "sparsity_flow_controller": 7669.855801,
+    "weight_flow_controller": 1674.105556,
+    "vpu_flow_controller": 6309.801455,
+    "vpu_core": 14782.92768,
+    "activation_flow_controller": 3824.918313,
+    "activation_core": 13250.207849,
+    "SRAM": 97582.710938,
+    "memory_controller": 13618.060595,
+    "glue": 110.1056,
+    "dma_engine": 12549.535711,
+    "axi_adapter": 6162.159815,
+    "host": 7812.492582
+  },
+  "yosys_standard_cell_area": {
+    "before": 139165.9712,
+    "after": 136462.128
+  },
+  "baseline_ci_placement_utilization_percent": 86.437,
+  "estimated_placement_utilization_percent": 84.75762326254653,
+  "notes": [
+    "Only mem_ctrl response storage and admission logic changed; arithmetic and write data registers are unchanged.",
+    "Both DC and local CI-configured Yosys exited successfully.",
+    "Read responses use two independent tagged 32-bit slots. Reads wait when slots are full; writes remain eligible subject to per-client ordering.",
+    "Memory stress, full-slot write progress, independent slot release, reset, and SPI integration tests passed.",
+    "Placement utilization is an estimate; this report does not establish physical signoff."
+  ],
+  "rtl_sha256": "67cbdf2de4be0ad0ead30e338bd59b52495604331566a432e50d6e999efa641d"
+}

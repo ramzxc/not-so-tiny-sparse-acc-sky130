@@ -47,6 +47,8 @@ python -m cocotb_tools.check_results sim_build/mem_512/results.xml
 
 The memory test also resets both halves of accumulated writes before commit,
 checking that interrupted operations leave the SRAM contents unchanged.
+It fills both shared response slots, checks that writes can bypass a blocked
+third read, releases each slot independently, and resets with both slots full.
 
 The VPU check compares 20,000 lane results from the single shared MAC against
 the FP16 helpers, including arbitrary binary16 values and reset during each

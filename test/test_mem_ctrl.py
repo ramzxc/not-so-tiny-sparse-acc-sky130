@@ -110,6 +110,28 @@ async def shared_memory_transactions(d):
     assert counts[1] == previous + 1
     await drain()
 
+    # Fill both shared response slots. A third read must wait, but a write
+    # must pass it. Releasing either slot must allow the waiting read through.
+    for release_client, stalled_client in ((0, 2), (2, 0)):
+        requests[0] = (0, 0, False, 0, False)
+        requests[2] = (0, 1, False, 0, False)
+        blocked_mask = 4095 & ~(1 << 0) & ~(1 << 2)
+        for _ in range(12):
+            await cycle(blocked_mask)
+        assert held[0] is not None and held[2] is not None
+        reads_before, writes_before = counts[3], counts[1]
+        requests[3] = (0, 2, False, 0, False)
+        requests[1] = (2, 1, True, 0x40003C00, False)
+        for _ in range(20):
+            await cycle(blocked_mask)
+        assert counts[3] == reads_before, 'read accepted without a free response slot'
+        assert counts[1] == writes_before + 1, 'full response slots blocked a write'
+        for _ in range(16):
+            await cycle(blocked_mask | (1 << release_client))
+        assert counts[3] == reads_before + 1, 'released slot was not reused'
+        assert held[stalled_client] is not None
+        await drain()
+
     # Contending reads/writes, including ACC accumulation and random response stalls.
     for _ in range(6000):
         for i in range(12):
@@ -163,4 +185,18 @@ async def shared_memory_transactions(d):
             await transact(1, addr)
             await transact(1, addr ^ 1)
             assert not int(d.error.value)
+    # Reset must discard both stalled responses and make both slots reusable.
+    requests[0] = (0, 0, False, 0, False)
+    requests[2] = (0, 1, False, 0, False)
+    for _ in range(12):
+        await cycle(4090)
+    assert held[0] is not None and held[2] is not None
+    d.rst.value = 1
+    await cycle(0)
+    expected[:] = [None] * 12
+    held[:] = [None] * 12
+    assert int(d.rsp_valid.value) == 0
+    d.rst.value = 0
+    for client in range(12):
+        await transact(0, client, client=client)
     d._log.info('PASS %s bytes: %s accepted transactions; all clients progressed', size, sum(counts))
