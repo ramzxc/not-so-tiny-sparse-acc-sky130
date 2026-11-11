@@ -14,7 +14,7 @@ module tpu_core
     parameter int UNIFIED_BUFFER_DEPTH         = SRAM_BYTES / 8,
     parameter int REGISTER_DEPTH               = SRAM_BYTES / 16,
     parameter int WEIGHT_REQ_FIFO_DEPTH        = 8,
-    parameter int SPARSITY_FIFO_DEPTH          = 4,
+    parameter int SPARSITY_FIFO_DEPTH          = 2,
     parameter int VPU_META_FIFO_DEPTH          = 4,
     parameter int ACTIVATION_META_FIFO_DEPTH   = 4,
     parameter int WEIGHT_CTR_WIDTH =

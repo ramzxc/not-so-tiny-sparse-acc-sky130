@@ -1,0 +1,67 @@
+{
+  "sram_bytes": 512,
+  "architectural_lanes": 2,
+  "physical_macs": 1,
+  "fifo_entries": {
+    "instruction": 2,
+    "dma": 2,
+    "sparsity": 2
+  },
+  "fifo_usable_entries": 1,
+  "baseline_commit": "ab1f053",
+  "dc_corner": "sky130_fd_sc_hd TT 1.8V 25C",
+  "clock_ns": 100,
+  "area_unit": "um^2",
+  "before_dc": {
+    "spi": 1517.705553,
+    "instruction_fifo": 8843.48134,
+    "decoder": 2105.769535,
+    "sparsity_flow_controller": 3958.796698,
+    "weight_flow_controller": 1674.105556,
+    "vpu_flow_controller": 6309.801455,
+    "vpu_core": 14782.92768,
+    "activation_flow_controller": 3824.918313,
+    "activation_core": 8036.457487,
+    "SRAM": 97582.710938,
+    "memory_controller": 13618.060595,
+    "glue": 110.1056,
+    "dma_engine": 12549.535711,
+    "axi_adapter": 6162.159815,
+    "host": 7812.492582
+  },
+  "after_dc": {
+    "spi": 1517.705553,
+    "instruction_fifo": 4372.94387,
+    "decoder": 2120.783935,
+    "sparsity_flow_controller": 1885.558349,
+    "weight_flow_controller": 1674.105556,
+    "vpu_flow_controller": 6309.801455,
+    "vpu_core": 14779.17408,
+    "activation_flow_controller": 3824.918313,
+    "activation_core": 8036.457487,
+    "SRAM": 97582.710938,
+    "memory_controller": 13616.809395,
+    "glue": 110.1056,
+    "dma_engine": 10244.825378,
+    "axi_adapter": 6162.159815,
+    "host": 7807.487782
+  },
+  "yosys_standard_cell_area": {
+    "before": 124539.4432,
+    "after": 114014.3488
+  },
+  "estimated_placement_utilization_percent": 70.8151438332764,
+  "notes": [
+    "Only instruction, DMA and sparsity FIFO depths changed from four physical entries to two.",
+    "Sigmoid, tanh, sparse execution, accumulated writes and host staging/pending behavior are preserved.",
+    "Both DC and local CI-configured Yosys completed successfully.",
+    "Placement utilization is a proportional estimate, not a placement result.",
+    "5000 instruction FIFO cycles, 512 sparse entries, 372 DMA transfers with boundary/odd-tail/stall/reset checks, and two SPI integration tests passed."
+  ],
+  "source_sha256": {
+    "src/inst_fifo.sv": "45e1698993a9f57b2c10175834535d44108cdbd4742500b018b97d7da0096315",
+    "src/dma.sv": "49f7cec1d25d7b82e018f37d51869d1c019c996ac522c9924ed4d50c7f7f7d37",
+    "src/tpu.sv": "171b55887979c96ef64b6f17c9d9f49134e22c7d5c68275f4930ce46a682ac73",
+    "src/tpu_core.sv": "c07397f0c16284652bf94bb7b95198941f31fdc3c700f1a25ba330146d66783b"
+  }
+}

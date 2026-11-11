@@ -1,6 +1,7 @@
 `timescale 1ns/1ps
-module tb_sparsity_four;
+module tb_sparsity_small;
     import tpu_pkg::*;
+    parameter int DEPTH=2;
     logic clk=0,rst=1,en=0,busy,resource_busy,vvalid,vready=0;
     logic mvalid=0,mready,mask,mrsp,reqvalid,reqready=0,rspvalid=0,rspready,sparsity_en=1;
     input_inst_type inst;
@@ -9,7 +10,7 @@ module tb_sparsity_four;
     buffer_addr_type expected_addr[512];
     fp16_type expected_data[512];
     integer pushed=0,requested=0,responded=0,consumed=0,masks=0,full_cycles=0;
-    sparsity_ctrl #(.META_FIFO_DEPTH(4),.UB_ROWS(64)) dut(
+    sparsity_ctrl #(.META_FIFO_DEPTH(DEPTH),.UB_ROWS(64)) dut(
         .clk(clk),.rst(rst),.input_inst(inst),.input_inst_enable(en),
         .busy(busy),.resource_busy(resource_busy),.vpu_input_data(value),
         .vpu_input_valid(vvalid),.vpu_input_ready(vready),
@@ -51,7 +52,7 @@ module tb_sparsity_four;
                 if(masks>=responded || mask!==(sparsity_en ? expected_data[masks]!=0 : 1'b1)) $fatal(1,"mask data/order");
                 masks++;
             end
-            if(pushed-consumed>3 || pushed-masks>3) $fatal(1,"FIFO overcommitted");
+            if(pushed-consumed>DEPTH-1 || pushed-masks>DEPTH-1) $fatal(1,"FIFO overcommitted");
             @(negedge clk);
         end
         if(pushed!=512 || consumed!=512 || masks!=512 || resource_busy || full_cycles==0)

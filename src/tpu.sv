@@ -167,7 +167,7 @@ module tpu
     // ------------------------------------------------------------------
 
     inst_fifo #(
-        .FIFO_DEPTH (4)
+        .FIFO_DEPTH (2)
     ) instruction_fifo (
         .clk        (clk),
         .rst        (rst),

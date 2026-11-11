@@ -45,6 +45,9 @@ jobs:
           cd test
           make -f Makefile.activation
           make -f Makefile.sparsity
+          make -f Makefile.fifo
+          make -f Makefile.dma
+          python -m cocotb_tools.check_results sim_build/dma_opt/results.xml
           make -f Makefile.vpu
           make -f Makefile.mem SRAM_BYTES=512
           python -m cocotb_tools.check_results sim_build/mem_512/results.xml

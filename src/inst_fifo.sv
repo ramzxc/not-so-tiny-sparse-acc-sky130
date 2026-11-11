@@ -5,7 +5,7 @@
 module inst_fifo
     import tpu_pkg::*;
 #(
-    parameter int FIFO_DEPTH = 4
+    parameter int FIFO_DEPTH = 2
 )(
     input logic clk,
     input logic rst,

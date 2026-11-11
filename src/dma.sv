@@ -14,7 +14,7 @@ module dma
     parameter int COMPUTE_WIDTH        = 2,
     parameter int DRAM_DATA_BYTES      = 8,
     parameter int MAX_BURST_BYTES      = 256,
-    parameter int ROW_FIFO_DEPTH       = 4
+    parameter int ROW_FIFO_DEPTH       = 2
 )(
     input logic clk,
     input logic rst,

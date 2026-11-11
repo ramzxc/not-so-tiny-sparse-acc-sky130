@@ -41,6 +41,9 @@ output stalls and reset. Run this check and the 512 B memory stress test with:
 ```sh
 make -f Makefile.activation
 make -f Makefile.sparsity
+make -f Makefile.fifo
+make -f Makefile.dma
+python -m cocotb_tools.check_results sim_build/dma_opt/results.xml
 make -f Makefile.vpu
 make -f Makefile.mem SRAM_BYTES=512
 python -m cocotb_tools.check_results sim_build/mem_512/results.xml
@@ -57,10 +60,12 @@ issue/drain phase. The architectural vector width remains two lanes.
 
 Activation uses one adder/shifter across both lanes. The exhaustive check
 still compares every supported function against the unchanged FP16 helpers.
-The sparsity check drives 512 entries through the four-entry FIFO, including
+The sparsity check drives 512 entries through the two-entry FIFO, including
 full conditions, pointer wrap, independent value/mask stalls, and invalid
-addresses. The ring FIFO keeps one entry empty, so four entries hold three
-outstanding items.
+addresses. Instruction, DMA and sparsity FIFOs now use two physical entries
+with one usable entry. The instruction FIFO check exercises simultaneous
+replacement while full, stalls, wrap and reset; the DMA stress test covers
+maximum-length transfers, boundaries, odd tails and independent stalls.
 
 Using GTKWave
 
