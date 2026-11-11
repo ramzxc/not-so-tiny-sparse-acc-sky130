@@ -20,6 +20,8 @@ temperatures = [25]
 check_lvsdrc = True
 analytical_delay = True
 perimeter_pins = False
+# Preserve real routing geometry instead of blanket internal blockages.
+detailed_lef = True
 route_supplies = os.environ.get("TT_ROUTE_SUPPLIES", "1") == "1"
 output_name = "tt_sram_1rw_64x64_sky130"
 output_path = os.environ["TT_SRAM_OUTPUT"]

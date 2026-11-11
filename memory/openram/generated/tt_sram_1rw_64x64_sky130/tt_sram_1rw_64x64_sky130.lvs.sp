@@ -811,6 +811,7 @@ Xbuf_p_en_bar
 + p_en_bar_unbuf p_en_bar vdd gnd
 + tt_sram_1rw_64x64_sky130_pdriver_4
 .ENDS tt_sram_1rw_64x64_sky130_control_logic_rw
+* Explicit SI units for LVS; SPICE simulation uses the separate sp_lib view.
 * SPICE3 file created from sky130_custom_dummy.ext - technology: sky130A
 
 .subckt sky130_custom_dummy BL BR WL VPWR VGND
@@ -2353,6 +2354,7 @@ Xbit_r0_c129
 + bl_0_129 br_0_129 wl_0_0 vdd gnd
 + sky130_custom_dummy
 .ENDS tt_sram_1rw_64x64_sky130_dummy_array_0
+* Explicit SI units for LVS; SPICE simulation uses the separate sp_lib view.
 * SPICE3 file created from sky130_custom_replica.ext - technology: sky130A
 
 .subckt sky130_custom_replica BL BR WL VPWR VGND
@@ -2507,6 +2509,7 @@ Xrbc_r32_c0
 + bl_0_0 br_0_0 wl_0_32 vdd gnd
 + sky130_custom_replica
 .ENDS tt_sram_1rw_64x64_sky130_replica_column
+* Explicit SI units for LVS; SPICE simulation uses the separate sp_lib view.
 * SPICE3 file created from sky130_custom_cell.ext - technology: sky130A
 
 .subckt sky130_custom_cell BL BR WL VPWR VGND
@@ -20000,6 +20003,7 @@ Xcolumn_mux_array0
 + bl_out_61 br_out_61 bl_out_62 br_out_62 bl_out_63 br_out_63 gnd
 + tt_sram_1rw_64x64_sky130_column_mux_array
 .ENDS tt_sram_1rw_64x64_sky130_port_data
+* Explicit SI units for LVS; SPICE simulation uses the separate sp_lib view.
 * NGSPICE file created from sky130_fd_bd_sram__openram_sp_custom_nand2_dec.ext - technology: sky130A
 
 .subckt sky130_custom_nand2_dec A B Z VDD GND
