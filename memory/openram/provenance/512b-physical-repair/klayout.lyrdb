@@ -2,14 +2,20 @@
 <report-database>
  <description>SKY130 DRC runset</description>
  <original-file/>
- <generator>drc: script='/tmp/tt-openram-pdk/sky130A/libs.tech/klayout/drc/sky130A_mr.drc'</generator>
+ <generator>drc: script='/tmp/tt-new-sky130A_mr.drc'</generator>
  <top-cell>tt_sram_1rw_64x64_sky130</top-cell>
  <tags>
  </tags>
  <categories>
   <category>
+   <name>dnwell.1</name>
+   <description>dnwell.1: min. dnwell width : 3.0um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
    <name>dnwell.2</name>
-   <description>dnwell.2 : min. dnwell width : 3.0um</description>
+   <description>dnwell.2 : min. dnwell spacing : 6.3um</description>
    <categories>
    </categories>
   </category>
@@ -32,6 +38,12 @@
    </categories>
   </category>
   <category>
+   <name>nwell.9</name>
+   <description>nwell.9 : HVnwell must be enclosed by hv marker</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
    <name>hvtp.1</name>
    <description>hvtp.1 : min. hvtp width : 0.38um</description>
    <categories>
@@ -40,6 +52,18 @@
   <category>
    <name>hvtp.2</name>
    <description>hvtp.2 : min. hvtp spacing : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>pwde.1</name>
+   <description>pwde.1 : min. pwde width : 0.84um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>pwde.2</name>
+   <description>pwde.2 : min. pwde inside v20 spacing : 1.27um</description>
    <categories>
    </categories>
   </category>
@@ -74,6 +98,12 @@
    </categories>
   </category>
   <category>
+   <name>MR_lvtn.OVL.2</name>
+   <description>MR_lvtn.OVL.2 : lvtn must not straddle nwell</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
    <name>ncm.1</name>
    <description>ncm.1 : min. ncm width : 0.38um</description>
    <categories>
@@ -94,6 +124,12 @@
   <category>
    <name>difftap.1_a</name>
    <description>difftap.1_a : min. diff width in periphery : 0.15um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>difftap.2</name>
+   <description>difftap.2 : min. diff width inside areadid:ce : 0.14um</description>
    <categories>
    </categories>
   </category>
@@ -128,6 +164,30 @@
    </categories>
   </category>
   <category>
+   <name>MR_tunm.CON.1</name>
+   <description>MR_tunm.CON.1 : use of layer tunm is prohibited</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>thkox.1</name>
+   <description>thkox.1 : min. thkox width inside periphery : 0.6um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>thkox.2</name>
+   <description>thkox.2 : min. thkox spacing inside periphery : 0.7um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>MR_thkox.CON.1</name>
+   <description>MR_thkox.CON.1 : thkox must not straddle diff</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
    <name>poly.1a</name>
    <description>poly.1a : min. poly width : 0.15um</description>
    <categories>
@@ -140,6 +200,24 @@
    </categories>
   </category>
   <category>
+   <name>poly.3</name>
+   <description>poly.3 : min. poly spacing inside areaid:core : 0.16um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>ldntm.1</name>
+   <description>ldntm.1 : min. ldntm width inside areaid:core : 0.7um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>ldntm.2</name>
+   <description>ldntm.2 : min. ldntm spacing inside areaid:core : 0.7um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
    <name>rpm.1a</name>
    <description>rpm.1a : min. rpm width : 1.27um</description>
    <categories>
@@ -148,6 +226,24 @@
   <category>
    <name>rpm.2</name>
    <description>rpm.2 : min. rpm spacing : 0.84um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>rdl.1</name>
+   <description>rdl.1 : min. rdl width : 10um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>rdl.2</name>
+   <description>rdl.2 : min. rdl spacing : 10um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>MR_rdl.CON.1</name>
+   <description>MR_rdl.CON.1 : use of rdl layer is prohibited</description>
    <categories>
    </categories>
   </category>
@@ -176,56 +272,146 @@
    </categories>
   </category>
   <category>
-   <name>nsd.1</name>
-   <description>nsd.1 : min. nsdm width : 0.38um</description>
+   <name>nsdm.1</name>
+   <description>nsdm.1 : min. nsdm spacing in periphery : 0.38um</description>
    <categories>
    </categories>
   </category>
   <category>
-   <name>nsd.2</name>
-   <description>nsd.2 : min. nsdm spacing, should be manually merged if less than : 0.38um</description>
+   <name>nsdm.2</name>
+   <description>nsdm.2 : min. nsdm width in periphery : 0.38um</description>
    <categories>
    </categories>
   </category>
   <category>
-   <name>psd.1</name>
-   <description>psd.1 : min. psdm width : 0.38um</description>
+   <name>nsdm.3</name>
+   <description>nsdm.3 : min. diff width across areaid:ce : 0.38um</description>
    <categories>
    </categories>
   </category>
   <category>
-   <name>psd.2</name>
-   <description>psd.2 : min. psdm spacing, should be manually merged if less than : 0.38um</description>
+   <name>nsdm.4</name>
+   <description>nsdm.4 : min. spacing across areaid:ce : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsdm.5</name>
+   <description>nsdm.5 : min. nsdm width in areaid:ce : 0.29um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsdm.6</name>
+   <description>nsdm.6 : min. nsdm spacing in areaid:ce : 0.29um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsdm.6a</name>
+   <description>nsdm.6a : min. nsdm spacing on parallel edges in areaid:ce : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>psdm.1</name>
+   <description>psdm.1 : min. psdm spacing in periphery : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>psdm.2</name>
+   <description>psdm.2 : min. psdm width in periphery : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>psdm.3</name>
+   <description>psdm.3 : min. diff width across areaid:ce : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>psdm.4</name>
+   <description>psdm.4 : min. spacing across areaid:ce : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>psdm.5</name>
+   <description>psdm.5 : min. psdm width in areaid:ce : 0.29um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>psdm.6</name>
+   <description>psdm.6 : min. psdm spacing in areaid:ce : 0.29um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>psdm.6a</name>
+   <description>psdm.6a : min. psdm spacing on parallel edges in areaid:ce : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsdm_psdm_overlap</name>
+   <description>nsdm_psdm_overlap : nsdm overlaps psdm over active</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>licon.1_c</name>
+   <description>licon.1_c : licon should be rectangle</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>MR_licon.SP.1</name>
+   <description>MR_licon.SP.1: min. licon spacing in periphery : 0.17um</description>
    <categories>
    </categories>
   </category>
   <category>
    <name>licon.1</name>
-   <description>licon.1 : licon should be rectangle</description>
-   <categories>
-   </categories>
-  </category>
-  <category>
-   <name>licon.1_a/b</name>
-   <description>licon.1_a/b : minimum/maximum width of licon : 0.17um</description>
+   <description>licon.1: min/max. licon length : 0.17um</description>
    <categories>
    </categories>
   </category>
   <category>
    <name>licon.13</name>
-   <description>licon.13 : min. difftap licon spacing to npc : 0.09um</description>
+   <description>licon.13:  min. licon on diff spacing to npc in periphery : 0.09um</description>
    <categories>
    </categories>
   </category>
   <category>
    <name>licon.13_a</name>
-   <description>licon.13_a : licon of diffTap in periphery must not overlap npc</description>
+   <description>licon.13_a:  licon on diff in periphery can't overlap npc</description>
    <categories>
    </categories>
   </category>
   <category>
    <name>licon.17</name>
    <description>licon.17 : Licons may not overlap both poly and (diff or tap)</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>licon.6</name>
+   <description>licon.6 : npc min enclosure of poly_licon inside areaid:core : 0.045um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsm.1</name>
+   <description>nsm.1 : nsm min. spacing : 4.0um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsm.2</name>
+   <description>nsm.2 : nsm min. width : 3.0um</description>
    <categories>
    </categories>
   </category>
@@ -243,25 +429,19 @@
   </category>
   <category>
    <name>capm.2b</name>
-   <description>capm.2b : min. capm spacing : 1.2um</description>
+   <description>capm.2b : min. spacing between met3_bot_plate : 1.2um</description>
    <categories>
    </categories>
   </category>
   <category>
    <name>capm.2b_a</name>
-   <description>capm.2b_a : min. spacing of m3_bot_plate : 1.2um</description>
+   <description>capm.2b_a : min. spacing between met3_bot_plate and met3 : 1.2um</description>
    <categories>
    </categories>
   </category>
   <category>
    <name>capm.3</name>
-   <description>capm.3 : min. capm and m3 enclosure of m3 : 0.14um</description>
-   <categories>
-   </categories>
-  </category>
-  <category>
-   <name>capm.3_a</name>
-   <description>capm.3_a : min. m3 enclosure of capm : 0.14um</description>
+   <description>capm.3 : min. m3 enclosure of capm : 0.14um</description>
    <categories>
    </categories>
   </category>
@@ -321,13 +501,13 @@
   </category>
   <category>
    <name>cap2m.4</name>
-   <description>cap2m.4 : min. cap2m enclosure of via4 : 0.14um</description>
+   <description>cap2m.4 : min. cap2m enclosure of via4 : 0.2um</description>
    <categories>
    </categories>
   </category>
   <category>
    <name>cap2m.5</name>
-   <description>cap2m.5 : min. cap2m spacing to via4 : 0.14um</description>
+   <description>cap2m.5 : min. cap2m spacing to via4 : 0.2um</description>
    <categories>
    </categories>
   </category>
@@ -339,13 +519,13 @@
   </category>
   <category>
    <name>li.1</name>
-   <description>li.1 : min. li width : 0.17um</description>
+   <description>li.1 : min. li width outside or crossing areaid:ce : 0.17um</description>
    <categories>
    </categories>
   </category>
   <category>
    <name>li.3</name>
-   <description>li.3 : min. li spacing : 0.17um</description>
+   <description>li.3 : min. li spacing outside or crossing areaid:ce : 0.17um</description>
    <categories>
    </categories>
   </category>
@@ -358,6 +538,24 @@
   <category>
    <name>li.6</name>
    <description>li.6 : min. li area : 0.0561um²</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>li.7</name>
+   <description>li.7 : min. li core spacing : 0.14um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>li.8</name>
+   <description>li.8 : min. li core width : 0.14um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>MR_li.WID.4</name>
+   <description>MR_li.WID.4 : li:res minimum width : 0.29um</description>
    <categories>
    </categories>
   </category>
@@ -572,6 +770,12 @@
    </categories>
   </category>
   <category>
+   <name>m2.4_b</name>
+   <description>m2.4_B : min. m2 enclosure of via inside areaid:core : 0.045um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
    <name>m2.5</name>
    <description>m2.5 : min. m2 enclosure of via of 2 adjacent edges : 0.085um</description>
    <categories>
@@ -668,6 +872,18 @@
    </categories>
   </category>
   <category>
+   <name>m3.6</name>
+   <description>m3.6 : min. m3 area : 0.240um²</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m3.7</name>
+   <description>m3.7 : min. m3 holes area : 0.2um²</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
    <name>via3.1</name>
    <description>via3.1 : via3 outside of moduleCut should be rectangular</description>
    <categories>
@@ -742,6 +958,12 @@
   <category>
    <name>m4.3_a</name>
    <description>m4.3_a : via3 must be enclosed by met4</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m4.7</name>
+   <description>m4.7 : min. m4 holes area : 0.2um²</description>
    <categories>
    </categories>
   </category>
@@ -830,8 +1052,20 @@
    </categories>
   </category>
   <category>
+   <name>m5.7</name>
+   <description>m5.7 : min. m5 holes area : 0.14um²</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
    <name>pad.2</name>
    <description>pad.2 : min. pad spacing : 1.27um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>moduleCut.1</name>
+   <description>moduleCut.1 : moduleCut layer is for SkyWater use only</description>
    <categories>
    </categories>
   </category>

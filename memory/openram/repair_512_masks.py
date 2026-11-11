@@ -20,10 +20,15 @@ for layer,datatype,spacing in [(93,44,.38),(94,20,.38),(95,20,.27)]:
     additions=gdstk.boolean(merged,original,"not",precision=.001,layer=layer,datatype=datatype)
     top.add(*additions)
     stats[str((layer,datatype))]={"added_area_um2":sum(p.area() for p in additions),"minimum_spacing_um":spacing}
-# Two diagonal PSDM junctions require 0.76 um square bridges to satisfy
-# spacing AND minimum width. These coordinates are specific to this macro.
-for cx,cy in [(32.755,63.285),(41.105,49.145)]:
-    top.add(gdstk.rectangle((round(cx-.38,3),round(cy-.38,3)),(round(cx+.38,3),round(cy+.38,3)),layer=94,datatype=20))
+# Two diagonal PSDM junctions need >= 0.38 um width while avoiding
+# NSDM-covered active areas. The asymmetric bridges are macro-specific.
+for cx,cy,down,up in [(32.755,63.285,.25,.38),(41.105,49.145,.38,.25)]:
+    top.add(gdstk.rectangle((round(cx-.38,3),round(cy-down,3)),(round(cx+.40,3),round(cy+up,3)),layer=94,datatype=20))
+overlap = gdstk.boolean(
+    gdstk.boolean(top.get_polygons(layer=93,datatype=44),
+                  top.get_polygons(layer=94,datatype=20), "and", precision=.001),
+    top.get_polygons(layer=65,datatype=20), "and", precision=.001)
+assert not overlap, "NSDM and PSDM overlap over active"
 a.output.parent.mkdir(parents=True,exist_ok=True)
 lib.write_gds(a.output)
 a.output.with_suffix(".mask_repair.json").write_text(json.dumps(stats,indent=2)+"\n")

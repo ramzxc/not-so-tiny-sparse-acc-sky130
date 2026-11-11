@@ -1,4 +1,4 @@
-Wed Nov 11 18:41:14 JST 2026: Starting DRC using Magic /tmp/tt-magic/bin/magic
+Wed Nov 11 19:34:45 JST 2026: Starting DRC using Magic /tmp/tt-magic/bin/magic
 
 Magic 8.3 revision 696 - Compiled on Wed Nov 11 14:15:16 JST 2026.
 Starting magic under Tcl interpreter
@@ -107,7 +107,7 @@ Finished expanding
 DRC style is now "drc(full)"
 Finished drc check
 Loading DRC CIF style.
-Created database crash recovery file /tmp/MAG106233.IAGE7Q
+Created database crash recovery file /tmp/MAG111611.aF8ePy
 Finished drc catchup
 Total DRC errors found: 0
-Wed Nov 11 18:42:29 JST 2026: Finished (0) DRC using Magic /tmp/tt-magic/bin/magic
+Wed Nov 11 19:35:58 JST 2026: Finished (0) DRC using Magic /tmp/tt-magic/bin/magic

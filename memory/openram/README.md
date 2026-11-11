@@ -83,7 +83,7 @@ The raw macro also had 1700 KLayout mask-spacing violations. The geometry-specif
 `repair_512_masks.py` adds NSDM/PSDM/NPC bridges while retaining every original
 cell polygon. It follows the merge requirement in the SKY130
 [periphery rules](https://skywater-pdk.readthedocs.io/en/main/rules/periphery.html)
-(nsd.2, psd.2, npc.2). Two diagonal PSDM junctions use 0.76 um square bridges;
+(nsd.2, psd.2, npc.2). Two diagonal PSDM junctions use asymmetric 0.78 x 0.63 um bridges;
 these coordinates apply only to this 512 B layout. It does not modify transistor,
 contact, routing-metal or via geometry. Magic DRC, KLayout DRC and LVS must be
 rerun after any change to the repair or input.
@@ -117,3 +117,37 @@ exceeding Magic's 2048-byte LEF input buffer. Coordinates now appear one pair
 per line (maximum line length 48); all LEF tokens and geometry are unchanged.
 Magic 8.3.623, the CI version, read all 356310 lines with no errors. See
 `provenance/512b-physical-repair/magic_lef_read.txt`. Full signoff remains pending.
+
+### Integration repair after run 43000975752
+
+The run passed LVS and antenna but failed with 394 KLayout DRC markers,
+576 Magic DRC markers, 310 extraction overlap errors and 252193 XOR differences.
+The KLayout streamout contained an empty SRAM cell: `RenameCell` retained the
+cleared LEF cell rather than replacing it with macro GDS. `OverwriteCell` now
+fills the existing cell from its supplied GDS. The macro geometry must be present
+and equivalent in both streamouts; XOR remains mandatory.
+
+392 KLayout markers were via3 size/spacing violations at the SRAM power rings.
+Automatic macro M3/M4 stitching duplicated existing internal macro vias.
+`pdn_standard_grid.tcl` preserves LibreLane 3.0.14's standard-cell power grid
+(Apache-2.0 source), omitting its default macro grid; the explicit checked edge
+connections remain in `pdn_sram_connections.tcl`. Both supply connectivity checks
+must pass. This removes duplicate geometry rather than ignoring DRC.
+
+The other two markers were NSDM/PSDM overlap on active beneath the previously
+added square bridges. The bridges are now asymmetric and the generation script
+asserts zero implant overlap on active. The earlier standalone KLayout deck
+lacked that rule and was insufficient. The CI PDK reference at open_pdks
+8afc8346a57fe1ab7934ba5a6056ea8b43078e71 pins fossi-foundation/mpw_precheck
+7eb869a4b6a5807f49d5ae738c541cce39c41ba5. Its `sky130A_mr.drc` SHA256 is
+caf4a6b08cb12f78d6bb2d120737424c786b3bae8d6489234b9b269e91107bfc.
+The updated macro passes this deck with FEOL/BEOL/offgrid/seal enabled, plus
+Magic DRC and unique Netgen LVS, with no property errors. Previous reports were
+replaced by reports for the updated macro. Physical checks are not timing/PVT
+characterization.
+
+Local replay of run 43000975752's final signal routing with the corrected PDN
+and macro gives **Magic DRC 0, KLayout DRC 0, XOR 0**, and both supply nets
+connected. Both streamouts contain the actual SRAM geometry. Evidence and hashes
+are in `provenance/512b-integration-repair/`. This replay does not replace a fresh
+full CI run or full-chip extraction/LVS after the changes. All checks stay enabled.

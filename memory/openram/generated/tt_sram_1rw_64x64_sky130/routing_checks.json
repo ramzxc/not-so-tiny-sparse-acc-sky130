@@ -44,5 +44,26 @@
     "version": "8.3.623 (same as CI)",
     "errors": 0,
     "processed_lines": 356310
+  },
+  "latest_integration_replay": {
+    "scope": "Local replay of CI 43000975752 final placement/signal routing, regenerating PDN and both streamouts; not a fresh full flow",
+    "magic_drc_errors": 0,
+    "klayout_drc_errors": 0,
+    "xor_differences": 0,
+    "macro_present_in_both_streamouts": true,
+    "VPWR_connectivity": "PASS",
+    "VGND_connectivity": "PASS",
+    "full_chip_lvs": "Fresh CI pending; previous CI LVS passed",
+    "macro_lvs": "PASS",
+    "klayout_drc_deck_sha256": "caf4a6b08cb12f78d6bb2d120737424c786b3bae8d6489234b9b269e91107bfc",
+    "checked_sha256": {
+      "tt_sram_1rw_64x64_sky130.gds": "a30021946db6cfa1286b5776980fc04661e39dace5297fd3e170f99745b52c74",
+      "tt_sram_1rw_64x64_sky130.lef": "25561c0ed3d25d88d22747a6ebeb602f4e639073380e6dec8b8ccc8261457a06",
+      "pdn.tcl": "1fd38a9053aae9e0dea29c61261e03f84c9d5333b215db4108e7061bf634d91e",
+      "pdn_standard_grid.tcl": "f37f7ebfa5002c3d1fffa3b30ee6261bb15208ceb725f21706e9ff23ec49bc0c",
+      "pdn_sram_connections.tcl": "f4a2c812dbdde27c999bbab9c3c01a32e04e144cb663729c7690f5ebd51436c6",
+      "tt_um_not_so_tiny_sparse_acc_ramzxc.magic.gds": "aae9246b596f521c4b68f506244a7d8ab383fbc67f27762b1bc4889bcf49053b",
+      "tt-clean.klayout.gds": "a1645f7760cd2896ed6c623600e4f92dff1810e8ba15984d2d732c120a823d45"
+    }
   }
 }

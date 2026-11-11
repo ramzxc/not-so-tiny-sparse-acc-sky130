@@ -4,9 +4,11 @@
   "lvs_property_errors": false,
   "final_verification": true,
   "checked_sha256": {
-    ".gds": "7137c41b2be824dc9c7fb52b791c1118bffa7325a489890155e135abf57692bd",
+    ".gds": "a30021946db6cfa1286b5776980fc04661e39dace5297fd3e170f99745b52c74",
     ".lvs.sp": "aecf2d431c88a9e6a144f23c69ec1eae3442e8054eb3da9a8ea30721d195bf3b"
   },
   "klayout_drc_errors": 0,
-  "klayout_deck": "sky130A_mr.drc; feol=1 beol=1 offgrid=1 seal=1"
+  "klayout_deck_sha256": "caf4a6b08cb12f78d6bb2d120737424c786b3bae8d6489234b9b269e91107bfc",
+  "klayout_deck_source": "https://github.com/fossi-foundation/mpw_precheck/blob/7eb869a4b6a5807f49d5ae738c541cce39c41ba5/checks/tech-files/sky130A_mr.drc",
+  "klayout_deck_options": "feol=1 beol=1 offgrid=1 seal=1"
 }

@@ -86,5 +86,6 @@
   "ERROR_ON_LVS_ERROR": true,
   "ERROR_ON_PDN_VIOLATIONS": true,
   "ERROR_ON_TR_DRC": true,
-  "ERROR_ON_XOR_ERROR": true
+  "ERROR_ON_XOR_ERROR": true,
+  "KLAYOUT_CONFLICT_RESOLUTION": "OverwriteCell"
 }
