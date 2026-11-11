@@ -40,6 +40,7 @@ output stalls and reset. Run this check and the 512 B memory stress test with:
 
 ```sh
 make -f Makefile.activation
+make -f Makefile.sparsity
 make -f Makefile.vpu
 make -f Makefile.mem SRAM_BYTES=512
 python -m cocotb_tools.check_results sim_build/mem_512/results.xml
@@ -53,6 +54,13 @@ third read, releases each slot independently, and resets with both slots full.
 The VPU check compares 20,000 lane results from the single shared MAC against
 the FP16 helpers, including arbitrary binary16 values and reset during each
 issue/drain phase. The architectural vector width remains two lanes.
+
+Activation uses one adder/shifter across both lanes. The exhaustive check
+still compares every supported function against the unchanged FP16 helpers.
+The sparsity check drives 512 entries through the four-entry FIFO, including
+full conditions, pointer wrap, independent value/mask stalls, and invalid
+addresses. The ring FIFO keeps one entry empty, so four entries hold three
+outstanding items.
 
 Using GTKWave
 

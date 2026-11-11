@@ -1,0 +1,74 @@
+{
+  "sram_bytes": 512,
+  "architectural_lanes": 2,
+  "physical_macs": 1,
+  "activation_arithmetic_sets": 1,
+  "sparsity_fifo_entries": 4,
+  "sparsity_fifo_usable_entries": 3,
+  "baseline_commit": "74e26e0",
+  "dc_corner": "sky130_fd_sc_hd TT 1.8V 25C",
+  "clock_ns": 100,
+  "area_unit": "um^2",
+  "before_dc": {
+    "spi": 1517.705553,
+    "instruction_fifo": 8843.48134,
+    "decoder": 2105.769535,
+    "sparsity_flow_controller": 7669.855801,
+    "weight_flow_controller": 1674.105556,
+    "vpu_flow_controller": 6309.801455,
+    "vpu_core": 14782.92768,
+    "activation_flow_controller": 3824.918313,
+    "activation_core": 13250.207849,
+    "SRAM": 97582.710938,
+    "memory_controller": 13618.060595,
+    "glue": 110.1056,
+    "dma_engine": 12549.535711,
+    "axi_adapter": 6162.159815,
+    "host": 7812.492582
+  },
+  "after_dc": {
+    "spi": 1517.705553,
+    "instruction_fifo": 8843.48134,
+    "decoder": 2105.769535,
+    "sparsity_flow_controller": 3958.796698,
+    "weight_flow_controller": 1674.105556,
+    "vpu_flow_controller": 6309.801455,
+    "vpu_core": 14782.92768,
+    "activation_flow_controller": 3824.918313,
+    "activation_core": 8036.457487,
+    "SRAM": 97582.710938,
+    "memory_controller": 13618.060595,
+    "glue": 110.1056,
+    "dma_engine": 12549.535711,
+    "axi_adapter": 6162.159815,
+    "host": 7812.492582
+  },
+  "yosys_standard_cell_area": {
+    "before": 136462.128,
+    "after": 124539.4432
+  },
+  "estimated_placement_utilization_percent": 77.35235675111933,
+  "activation_issue_intervals_cycles": {
+    "before": {
+      "simple": 2,
+      "sigmoid": 5,
+      "tanh": 7
+    },
+    "after": {
+      "simple": 3,
+      "sigmoid": 9,
+      "tanh": 13
+    }
+  },
+  "notes": [
+    "Only activation datapath and sparsity FIFO depth changed. Other FIFOs, MAC and memory controller are unchanged.",
+    "Both synthesis runs completed successfully.",
+    "Placement utilization is an estimate based on the one-MAC CI utilization of 86.437 percent, not a placement result.",
+    "327682 activation comparisons against unchanged FP16 helpers, output stalls/reset, 512 sparse entries with independent consumer stalls/full/wrap/invalid addresses, and two SPI integration tests passed."
+  ],
+  "source_sha256": {
+    "src/activation.sv": "558a1df6e623fbec4cb357b4276d81d6e33440b66c13cfdab0e6921ec312fe90",
+    "src/tpu_core.sv": "515883f659795fce0ba56195d8d2a10937fb9fc2a10b456149aa47207abd1b9d",
+    "src/sparsity_ctrl.sv": "ac244af0927bd57a497ca82b58ca1fd2f66bc7084c71362eda61ef334112dfb9"
+  }
+}
