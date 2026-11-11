@@ -3,7 +3,8 @@
 module sparsity_ctrl
     import tpu_pkg::*;
 #(
-    parameter int META_FIFO_DEPTH = 8
+    parameter int META_FIFO_DEPTH = 8,
+    parameter int UB_ROWS = DEFAULT_SRAM_BYTES / 8
 )(
     input logic clk,
     input logic rst, 
@@ -54,7 +55,9 @@ module sparsity_ctrl
     endfunction
 
     // meta FIFO 
-    buffer_addr_type addr_fifo [META_FIFO_DEPTH-1:0];
+    localparam int UB_AW = $clog2(UB_ROWS);
+    logic [UB_AW-1:0] addr_fifo [META_FIFO_DEPTH-1:0];
+    logic invalid_addr_fifo [META_FIFO_DEPTH-1:0];
     fp16_type        val_fifo  [META_FIFO_DEPTH-1:0];
 
     fifo_ptr_t inst_ptr_cs;
@@ -77,7 +80,7 @@ module sparsity_ctrl
 
     //step 2: Unified buffer에 request
     assign input_read_req_valid = (req_ptr_cs != inst_ptr_cs);
-    assign input_read_req_addr = addr_fifo[req_ptr_cs];
+    assign input_read_req_addr = invalid_addr_fifo[req_ptr_cs] ? '1 : buffer_addr_type'(addr_fifo[req_ptr_cs]);
     assign req_fire = input_read_req_valid && input_read_req_ready;
 
     //step 3
@@ -105,7 +108,8 @@ module sparsity_ctrl
         end
         else begin
             if (push_fire) begin
-                addr_fifo[inst_ptr_cs] <= input_inst.input_addr;
+                addr_fifo[inst_ptr_cs] <= UB_AW'(input_inst.input_addr);
+                invalid_addr_fifo[inst_ptr_cs] <= input_inst.input_addr >= UB_ROWS;
                 inst_ptr_cs <= next_fifo_ptr(inst_ptr_cs);
             end
 

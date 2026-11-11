@@ -10,7 +10,8 @@ module activation_ctrl
     import tpu_pkg::*;
 #(
     parameter int COMPUTE_WIDTH    = 14,
-    parameter int META_FIFO_DEPTH = 4
+    parameter int META_FIFO_DEPTH = 4,
+    parameter int UB_ROWS = DEFAULT_SRAM_BYTES / 8
 )(
     input  logic clk,
     input  logic rst,
@@ -63,9 +64,12 @@ module activation_ctrl
     typedef logic [FIFO_PTR_WIDTH-1:0]      fifo_ptr_type;
     typedef logic [FIFO_COUNT_WIDTH-1:0]    fifo_count_type;
 
+    localparam int UB_AW = $clog2(UB_ROWS);
+
     typedef struct packed {
         activation_type  function_sel;
-        buffer_addr_type buffer_addr;
+        logic [UB_AW-1:0] buffer_addr;
+        logic address_invalid;
     } activation_meta_type;
 
     activation_meta_type meta_fifo [META_FIFO_DEPTH-1:0];
@@ -156,7 +160,7 @@ module activation_ctrl
         activation_rsp_valid && (activation_ptr_cs != buffer_ptr_cs);
 
     assign buffer_write_addr = buffer_write_valid
-        ? meta_fifo[buffer_ptr_cs].buffer_addr
+        ? (meta_fifo[buffer_ptr_cs].address_invalid ? '1 : buffer_addr_type'(meta_fifo[buffer_ptr_cs].buffer_addr))
         : '0;
 
     assign activation_rsp_ready =
@@ -201,7 +205,8 @@ module activation_ctrl
             if (acc_request_fire) begin
                 meta_fifo[write_ptr_cs] <= '{
                     function_sel: function_cs,
-                    buffer_addr:  buffer_addr_cs
+                    buffer_addr: UB_AW'(buffer_addr_cs),
+                    address_invalid: buffer_addr_cs >= UB_ROWS
                 };
 
                 write_ptr_cs     <= next_ptr(write_ptr_cs);

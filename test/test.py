@@ -261,5 +261,13 @@ async def test_shared_memory_compute_and_activation(dut):
     await h.instruction((32 << 24) | (16 << 8) | 0x81)
     await store(0x4300, 0x42, [0x4A00480048004400, 0] * 4, row=32)
 
+    # Multi-cycle sigmoid/tanh must also preserve metadata ordering across
+    # FIFO wrap. Each input pair of rows contains zero, zero, +inf, -inf.
+    await load(0x4400, 0x44, [0xFC007C0000000000] * 8)
+    await h.instruction((32 << 24) | (16 << 8) | 0x89)
+    await store(0x4500, 0x42, [0x00003C0038003800] * 8, row=32)
+    await h.instruction((32 << 24) | (16 << 8) | 0x8A)
+    await store(0x4600, 0x42, [0xBC003C0000000000] * 8, row=32)
+
     await h.instruction(0xFF)
     await h.wait_status(0x20)

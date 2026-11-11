@@ -1,0 +1,6 @@
+# Exhaustive binary16 equivalence against the unchanged tpu_pkg helpers.
+BUILD ?= sim_build/activation
+.PHONY: all
+all:
+	verilator --binary --timing -j 2 -Wno-fatal --top-module tb_activation_shared --Mdir $(BUILD) ../src/tpu_pkg.sv ../src/activation.sv tb_activation_shared.sv
+	./$(BUILD)/Vtb_activation_shared

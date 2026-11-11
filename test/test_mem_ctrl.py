@@ -146,4 +146,21 @@ async def shared_memory_transactions(d):
     d.rst.value = 0
     await transact(0, 0)
     assert not int(d.error.value)
+
+    # Reset in either serialized accumulate phase must not commit half a row.
+    for addr in (0, 1):
+        for extra_cycles in (1, 2):
+            saved = model[1][addr]
+            requests[0] = (1, addr, True, 0x3C003C00, True)
+            await cycle()
+            assert requests[0] is None
+            for _ in range(extra_cycles):
+                await cycle()
+            d.rst.value = 1
+            await cycle()
+            model[1][addr] = saved
+            d.rst.value = 0
+            await transact(1, addr)
+            await transact(1, addr ^ 1)
+            assert not int(d.error.value)
     d._log.info('PASS %s bytes: %s accepted transactions; all clients progressed', size, sum(counts))

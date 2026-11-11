@@ -24,55 +24,73 @@ module mem_ctrl
     input logic [CLIENTS-1:0] rsp_ready,
     output logic busy, error
 );
-    typedef enum logic [1:0] {IDLE, READ_RESULT, WRITE_COMMIT} state_t;
+    typedef enum logic [1:0] {IDLE, READ_RESULT, ACC_UPPER, WRITE_COMMIT} state_t;
     state_t state;
     logic [CW-1:0] next_client, selected, owner;
     logic selected_valid, address_ok;
     logic [AW-1:0] mapped_addr, saved_addr;
     logic selected_half, saved_half, saved_write, saved_accumulate;
-    logic [31:0] saved_data, old_row, updated_row;
+    logic [31:0] saved_data, old_row;
     logic [63:0] write_word, macro_data;
     logic macro_enable, macro_write;
     logic [AW-1:0] macro_addr;
-    integer candidate;
-    logic [23:0] row_limit, row_base;
+    logic [CLIENTS-1:0] eligible, upper_eligible, grant;
+    logic [AW:0] selected_row, row_limit, row_base;
+    logic selected_address_high;
+    logic [1:0] selected_region;
+    logic [31:0] selected_data;
+    logic selected_write, selected_accumulate;
+    logic [15:0] add_a, add_b, add_result;
 
     always_comb begin
+        eligible = req_valid & ~rsp_valid;
+        for (int i=0;i<CLIENTS;i++) upper_eligible[i] = eligible[i] && (CW'(i) >= next_client);
+        grant = '0;
         selected = '0;
-        selected_valid = 1'b0;
-        candidate = 0;
-        for (int offset = 0; offset < CLIENTS; offset++) begin
-            candidate = int'(next_client) + offset;
-            if (candidate >= CLIENTS) candidate = candidate - CLIENTS;
-            if (!selected_valid && req_valid[candidate] && !rsp_valid[candidate]) begin
-                selected = CW'(candidate);
-                selected_valid = 1'b1;
+        selected_valid = 0;
+        for (int i=0;i<CLIENTS;i++) begin
+            if (!selected_valid && ((|upper_eligible) ? upper_eligible[i] : eligible[i])) begin
+                grant[i] = 1;
+                selected = CW'(i);
+                selected_valid = 1;
             end
+        end
+        // Mux only the physical row bits. Keep a separate high-bit flag so
+        // invalid architectural addresses never alias into a legal region.
+        selected_row = '0;
+        selected_address_high = 0;
+        selected_region = '0;
+        selected_data = '0;
+        selected_write = 0;
+        selected_accumulate = 0;
+        for (int i=0;i<CLIENTS;i++) begin
+            selected_row |= req_addr[i][AW:0] & {(AW+1){grant[i]}};
+            selected_address_high |= grant[i] && (|req_addr[i][23:AW+1]);
+            selected_region |= req_region[i] & {2{grant[i]}};
+            selected_data |= req_data[i] & {32{grant[i]}};
+            selected_write |= req_write[i] && grant[i];
+            selected_accumulate |= req_accumulate[i] && grant[i];
         end
         row_limit = '0;
         row_base = '0;
-        case (req_region[selected])
-            0: begin row_limit = 24'(UB_ROWS); row_base = 0; end
-            1: begin row_limit = 24'(ACC_ROWS); row_base = 24'(UB_ROWS); end
-            2: begin row_limit = 24'(WB_ROWS); row_base = 24'(UB_ROWS+ACC_ROWS); end
+        case (selected_region)
+            0: begin row_limit = (AW+1)'(UB_ROWS); row_base = 0; end
+            1: begin row_limit = (AW+1)'(ACC_ROWS); row_base = (AW+1)'(UB_ROWS); end
+            2: begin row_limit = (AW+1)'(WB_ROWS); row_base = (AW+1)'(UB_ROWS+ACC_ROWS); end
             default: ;
         endcase
-        address_ok = req_addr[selected] < row_limit;
-        mapped_addr = AW'((row_base + req_addr[selected]) >> 1);
-        selected_half = req_addr[selected][0];
+        address_ok = !selected_address_high && selected_row < row_limit;
+        mapped_addr = AW'((row_base + selected_row) >> 1);
+        selected_half = selected_row[0];
         req_ready = '0;
-        if (!rst && state == IDLE && selected_valid) req_ready[selected] = 1'b1;
+        if (!rst && state == IDLE) req_ready = grant;
     end
 
     assign busy = (state != IDLE) || (|req_valid) || (|rsp_valid);
     assign old_row = saved_half ? macro_data[63:32] : macro_data[31:0];
-    always_comb begin
-        updated_row = saved_data;
-        if (saved_accumulate) begin
-            updated_row[15:0] = fp16_add(old_row[15:0],saved_data[15:0]);
-            updated_row[31:16] = fp16_add(old_row[31:16],saved_data[31:16]);
-        end
-    end
+    assign add_a = state == ACC_UPPER ? write_word[(saved_half ? 48 : 16) +: 16] : old_row[15:0];
+    assign add_b = state == ACC_UPPER ? saved_data[31:16] : saved_data[15:0];
+    assign add_result = fp16_add(add_a,add_b);
     assign macro_enable = !rst && ((state == IDLE && selected_valid && address_ok) || state == WRITE_COMMIT);
     assign macro_write = (state == WRITE_COMMIT);
     assign macro_addr = (state == WRITE_COMMIT) ? saved_addr : mapped_addr;
@@ -104,7 +122,7 @@ module mem_ctrl
                     if (!address_ok) begin
                         // Never truncate an out-of-range address into another region.
                         error <= 1;
-                        if (!req_write[selected]) begin
+                        if (!selected_write) begin
                             rsp_valid[selected] <= 1;
                             rsp_data[selected] <= '0;
                         end
@@ -112,23 +130,33 @@ module mem_ctrl
                         owner <= selected;
                         saved_addr <= mapped_addr;
                         saved_half <= selected_half;
-                        saved_write <= req_write[selected];
-                        saved_accumulate <= req_accumulate[selected];
-                        saved_data <= req_data[selected];
+                        saved_write <= selected_write;
+                        saved_accumulate <= selected_accumulate;
+                        saved_data <= selected_data;
                         state <= READ_RESULT;
                     end
                 end
                 READ_RESULT: begin
                     // Macro sampled at preceding posedge, returned data at negedge.
                     if (saved_write) begin
-                        write_word <= saved_half ? {updated_row,macro_data[31:0]}
-                                                 : {macro_data[63:32],updated_row};
-                        state <= WRITE_COMMIT;
+                        if (saved_accumulate) begin
+                            write_word <= macro_data;
+                            write_word[(saved_half ? 32 : 0) +: 16] <= add_result;
+                            state <= ACC_UPPER;
+                        end else begin
+                            write_word <= saved_half ? {saved_data,macro_data[31:0]}
+                                                     : {macro_data[63:32],saved_data};
+                            state <= WRITE_COMMIT;
+                        end
                     end else begin
                         rsp_valid[owner] <= 1;
                         rsp_data[owner] <= old_row;
                         state <= IDLE;
                     end
+                end
+                ACC_UPPER: begin
+                    write_word[(saved_half ? 48 : 16) +: 16] <= add_result;
+                    state <= WRITE_COMMIT;
                 end
                 WRITE_COMMIT: state <= IDLE;
                 default: state <= IDLE;

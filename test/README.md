@@ -34,6 +34,19 @@ This will generate `tb.vcd` instead of `tb.fst`.
 
 ## How to view the waveform file
 
+The shared activation datapath is checked against the unchanged FP16 helper
+functions for all 65,536 binary16 patterns per supported activation, including
+output stalls and reset. Run this check and the 512 B memory stress test with:
+
+```sh
+make -f Makefile.activation
+make -f Makefile.mem SRAM_BYTES=512
+python -m cocotb_tools.check_results sim_build/mem_512/results.xml
+```
+
+The memory test also resets both halves of accumulated writes before commit,
+checking that interrupted operations leave the SRAM contents unchanged.
+
 Using GTKWave
 
 ```sh

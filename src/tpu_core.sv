@@ -245,7 +245,8 @@ module tpu_core
     // ---------------------------------------------------------------------
 
     sparsity_ctrl #(
-        .META_FIFO_DEPTH  (WEIGHT_REQ_FIFO_DEPTH)
+        .META_FIFO_DEPTH  (WEIGHT_REQ_FIFO_DEPTH),
+        .UB_ROWS          (UNIFIED_BUFFER_DEPTH)
     ) sparsity_flow_controller (
         .clk                   (clk),
         .rst                   (rst),
@@ -356,7 +357,8 @@ module tpu_core
 
     activation_ctrl #(
         .COMPUTE_WIDTH   (COMPUTE_WIDTH),
-        .META_FIFO_DEPTH (ACTIVATION_META_FIFO_DEPTH)
+        .META_FIFO_DEPTH (ACTIVATION_META_FIFO_DEPTH),
+        .UB_ROWS         (UNIFIED_BUFFER_DEPTH)
     ) activation_flow_controller (
         .clk                    (clk),
         .rst                    (rst),
