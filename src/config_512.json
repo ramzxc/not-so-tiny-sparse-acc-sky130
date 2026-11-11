@@ -68,5 +68,6 @@
   "MAGIC_WRITE_LEF_PINONLY": 1,
   "VERILOG_DEFINES": [
     "ACC_SRAM_BYTES=512"
-  ]
+  ],
+  "PDN_CFG": "dir::pdn.tcl"
 }
