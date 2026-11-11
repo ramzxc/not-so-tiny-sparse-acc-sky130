@@ -1,0 +1,44 @@
+{
+  "met1": {
+    "gds_polygons": 128678,
+    "obstruction_polygons": 5565,
+    "missing_area_um2": 0,
+    "pin_excess_area_um2": 0
+  },
+  "met2": {
+    "gds_polygons": 33298,
+    "obstruction_polygons": 6219,
+    "missing_area_um2": 0,
+    "pin_excess_area_um2": 0
+  },
+  "met3": {
+    "gds_polygons": 5541,
+    "obstruction_polygons": 798,
+    "missing_area_um2": 0,
+    "pin_excess_area_um2": 0
+  },
+  "met4": {
+    "gds_polygons": 1324,
+    "obstruction_polygons": 244,
+    "missing_area_um2": 0,
+    "pin_excess_area_um2": 0
+  },
+  "via": {
+    "gds_polygons": 12528,
+    "obstruction_polygons": 7882,
+    "missing_area_um2": 0,
+    "pin_excess_area_um2": 0
+  },
+  "via2": {
+    "gds_polygons": 2996,
+    "obstruction_polygons": 2776,
+    "missing_area_um2": 0,
+    "pin_excess_area_um2": 0
+  },
+  "via3": {
+    "gds_polygons": 957,
+    "obstruction_polygons": 918,
+    "missing_area_um2": 0,
+    "pin_excess_area_um2": 0
+  }
+}

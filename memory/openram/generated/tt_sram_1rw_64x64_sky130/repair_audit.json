@@ -1,0 +1,20 @@
+{
+  "reproduced_gds_cell_geometry_exact_match": true,
+  "reproduced_lef_byte_exact_match": true,
+  "all_original_polygons_preserved": true,
+  "added_layers_only": {
+    "NSDM": [
+      93,
+      44
+    ],
+    "PSDM": [
+      94,
+      20
+    ],
+    "NPC": [
+      95,
+      20
+    ]
+  },
+  "gds_sha256": "7137c41b2be824dc9c7fb52b791c1118bffa7325a489890155e135abf57692bd"
+}

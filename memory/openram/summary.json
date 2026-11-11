@@ -49,12 +49,14 @@
       "lvs_property_errors": false,
       "final_verification": true,
       "checked_sha256": {
-        ".gds": "79c03b07ae0ffd54d4f40f9c8fe5601d43bf25b0207bf22d75a4313b65594618",
+        ".gds": "7137c41b2be824dc9c7fb52b791c1118bffa7325a489890155e135abf57692bd",
         ".lvs.sp": "aecf2d431c88a9e6a144f23c69ec1eae3442e8054eb3da9a8ea30721d195bf3b"
-      }
+      },
+      "klayout_drc_errors": 0,
+      "klayout_deck": "sky130A_mr.drc; feol=1 beol=1 offgrid=1 seal=1"
     },
-    "release_status": "macro-level DRC/LVS PASS; top-level P&R and timing signoff not performed",
+    "release_status": "Macro-only Magic DRC, KLayout DRC and LVS PASS; updated full-chip DRC/LVS/XOR pending; analytical timing only",
     "liberty": "analytical TT estimate, not SPICE timing characterization",
-    "top_level_pnr": "not performed"
+    "top_level_pnr": "Updated GDS/LEF pending CI"
   }
 ]

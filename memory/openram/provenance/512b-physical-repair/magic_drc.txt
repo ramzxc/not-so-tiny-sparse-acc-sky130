@@ -1,0 +1,113 @@
+Wed Nov 11 18:41:14 JST 2026: Starting DRC using Magic /tmp/tt-magic/bin/magic
+
+Magic 8.3 revision 696 - Compiled on Wed Nov 11 14:15:16 JST 2026.
+Starting magic under Tcl interpreter
+Using the terminal as the console.
+WARNING: RLIMIT_NOFILE is above 1024 and Tcl_Version<9 this may cause runtime issues [rlim_cur=4096]
+Using NULL graphics device.
+Processing system .magicrc file
+Switching to WIRING tool.
+Switching to NETLIST tool.
+Switching to PICK tool.
+Switching to BOX tool.
+Sourcing design .magicrc for technology sky130A ...
+2 Magic internal units = 1 Lambda
+Input style sky130(): scaleFactor=2, multiplier=2
+The following types are not handled by extraction and will be treated as non-electrical types:
+    ubm 
+Scaled tech values by 2 / 1 to match internal grid scaling
+Loading sky130A Device Generator Menu ...
+Loading "tt_sram_1rw_64x64_sky130.drc.tcl" from command line.
+Cell tt_sram_1rw_64x64_sky130 read from current working directory
+tt_sram_1rw_64x64_sky130: 10000 rects
+Finished loading cell tt_sram_1rw_64x64_sky130
+Cell tt_sram_1rw_64x64_sky130_col_addr_dff read from current working directory
+Cell sky130_fd_bd_sram__openram_dff read from current working directory
+Cell tt_sram_1rw_64x64_sky130_contact_46 read from current working directory
+Scaled magic input cell tt_sram_1rw_64x64_sky130_contact_46 geometry by factor of 2
+Cell tt_sram_1rw_64x64_sky130_cr_2 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_cr_3 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_data_dff read from current working directory
+Cell tt_sram_1rw_64x64_sky130_row_addr_dff read from current working directory
+Cell tt_sram_1rw_64x64_sky130_bank read from current working directory
+Cell tt_sram_1rw_64x64_sky130_port_data read from current working directory
+Cell tt_sram_1rw_64x64_sky130_write_driver_array read from current working directory
+Cell sky130_fd_bd_sram__openram_write_driver read from current working directory
+Cell tt_sram_1rw_64x64_sky130_sense_amp_array read from current working directory
+Cell sky130_fd_bd_sram__openram_sense_amp read from current working directory
+Cell tt_sram_1rw_64x64_sky130_precharge_array read from current working directory
+Cell tt_sram_1rw_64x64_sky130_precharge_0 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_column_mux_array read from current working directory
+Cell tt_sram_1rw_64x64_sky130_column_mux read from current working directory
+Cell tt_sram_1rw_64x64_sky130_port_address read from current working directory
+Cell tt_sram_1rw_64x64_sky130_wordline_driver_array read from current working directory
+Cell tt_sram_1rw_64x64_sky130_wordline_driver read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_dec_0 read from current working directory
+Cell sky130_custom_nand2_dec read from current working directory
+Cell tt_sram_1rw_64x64_sky130_hierarchical_decoder read from current working directory
+Cell tt_sram_1rw_64x64_sky130_hierarchical_predecode3x8 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_dec read from current working directory
+Cell tt_sram_1rw_64x64_sky130_and3_dec read from current working directory
+Cell sky130_custom_nand3_dec read from current working directory
+Cell tt_sram_1rw_64x64_sky130_hierarchical_predecode2x4 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_and2_dec read from current working directory
+Cell tt_sram_1rw_64x64_sky130_and2_dec_0 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_column_decoder read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinvbuf read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_tapped_1 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_tapped_0 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_tapped read from current working directory
+Cell tt_sram_1rw_64x64_sky130_capped_replica_bitcell_array read from current working directory
+Cell tt_sram_1rw_64x64_sky130_replica_bitcell_array read from current working directory
+Cell tt_sram_1rw_64x64_sky130_replica_column read from current working directory
+Cell sky130_custom_replica read from current working directory
+Cell tt_sram_1rw_64x64_sky130_dummy_array read from current working directory
+Cell sky130_custom_dummy read from current working directory
+Cell tt_sram_1rw_64x64_sky130_bitcell_array read from current working directory
+Cell sky130_custom_cell read from current working directory
+Cell tt_sram_1rw_64x64_sky130_dummy_array_3 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_dummy_array_2 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_dummy_array_1 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_dummy_array_0 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_control_logic_rw read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pnand2_0 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pdriver_4 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_tapped_15 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_0 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_tapped_8 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_tapped_7 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_tapped_6 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_tapped_5 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pdriver_1 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_tapped_12 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_tapped_11 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pdriver_0 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_tapped_10 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_2 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_tapped_9 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_1 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pand3_0 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pnand3 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pdriver_3 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_tapped_14 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_4 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pand3 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pdriver_2 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_tapped_13 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_3 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pand2 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pnand2 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pdriver read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_tapped_2 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_dff_buf_array read from current working directory
+Cell tt_sram_1rw_64x64_sky130_dff_buf_0 read from current working directory
+Cell tt_sram_1rw_64x64_sky130_delay_chain read from current working directory
+Cell tt_sram_1rw_64x64_sky130_pinv_tapped_16 read from current working directory
+Finished expanding
+DRC style is now "drc(full)"
+Finished drc check
+Loading DRC CIF style.
+Created database crash recovery file /tmp/MAG106233.IAGE7Q
+Finished drc catchup
+Total DRC errors found: 0
+Wed Nov 11 18:42:29 JST 2026: Finished (0) DRC using Magic /tmp/tt-magic/bin/magic

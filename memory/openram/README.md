@@ -70,3 +70,43 @@ python3 memory/openram/package.py
 기본 도구 위치는 `/tmp` 아래다. 장기 재현 시 기록한 commit에서 다시 설치해야 한다. `TT_OPENRAM_ROOT`, `TT_OPENRAM_PYTHON`, `TT_PDK_ROOT`는 생성 도구 위치, `TT_MAGIC`, `TT_NETGEN`은 검증 실행 파일을 지정한다. 검증 시 `OPENRAM_HOME`, `OPENRAM_TECH`, `PDK_ROOT`도 해당 설치에 맞춰 지정한다.
 
 이전 실패 산출물은 `archive/rejected_cypress/`에 로컬 보관했다. Git push는 수행하지 않았다.
+
+### 512 B physical repair candidate (SRAM-only CI)
+
+The raw detailed LEF omitted actual routing geometry. `lef_from_gds.py` rebuilds
+M1–M4 and via–via3 OBS from final GDS, subtracting only the public LEF pin
+shapes. It verifies that pins exist in GDS and no routing geometry is omitted.
+See [ORFS #4753](https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts/issues/4753)
+for an independently reported analogous failure. No route/check exemptions are added.
+
+The raw macro also had 1700 KLayout mask-spacing violations. The geometry-specific
+`repair_512_masks.py` adds NSDM/PSDM/NPC bridges while retaining every original
+cell polygon. It follows the merge requirement in the SKY130
+[periphery rules](https://skywater-pdk.readthedocs.io/en/main/rules/periphery.html)
+(nsd.2, psd.2, npc.2). Two diagonal PSDM junctions use 0.76 um square bridges;
+these coordinates apply only to this 512 B layout. It does not modify transistor,
+contact, routing-metal or via geometry. Magic DRC, KLayout DRC and LVS must be
+rerun after any change to the repair or input.
+
+Reproduce using Python with `gdstk` (raw input is retained in git):
+
+```sh
+mkdir -p /tmp/sram-raw /tmp/sram-repaired
+name=tt_sram_1rw_64x64_sky130
+git show 92e4afc:memory/openram/generated/$name/$name.gds > /tmp/sram-raw/$name.gds
+git show 92e4afc:memory/openram/generated/$name/$name.lef > /tmp/sram-raw/$name.lef
+python3 memory/openram/repair_512_masks.py /tmp/sram-raw/$name.gds /tmp/sram-repaired/$name.gds
+python3 memory/openram/lef_from_gds.py /tmp/sram-repaired/$name.gds /tmp/sram-raw/$name.lef /tmp/sram-repaired/$name.lef
+```
+
+GDS timestamps may differ; cell geometry must be identical. `repair_audit.json`
+records the reproduction audit. `lef_coverage.json` records coverage on all seven
+routing/cut layers. The adopted GDS is the exact file checked by Magic and LVS
+(`verification.json` includes its SHA256); standalone KLayout checked FEOL,
+BEOL, off-grid and seal rules with zero markers. Local OpenROAD pin access also
+passed. Full wrapper routing DRC/LVS and Magic-versus-KLayout XOR are **pending**
+for this candidate. The previous strict run 42994071301 failed (254954 XOR,
+3609 Magic DRC, 2593 KLayout DRC). Earlier route-zero results in
+`routing_checks.json` apply only to the previous, incomplete LEF.
+Timing Liberty is still analytical, not SPICE/PVT signoff. This is a CI validation
+candidate, not a tapeout-qualified release. All strict CI checks remain enabled.

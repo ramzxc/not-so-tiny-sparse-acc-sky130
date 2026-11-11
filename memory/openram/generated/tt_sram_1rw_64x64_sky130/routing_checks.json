@@ -1,31 +1,43 @@
 {
-  "scope": "Local replay of placed SRAM-only CI DEF with regenerated detailed LEF and perimeter power connections; not a fresh placement or full-chip Magic/LVS signoff; final CI configuration additionally enables KLayout DRC and GDS XOR",
-  "source_ci_run": 42975241234,
-  "macro_drc_errors": 0,
-  "macro_lvs_errors": 0,
-  "rtl_full_512_bytes": "PASS",
-  "power_connectivity": {
-    "VPWR": "PASS",
-    "VGND": "PASS"
-  },
+  "scope": "GDS-derived LEF pin-access check only; full-chip routing and signoff pending",
   "macro_pins_without_access": 0,
-  "routing_max_layer": "met4",
-  "detailed_route_final_violations": 0,
-  "openroad_version": "dcf36133a369abc8f3c5e5738cd4d82e4903c0e0",
-  "checked_sha256": {
-    "tt_sram_1rw_64x64_sky130.gds": "79c03b07ae0ffd54d4f40f9c8fe5601d43bf25b0207bf22d75a4313b65594618",
-    "tt_sram_1rw_64x64_sky130.lef": "3abbe6b3af8503be8fe2c88ea02362a66cd80061d64690e5903a1530423be4b4",
-    "pdn.tcl": "e4448e8a576dd5c4261dd16d19356f7342fae701826d69726b0832ce4926c8ac",
-    "pdn_sram_connections.tcl": "f4a2c812dbdde27c999bbab9c3c01a32e04e144cb663729c7690f5ebd51436c6"
+  "standard_cell_pins_without_access": 0,
+  "checked_lef_sha256": "dab91c96041dc9abc21250f0be7005720e941600f663691d1c1da10e79ff5f18",
+  "previous_geometry_results": {
+    "scope": "Local replay of placed SRAM-only CI DEF with regenerated detailed LEF and perimeter power connections; not a fresh placement or full-chip Magic/LVS signoff; final CI configuration additionally enables KLayout DRC and GDS XOR",
+    "source_ci_run": 42975241234,
+    "macro_drc_errors": 0,
+    "macro_lvs_errors": 0,
+    "rtl_full_512_bytes": "PASS",
+    "power_connectivity": {
+      "VPWR": "PASS",
+      "VGND": "PASS"
+    },
+    "macro_pins_without_access": 0,
+    "routing_max_layer": "met4",
+    "detailed_route_final_violations": 0,
+    "openroad_version": "dcf36133a369abc8f3c5e5738cd4d82e4903c0e0",
+    "checked_sha256": {
+      "tt_sram_1rw_64x64_sky130.gds": "79c03b07ae0ffd54d4f40f9c8fe5601d43bf25b0207bf22d75a4313b65594618",
+      "tt_sram_1rw_64x64_sky130.lef": "3abbe6b3af8503be8fe2c88ea02362a66cd80061d64690e5903a1530423be4b4",
+      "pdn.tcl": "e4448e8a576dd5c4261dd16d19356f7342fae701826d69726b0832ce4926c8ac",
+      "pdn_sram_connections.tcl": "f4a2c812dbdde27c999bbab9c3c01a32e04e144cb663729c7690f5ebd51436c6"
+    },
+    "fresh_pdn_with_detailed_lef": {
+      "VPWR": "PASS",
+      "VGND": "PASS",
+      "temporary_met4_obstruction_um": [
+        410,
+        9.135,
+        950.455,
+        216.63
+      ]
+    }
   },
-  "fresh_pdn_with_detailed_lef": {
-    "VPWR": "PASS",
-    "VGND": "PASS",
-    "temporary_met4_obstruction_um": [
-      410,
-      9.135,
-      950.455,
-      216.63
-    ]
+  "previous_strict_ci": {
+    "run": 42994071301,
+    "xor_differences": 254954,
+    "magic_drc_errors": 3609,
+    "klayout_drc_errors": 2593
   }
 }
