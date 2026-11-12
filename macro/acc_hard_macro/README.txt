@@ -8,7 +8,10 @@ Synthesis uses blackbox.v. Physical flow uses LEF and merged GDS.
 Hierarchical nominal TT STA uses acc_hard_macro.v and the extracted SPEF.
 LVS and gate simulation use the powered acc_hard_macro.pg.v netlist.
 SRAM Liberty, LVS SPICE and simulation model remain in memory/openram/generated.
-The raw ICC2 exports are preserved, not rewritten to suppress errors.
+The raw ICC2 exports remain in the source run. The packaged GDS adds the
+LEF-sized 235/4 PR boundary and exactly converts DBU from 0.1nm to 1nm for
+Magic compatibility. No geometry is rounded or moved; see boundary_validation.json
+and units_validation.json. All other records and reference transforms are preserved.
 PDN feeds are derived from the fixed wrapper power contract, not a shifted grid.
 
 Validation before push:

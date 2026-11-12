@@ -1,0 +1,11 @@
+{
+  "source_sha256": "c078e7ce81766758a4c027a39bcf89b7b082580111b62afdb1a77ed9a5c05537",
+  "output_sha256": "24b847c804d99ebea79bb4c2ca0f6bc77e8fa48e03f4214670ba49f50813b2a5",
+  "source_dbu_m": 1e-10,
+  "output_dbu_m": 1e-09,
+  "length_values_rescaled_exactly": 1212987,
+  "length_records": 367549,
+  "rounding": false,
+  "geometry_and_transforms_preserved": true,
+  "other_records_preserved": true
+}

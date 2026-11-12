@@ -18,3 +18,10 @@ scripts/add_core_boundary.py inserts one top-cell 235/4 rectangle matching LEF,
 (0,0)-(1367.12,214.88) um. All other GDS bytes are preserved; see
 macro/acc_hard_macro/boundary_validation.json. Local Magic 8.3.623 now reads
 FIXED_BBOX = 0 0 273424 42976 in its 0.005 um internal units.
+
+Actions run 43223298860 passed boundary extraction but found ICC2 GDS DBU
+0.1nm incompatible with Magic read-only macro copying (requires 1nm).
+normalize_core_gds_units.py exactly divides all length integers by 10 and
+rescales UNITS; all 1,212,987 values divide exactly, with no rounding.
+Source SRAM/standard-cell geometry and reference transforms still match.
+Local Magic read-only copy into a wrapper now succeeds (297 cells retained).
