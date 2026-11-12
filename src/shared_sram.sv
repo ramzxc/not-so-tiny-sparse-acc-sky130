@@ -22,7 +22,18 @@ module shared_sram #(
             .din0({1'b0,wdata}), .dout0(raw_data)
         );
     end
+    // Isolate the characterized SRAM outputs from downstream mux/fanout load.
+    // Keep the physical buffers through synthesis, but allow PnR resizing.
+    // No registers or extra cycles are introduced; the spare bit is unused.
+`ifdef SYNTHESIS
+    for (genvar bit_idx=0; bit_idx<64; bit_idx++) begin : output_drive
+        (* keep = 1 *) sky130_fd_sc_hd__buf_4 buffer_cell (
+            .A(raw_data[bit_idx]), .X(rdata[bit_idx])
+        );
+    end
+`else
     assign rdata = raw_data[63:0];
+`endif
 `ifndef SYNTHESIS
     initial if (SRAM_BYTES != 512 && SRAM_BYTES != 1024)
         $fatal(1, "shared_sram requires 512 or 1024 bytes");
