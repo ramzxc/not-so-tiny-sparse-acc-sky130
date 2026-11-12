@@ -14,7 +14,7 @@
     "acc_hard_macro.pg.v": "cb7f3a4a233ddd44c8c79816392e4cf7c205c890b68c3f212a0976c00f34be3e",
     "acc_hard_macro.sdc": "bdaa1cdb3cc91bfa724d9011afd29970498c40a05cc841bb420230d4985aa042",
     "acc_hard_macro.gds": "24b847c804d99ebea79bb4c2ca0f6bc77e8fa48e03f4214670ba49f50813b2a5",
-    "acc_hard_macro.lef": "6eb46a76a861ae56b3c64dbb786d0fc569c71d2caf3ab2c8e1a6535a0b9dd107",
+    "acc_hard_macro.lef": "fe8564b2e0602938e8be81a316eb0a5502878c213e64d8ee8aa2c0507e5fa53b",
     "acc_hard_macro.v": "9f8cec8f19cc4ceadfdf5d2c420255b4e44fe6c35408c61ed2fef70b262851b1",
     "blackbox.v": "90d43b3c45ce5e548c57a0fa7ae45513875f964e3c7afb349b4ca75ad92d9c10",
     "acc_hard_macro.sky130_nominal_25.spef": "a78b501983e9879622901be8c88ab76b1d7e5557bfa24212fd7ce2c836840c5c",
@@ -22,5 +22,6 @@
   },
   "pr_boundary": "boundary_validation.json: only added top-level SKY130 235/4 boundary; all other GDS records unchanged",
   "gds_units": "units_validation.json: exact 0.1nm to 1nm DBU conversion without rounding",
-  "lef_compatibility": "lef_validation.json: wrap long polygon lines and omit virtual OVERLAP metadata; physical geometry unchanged"
+  "lef_compatibility": "lef_validation.json: wrap long polygon lines and omit virtual OVERLAP metadata; physical geometry unchanged",
+  "lef_obstructions": "Removed only empty M1 margins after checking all GDS M1 geometry; pins and GDS unchanged. Regenerate with scripts/fix_core_lef_obstructions.py."
 }

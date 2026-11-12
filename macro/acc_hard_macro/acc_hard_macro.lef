@@ -463,7 +463,7 @@ MACRO acc_hard_macro
     LAYER li1 SPACING 0 ;
       RECT 0 0 1367.12 214.88 ;
     LAYER met1 SPACING 0 ;
-      RECT 0 0 1367.12 214.88 ;
+      RECT 0 0.25 1367.12 214.37 ;
     LAYER met2 SPACING 0 ;
       RECT 0 0 1367.12 214.88 ;
     LAYER met3 SPACING 0 ;
@@ -805,7 +805,7 @@ MACRO acc_hard_macro
       RECT 658.52 0.25 658.84 0.51 ;
       RECT 411.5 0.25 411.82 0.51 ;
       RECT 394.48 0.25 394.8 0.51 ;
-      RECT 0.28 0.28 1366.84 214.6 ;
+      RECT 0.28 0.28 1366.84 214.37 ;
     LAYER met2 ;
       RECT 1074.85 0.22 1075.11 0.54 ;
       RECT 927.19 0.22 927.45 0.54 ;
