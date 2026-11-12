@@ -49,3 +49,16 @@ Local checks now pass: PG connectivity; check_placement before/after filler;
 no filler in reserved row. Full Magic DRC on the core + regenerated wrapper PG
 and filler is zero (local_pg_plus_core_magic_drc.txt). This local assembly does
 not include final wrapper signal routing; CI still checks the final layout.
+
+Actions run 43227194733: PG connectivity, routing DRC, Magic DRC (0),
+KLayout DRC (0), XOR (0) passed; LVS failed (49 errors) and Magic abstract
+extraction reported 198 illegal overlaps. This is NOT a tapeout-clean result.
+Full-GDS extraction additionally exposed a real wrapper power short: the
+VPWR M3 link right edge at 1373.65 overlapped the existing VGND via landing
+pad starting at 1373.63 by 0.02 um. Same-layer union is DRC-clean but shorts
+the two nets. Move only the added VPWR link center from 1373.35 to 1373.00,
+leaving 0.33 um clearance. Existing TT M4 grid and core remain fixed.
+Local regenerated core + PG + filler Magic DRC = 0. Extracting root wrapper
+metal separately now retains distinct VPWR and VGND nodes (no equivalence).
+This metal-only check does not establish full-design LVS. Full-GDS/source
+netlist LVS integration remains unresolved; no check has been disabled.

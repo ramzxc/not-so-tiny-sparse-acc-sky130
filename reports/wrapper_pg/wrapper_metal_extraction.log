@@ -1,0 +1,26 @@
+
+Magic 8.3 revision 623 - Compiled on Tue Mar 17 08:19:38 UTC 2026.
+Starting magic under Tcl interpreter
+Using the terminal as the console.
+WARNING: RLIMIT_NOFILE is above 1024 and Tcl_Version<9 this may cause runtime issues [rlim_cur=4096]
+Using NULL graphics device.
+Input style sky130(): scaleFactor=2, multiplier=2
+The following types are not handled by extraction and will be treated as non-electrical types:
+    ubm 
+Processing system .magicrc file
+Switching to WIRING tool.
+Switching to NETLIST tool.
+Switching to PICK tool.
+Switching to BOX tool.
+Loading "/tmp/tt-pg-metal-extract.tcl" from command line.
+Warning: Calma reading is not undoable!  I hope that's OK.
+Library written using GDS-II Release 6.0
+Library name: library
+Reading "tt_um_not_so_tiny_sparse_acc_ramzxc".
+CIF file read warning: Input off lambda grid by 1/2; grid redefined.
+CIF file read error: Warning:  Cell tt_um_not_so_tiny_sparse_acc_ramzxc boundary was redefined.
+Annotating port orders from /tmp/tt-pg-metal-ports.spice
+Annotating cell tt_um_not_so_tiny_sparse_acc_ramzxc
+Cell tt_um_not_so_tiny_sparse_acc_ramzxc port order was modified.
+Extracting tt_um_not_so_tiny_sparse_acc_ramzxc into tt_um_not_so_tiny_sparse_acc_ramzxc.ext:
+exttospice finished.

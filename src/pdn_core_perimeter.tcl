@@ -22,8 +22,9 @@ foreach {netname y} {VPWR 5.04 VGND 2.72} {
 }
 
 # Two 0.6 um M3 wires in the right-hand corridor, outside core xMax=1372.64.
-# Their 0.5 um mutual spacing also leaves room for the generated via enclosures.
-foreach {netname x} {VPWR 1373.35 VGND 1374.45} {
+# VPWR ends at x=1373.30: this leaves 0.33 um to the existing right
+# VGND M1-M4 stack M3 landing pad (starts at x=1373.63).
+foreach {netname x} {VPWR 1373.00 VGND 1374.45} {
     set net [$block findNet $netname]
     set sw [odb::dbSWire_create $net ROUTED]
     odb::dbSBox_create $sw $m3 \
