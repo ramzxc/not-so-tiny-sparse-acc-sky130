@@ -11,6 +11,16 @@ if {abs(double([$die xMax])/$units-1378.16)>0.001 ||
     error "Unexpected die size: fixed TT perimeter PG contract invalid"
 }
 
+# Supply rails in the reserved bottom corridor. VPWR is 0.40 um below
+# the former row-edge rail: its upper edge 5.28 leaves 0.38 um to core M1.
+# Keep the outer VGND rail at the original y=2.72.
+foreach {netname y} {VPWR 5.04 VGND 2.72} {
+    set sw [odb::dbSWire_create [$block findNet $netname] ROUTED]
+    odb::dbSBox_create $sw [$tech findLayer met1] \
+        [expr {round(2.76*$units)}] [expr {round(($y-0.24)*$units)}] \
+        [expr {round(1375.40*$units)}] [expr {round(($y+0.24)*$units)}] STRIPE
+}
+
 # Two 0.6 um M3 wires in the right-hand corridor, outside core xMax=1372.64.
 # Their 0.5 um mutual spacing also leaves room for the generated via enclosures.
 foreach {netname x} {VPWR 1373.35 VGND 1374.45} {
@@ -37,6 +47,19 @@ foreach {netname x} {VPWR 1373.35 VGND 1374.45} {
                 }
             }
         }
+    }
+    if {$terminal_count == 0} {
+        # Reserving the bottom row may remove pdngen's left VPWR stub.
+        # Restore the same terminal rectangle explicitly, not a new location.
+        if {$netname eq "VPWR"} {set ys {2.48 11.12}} else {set ys {214.64 223.28}}
+        set bt [$block findBTerm $netname]
+        if {$bt == "NULL"} {error "Missing supply port $netname"}
+        set bp [odb::dbBPin_create $bt]
+        $bp setPlacementStatus FIRM
+        set box [list [expr {round(3.74*$units)}] [expr {round([lindex $ys 0]*$units)}] [expr {round(4.54*$units)}] [expr {round([lindex $ys 1]*$units)}]]
+        odb::dbBox_create $bp [$tech findLayer met4] {*}$box
+        odb::dbSBox_create $sw [$tech findLayer met4] {*}$box STRIPE
+        incr terminal_count
     }
     if {$terminal_count != 1} {error "Expected one left M4 terminal for $netname, got $terminal_count"}
 }

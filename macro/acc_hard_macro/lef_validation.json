@@ -1,0 +1,9 @@
+{
+  "source_sha256": "d105c94a3c9571c678785ea143583e66e57fcbd9ac6950eae6b2f51098177657",
+  "output_sha256": "6eb46a76a861ae56b3c64dbb786d0fc569c71d2caf3ab2c8e1a6535a0b9dd107",
+  "changes": [
+    "Wrap long polygon lines without altering tokens",
+    "Remove unsupported virtual OVERLAP layer declaration and OBS polygon; CLASS BLOCK and SIZE retained"
+  ],
+  "all_physical_layer_tokens_unchanged": true
+}

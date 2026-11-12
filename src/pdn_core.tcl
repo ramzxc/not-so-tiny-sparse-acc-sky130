@@ -1,4 +1,5 @@
 # Preserve the TT grid; connect the fixed core and wrapper with real metal/vias.
+source [file join [file dirname [info script]] pdn_core_rows.tcl]
 source [file join [file dirname [info script]] pdn_standard_grid.tcl]
 set ::tt_core_feed_script [file join [file dirname [info script]] pdn_core_feeds.tcl]
 set ::tt_core_perimeter_script [file join [file dirname [info script]] pdn_core_perimeter.tcl]

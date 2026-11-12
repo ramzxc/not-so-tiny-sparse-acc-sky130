@@ -25,3 +25,17 @@ normalize_core_gds_units.py exactly divides all length integers by 10 and
 rescales UNITS; all 1,212,987 values divide exactly, with no rounding.
 Source SRAM/standard-cell geometry and reference transforms still match.
 Local Magic read-only copy into a wrapper now succeeds (297 cells retained).
+
+Actions run 43224191220: PG connectivity and XOR pass (0 differences).
+Final DRC: Magic 83 markers / KLayout 14, all M1 spacing at bottom wrapper
+rail y=5.44 beside core routing. Core-only full Magic DRC independently = 0.
+Reserve only the bottom wrapper row before placement/filler insertion; remove
+its preinserted tap/endcap cells. Core instances/GDS are untouched. Generate
+bottom VPWR rail centered at y=5.04, giving 0.38um clearance to core metal
+(minimum 0.28um), with VGND at original y=2.72. Keep TT M4 stripe positions.
+Local regenerated PG still passes VPWR and VGND connectivity checks.
+
+Magic LVS extraction also rejected a 6403-character LEF polygon line and the
+virtual OVERLAP layer. Wrap polygon tokens and omit only OVERLAP metadata;
+all physical-layer tokens remain identical (lef_validation.json). Magic LEF
+read now completes without errors.
