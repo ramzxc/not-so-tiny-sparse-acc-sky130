@@ -25,5 +25,6 @@ proc pdngen {args} {
     set idx [lsearch -exact $args -failed_via_report]
     if {$idx >= 0} {lappend via_args -failed_via_report [lindex $args [expr {$idx+1}]]}
     tt_core_original_pdngen {*}$via_args
+    tt_restore_reserved_rows
     foreach net {VPWR VGND} {check_power_grid -net $net}
 }

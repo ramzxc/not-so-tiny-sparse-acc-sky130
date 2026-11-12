@@ -1,0 +1,16 @@
+OpenROAD dcf36133a369abc8f3c5e5738cd4d82e4903c0e0 
+Features included (+) or not (-): +GPU +GUI +Python
+This program is licensed under the BSD-3 license. See the LICENSE file for details.
+Components of this program may be licensed under more restrictive licenses which must be honored.
+Reserved bottom wrapper row: temporarily withheld 1 rows from PDN; removed 108 tap/endcap instances
+[INFO] Setting global connections...
+core matched with core
+[INFO ODB-0403] 0 connections made, 0 conflicts skipped.
+[INFO PDN-0001] Inserting grid: stdcell_grid
+[INFO PDN-0101] Using VPWR as power net for Core domain.
+[INFO PDN-0102] Using VGND as ground net for Core domain.
+[INFO PDN-0001] Inserting grid: wrapper_existing
+[INFO PSM-0040] All shapes on net VPWR are connected.
+[INFO PSM-0040] All shapes on net VGND are connected.
+[INFO DPL-0001] Placed 531 filler instances.
+PLACEMENT_AND_FILLER_RESERVATION_PASS

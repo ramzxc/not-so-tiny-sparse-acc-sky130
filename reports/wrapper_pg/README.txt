@@ -39,3 +39,13 @@ Magic LVS extraction also rejected a 6403-character LEF polygon line and the
 virtual OVERLAP layer. Wrap polygon tokens and omit only OVERLAP metadata;
 all physical-layer tokens remain identical (lef_validation.json). Magic LEF
 read now completes without errors.
+
+Actions run 43225922858 showed that deleting the bottom row shrinks OpenROAD's
+placement canvas and falsely leaves the fixed core outside it (DPL-0011).
+The corrected reservation creates a hard placement blockage, temporarily hides
+the row only during followpin generation, then restores the exact row record.
+This retains the canvas but excludes placement/filler from the bottom corridor.
+Local checks now pass: PG connectivity; check_placement before/after filler;
+no filler in reserved row. Full Magic DRC on the core + regenerated wrapper PG
+and filler is zero (local_pg_plus_core_magic_drc.txt). This local assembly does
+not include final wrapper signal routing; CI still checks the final layout.
