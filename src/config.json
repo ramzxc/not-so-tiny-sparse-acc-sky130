@@ -25,7 +25,7 @@
       ],
       "spef": {
         "*_tt_025C_1v80": [
-          "dir::../macro/acc_hard_macro/acc_hard_macro.sky130_nominal_25.spef"
+          "dir::../macro/acc_hard_macro/acc_hard_macro.opensta.spef.gz"
         ]
       },
       "instances": {

@@ -28,7 +28,7 @@ else
 
 # Gate level simulation:
 SIM_BUILD				= sim_build/gl
-COMPILE_ARGS    += -DGL_TEST
+COMPILE_ARGS    += -DGL_TEST -DTT_ICC2_HARDMACRO
 COMPILE_ARGS    += -DFUNCTIONAL
 COMPILE_ARGS    += -DUSE_POWER_PINS
 COMPILE_ARGS    += -DSIM
@@ -44,7 +44,7 @@ VERILOG_SOURCES += $(CURDIR)/gate_level_netlist.v
 endif
 
 # Allow sharing configuration between design and testbench via `include`:
-COMPILE_ARGS 		+= -I$(SRC_DIR)
+COMPILE_ARGS 		+= -I$(SRC_DIR) -I$(CURDIR)
 
 ifeq ($(SIM),verilator)
 COMPILE_ARGS += -Wno-fatal --timing --timescale-override 1ns/1ps
@@ -60,3 +60,11 @@ COCOTB_TEST_MODULES = test
 # include cocotb's make rules to take care of the simulator setup
 COCOTB_RESULTS_FILE ?= $(CURDIR)/results.xml
 include $(shell cocotb-config --makefiles)/Makefile.sim
+
+# Never enable the narrow reset correction without proving the packaged netlist.
+ifeq ($(GATES),yes)
+.PHONY: check-icc2-reset
+check-icc2-reset:
+	python3 $(CURDIR)/check_icc2_reset.py
+$(SIM_BUILD)/sim.vvp: check-icc2-reset $(CURDIR)/icc2_reset_x.vh
+endif

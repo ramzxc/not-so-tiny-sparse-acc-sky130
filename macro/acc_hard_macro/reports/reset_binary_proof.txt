@@ -1,0 +1,2 @@
+PASS activation_ctrl_COMPUTE_WIDTH2_META_FIFO_DEPTH4_UB_ROWS64.acc_req_addr[1]: D=n115=0 for all 1024 binary assignments during reset
+PASS activation_ctrl_COMPUTE_WIDTH2_META_FIFO_DEPTH4_UB_ROWS64.buffer_addr_cs[1]: D=n131=0 for all 1024 binary assignments during reset

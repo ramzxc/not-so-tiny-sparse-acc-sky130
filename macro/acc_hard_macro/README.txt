@@ -18,6 +18,18 @@ Validation before push:
 - Wrapper/header lint: passed.
 - Local Icarus powered-netlist simulation: SPI/DMA roundtrip passed;
   shared-memory compute/activation failed with X data at test/test.py:249.
-  See reports/local_core_gl.xml. This failure is unresolved, not waived.
+  See reports/local_core_gl.xml for the original failing run.
+- Resolved GL X-pessimism in reset feedback on two activation address bits:
+  test/check_icc2_reset.py proves both D inputs zero for all 1024 binary
+  input/feedback assignments each. test/icc2_reset_x.vh applies only while
+  all three reset predicates are known and asserted, releasing otherwise.
+  No Q forcing, SRAM initialization, or netlist/GDS modification is used.
+  The powered-netlist integration tests now pass 2/2, including ReLU,
+  sigmoid/tanh and FIFO wrap: reports/local_core_gl_reset_corrected.xml.
+- Actions initially rejected unescaped '!' in ICC2 SPEF NAME_MAP filler names.
+  scripts/prepare_opensta_spef.py writes acc_hard_macro.opensta.spef.gz for
+  Actions. Raw SPEF retained. Only name escaping differs; RC sections unchanged.
+  Converted file successfully parsed with local OpenSTA 2.7.0. This parser
+  check is not a complete timing signoff; annotation coverage still needs review.
 - Full merged-GDS foundry-rule DRC/LVS/antenna and wrapper Actions pending.
 This experiment is NOT a signoff-approved tapeout release.

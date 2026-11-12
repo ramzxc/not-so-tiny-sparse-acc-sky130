@@ -45,4 +45,10 @@ module tb ();
       .rst_n  (rst_n)     // not reset
   );
 
+`ifdef GL_TEST
+`ifdef TT_ICC2_HARDMACRO
+  `include "icc2_reset_x.vh"
+`endif
+`endif
+
 endmodule
