@@ -1,0 +1,14 @@
+{
+  "sram": {
+    "checked_cells": 134,
+    "differences": []
+  },
+  "stdcell": {
+    "checked_cells": 152,
+    "differences": []
+  },
+  "unresolved_references": [],
+  "top_cells": [
+    "acc_hard_macro"
+  ]
+}

@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites name="cocotb tests"><testsuite name="test" errors="0" failures="1" skipped="0" tests="2" time="56.110" timestamp="2026-11-12T12:20:31.931307+00:00" hostname="carchlab-master"><testcase classname="test" name="test_spi_dma_roundtrip" time="39.523"><properties><property name="cocotb" value="True" /><property name="random_seed" value="1794485992" /><property name="file" value="/docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/test/test.py" /><property name="line" value="91" /><property name="sim_time_unit" value="ns" /><property name="sim_time_start" value="0.0" /><property name="sim_time_stop" value="9117000.0" /><property name="sim_time_duration" value="9117000.0" /><property name="sim_time_ratio" value="230674.72622356968" /></properties></testcase><testcase classname="test" name="test_shared_memory_compute_and_activation" time="16.587"><failure message="Can't convert LogicArray to int: it contains non-0/1 values" type="ValueError">Traceback (most recent call last):
+  File "/docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/test/test.py", line 249, in test_shared_memory_compute_and_activation
+    await store(0x2200, 0x42, [0x4A00480048004400, 0], row=8)
+  File "/docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/test/test.py", line 233, in store
+    assert await h.read_word(16, 8) == word
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/test/test.py", line 80, in read_word
+    value |= (await self.read(addr+i)) &lt;&lt; (8*i)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/test/test.py", line 55, in read
+    return await self.transaction(addr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/test/test.py", line 47, in transaction
+    result = await self.byte(data)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/test/test.py", line 34, in byte
+    result = (result &lt;&lt; 1) | (int(self.dut.uio_out.value) &amp; 1)
+                              ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/tt-acc-venv/lib/python3.13/site-packages/cocotb/types/_logic_array.py", line 924, in __int__
+    return self.to_unsigned()
+           ~~~~~~~~~~~~~~~~^^
+  File "/tmp/tt-acc-venv/lib/python3.13/site-packages/cocotb/types/_logic_array.py", line 792, in to_unsigned
+    return self._get_int()
+           ~~~~~~~~~~~~~^^
+  File "/tmp/tt-acc-venv/lib/python3.13/site-packages/cocotb/types/_logic_array.py", line 347, in _get_int
+    raise ValueError(
+        f"Can't convert {type(self).__qualname__} to int: it contains non-0/1 values"
+    ) from None
+ValueError: Can't convert LogicArray to int: it contains non-0/1 values
+</failure><properties><property name="cocotb" value="True" /><property name="random_seed" value="1794485992" /><property name="file" value="/docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/test/test.py" /><property name="line" value="210" /><property name="sim_time_unit" value="ns" /><property name="sim_time_start" value="9117000.001" /><property name="sim_time_stop" value="12794100.001" /><property name="sim_time_duration" value="3677100.0" /><property name="sim_time_ratio" value="221690.02344069298" /></properties><system-err>Test failed with COCOTB_RANDOM_SEED=1794485992
+</system-err></testcase></testsuite></testsuites>

@@ -10,7 +10,7 @@ endif
 FST ?= -fst # Use more efficient FST format
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(CURDIR)/../src
-PROJECT_SOURCES = project.v tpu_pkg.sv acc_host.sv mem_ctrl.sv shared_sram.sv acc_spi.sv activation.sv activation_ctrl.sv axi_master_adapter.sv dma.sv inst_decoder.sv inst_fifo.sv mac_unit.sv sparsity_ctrl.sv tpu.sv tpu_core.sv vpu.sv vpu_ctrl.sv weight_load_ctrl.sv
+PROJECT_SOURCES = project.v acc_hard_macro_rtl.v tpu_pkg.sv acc_host.sv mem_ctrl.sv shared_sram.sv acc_spi.sv activation.sv activation_ctrl.sv axi_master_adapter.sv dma.sv inst_decoder.sv inst_fifo.sv mac_unit.sv sparsity_ctrl.sv tpu.sv tpu_core.sv vpu.sv vpu_ctrl.sv weight_load_ctrl.sv
 
 SRAM_BYTES ?= 512
 export SRAM_BYTES
@@ -35,6 +35,8 @@ COMPILE_ARGS    += -DSIM
 COMPILE_ARGS    += -DUNIT_DELAY=\#1
 VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v
 VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
+
+VERILOG_SOURCES += $(SRC_DIR)/../macro/acc_hard_macro/acc_hard_macro.pg.v
 
 # this gets copied in by the GDS action workflow
 VERILOG_SOURCES += $(CURDIR)/gate_level_netlist.v

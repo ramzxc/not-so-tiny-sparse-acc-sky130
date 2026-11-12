@@ -19,24 +19,6 @@ project:
   # Keep the plain-Verilog top first for Tiny Tapeout port discovery.
   source_files:
     - "project.v"
-    - "tpu_pkg.sv"
-    - "acc_host.sv"
-    - "mem_ctrl.sv"
-    - "shared_sram.sv"
-    - "acc_spi.sv"
-    - "activation.sv"
-    - "activation_ctrl.sv"
-    - "axi_master_adapter.sv"
-    - "dma.sv"
-    - "inst_decoder.sv"
-    - "inst_fifo.sv"
-    - "mac_unit.sv"
-    - "sparsity_ctrl.sv"
-    - "tpu.sv"
-    - "tpu_core.sv"
-    - "vpu.sv"
-    - "vpu_ctrl.sv"
-    - "weight_load_ctrl.sv"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
