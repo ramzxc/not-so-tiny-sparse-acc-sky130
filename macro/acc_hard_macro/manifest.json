@@ -14,7 +14,7 @@
     "acc_hard_macro.pg.v": "cb7f3a4a233ddd44c8c79816392e4cf7c205c890b68c3f212a0976c00f34be3e",
     "acc_hard_macro.sdc": "bdaa1cdb3cc91bfa724d9011afd29970498c40a05cc841bb420230d4985aa042",
     "acc_hard_macro.gds": "24b847c804d99ebea79bb4c2ca0f6bc77e8fa48e03f4214670ba49f50813b2a5",
-    "acc_hard_macro.lef": "fe8564b2e0602938e8be81a316eb0a5502878c213e64d8ee8aa2c0507e5fa53b",
+    "acc_hard_macro.lef": "bdb718574ee06ba6ba1f9bba1dc58b09a85578152a511d218e25fa6fd7bce61c",
     "acc_hard_macro.v": "9f8cec8f19cc4ceadfdf5d2c420255b4e44fe6c35408c61ed2fef70b262851b1",
     "blackbox.v": "90d43b3c45ce5e548c57a0fa7ae45513875f964e3c7afb349b4ca75ad92d9c10",
     "acc_hard_macro.sky130_nominal_25.spef": "a78b501983e9879622901be8c88ab76b1d7e5557bfa24212fd7ce2c836840c5c",
@@ -23,5 +23,12 @@
   "pr_boundary": "boundary_validation.json: only added top-level SKY130 235/4 boundary; all other GDS records unchanged",
   "gds_units": "units_validation.json: exact 0.1nm to 1nm DBU conversion without rounding",
   "lef_compatibility": "lef_validation.json: wrap long polygon lines and omit virtual OVERLAP metadata; physical geometry unchanged",
-  "lef_obstructions": "Removed only empty M1 margins after checking all GDS M1 geometry; pins and GDS unchanged. Regenerate with scripts/fix_core_lef_obstructions.py."
+  "lef_obstructions": "Removed only empty M1 margins after checking all GDS M1 geometry; pins and GDS unchanged. Regenerate with scripts/fix_core_lef_obstructions.py.",
+  "lvs_inputs": {
+    "macro/acc_hard_macro/acc_hard_macro.pg.v": "cb7f3a4a233ddd44c8c79816392e4cf7c205c890b68c3f212a0976c00f34be3e",
+    "memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.lvs.sp": "aecf2d431c88a9e6a144f23c69ec1eae3442e8054eb3da9a8ea30721d195bf3b",
+    "macro/acc_hard_macro/acc_hard_macro.lvs.spice": "8e36f68091c5c0bcdfa3916b2315e9d09702405a14fb47bde80c7b34f45b5e0c",
+    "macro/acc_hard_macro/sram.lvs_micron.spice": "f6e25d29d38a08721eed0578a2933c8f27126d5644952567706ff15f3e66b163"
+  },
+  "lef_power_pins": "43 continuous M4 supply columns verified against actual GDS; full-height pins and matching M4 OBS subtraction. Reproduce with scripts/expose_core_power_pins.py."
 }

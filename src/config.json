@@ -1,5 +1,5 @@
 {
-  "//": "Only export pin area in LEF (without any connected nets)",
+  "//": "Full LVS uses actual GDS and complete core/SRAM SPICE models. Macro Verilog import is disabled only to avoid duplicate circuit definitions.",
   "PL_TARGET_DENSITY_PCT": 60,
   "CLOCK_PERIOD": 100,
   "USE_SLANG": true,
@@ -107,5 +107,27 @@
   "STA_MACRO_PRIORITIZE_NL": true,
   "LVS_INCLUDE_MARCO_NETLISTS": false,
   "FP_MACRO_HORIZONTAL_HALO": 0,
-  "FP_MACRO_VERTICAL_HALO": 0
+  "FP_MACRO_VERTICAL_HALO": 0,
+  "MAGICRC": "dir::magicrc.tcl",
+  "MAGIC_EXT_USE_GDS": true,
+  "MAGIC_EXT_SHORT_RESISTOR": true,
+  "LVS_FLATTEN_CELLS": [
+    "acc_hard_macro"
+  ],
+  "EXTRA_SPICE_MODELS": [
+    "dir::../macro/acc_hard_macro/sram.lvs_micron.spice"
+  ],
+  "CELL_SPICE_MODELS": [
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_ef_sc_hd__decap_12.spice",
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_ef_sc_hd__decap_20_12.spice",
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_ef_sc_hd__decap_40_12.spice",
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_ef_sc_hd__decap_60_12.spice",
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_ef_sc_hd__decap_80_12.spice",
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_ef_sc_hd__fill_12.spice",
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_ef_sc_hd__fill_2.spice",
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_ef_sc_hd__fill_4.spice",
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_ef_sc_hd__fill_8.spice",
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_fd_sc_hd.spice",
+    "dir::../macro/acc_hard_macro/acc_hard_macro.lvs.spice"
+  ]
 }

@@ -3,6 +3,7 @@ source [file join [file dirname [info script]] pdn_core_rows.tcl]
 source [file join [file dirname [info script]] pdn_standard_grid.tcl]
 set ::tt_core_feed_script [file join [file dirname [info script]] pdn_core_feeds.tcl]
 set ::tt_core_perimeter_script [file join [file dirname [info script]] pdn_core_perimeter.tcl]
+set ::tt_core_port_script [file join [file dirname [info script]] pdn_core_ports.tcl]
 rename pdngen tt_core_original_pdngen
 proc pdngen {args} {
     # Control/report calls must not create additional geometry.
@@ -25,6 +26,7 @@ proc pdngen {args} {
     set idx [lsearch -exact $args -failed_via_report]
     if {$idx >= 0} {lappend via_args -failed_via_report [lindex $args [expr {$idx+1}]]}
     tt_core_original_pdngen {*}$via_args
+    source $::tt_core_port_script
     tt_restore_reserved_rows
     foreach net {VPWR VGND} {check_power_grid -net $net}
 }
