@@ -42,6 +42,19 @@ def core_cells(root):
     return Counter(line.split()[-1] for line in text.splitlines() if line.startswith('X'))
 
 
+def core_physical(root):
+    folder = root / 'macro/acc_hard_macro'
+    result = json.loads((folder / 'physical_summary.json').read_text())
+    if result['schema'] != 1:
+        raise ValueError('Unsupported core physical-summary schema')
+    for name, expected in result['submitted_assets_sha256'].items():
+        if hashlib.sha256((folder / name).read_bytes()).hexdigest() != expected:
+            raise ValueError(f'Stale core physical summary: {name}; rerun scripts/extract_core_summary.py')
+    if result['cell_count'] != core_cells(root):
+        raise ValueError('Core physical summary inventory mismatch')
+    return result
+
+
 def table(headers, rows):
     print('| ' + ' | '.join(headers) + ' |')
     print('|' + '|'.join('---' for _ in headers) + '|')
@@ -57,28 +70,22 @@ def routing(run):
         print('Unavailable: this run has no final/metrics.json.\n')
         return
     metrics = json.loads(path.read_text())
-
-    def value(*keys, scale=1):
-        for key in keys:
-            if metrics.get(key) is not None:
-                return f'{float(metrics[key]) * scale:,.3f}'
-        return 'N/A (not reported)'
-
-    table(['Metric', 'Value', 'Scope'], [
-        ['Routed wire length (µm)', value('route__wirelength', 'detailedroute__route__wirelength'), 'Wrapper only'],
-        ['Instance utilization (%)', value('design__instance__utilization', scale=100), 'Wrapper, including macro footprint'],
-        ['Standard-cell utilization (%)', value('design__instance__utilization__stdcell', scale=100), 'Wrapper standard cells; LibreLane denominator'],
-        ['Die area (µm²)', value('design__die__area'), 'Tiny Tapeout wrapper'],
-        ['Macro footprint area (µm²)', value('design__instance__area__macros'), 'Includes core logic and SRAM footprint'],
+    core = core_physical(ROOT)
+    wrapper_wire = metrics.get('route__wirelength', metrics.get('detailedroute__route__wirelength'))
+    length = f"{float(wrapper_wire) + core['wirelength_total_um']:.3f}" if wrapper_wire is not None else 'N/A'
+    table(['Utilisation (%)', 'Wire length (um)'], [
+        [f"{core['utilization_pct']['excluding_fill_tap']:.2f}", length],
     ])
-    print('Source: `runs/wokwi/final/metrics.json`. Utilization is the reported fraction × 100. '
-          'Macro footprint is not the sum of standard-cell areas. '
-          'Core/SRAM internal wire length is not reported by this wrapper run; '
-          'the wrapper wire length is **not** the whole-chip wire length.\n')
+    print('Utilisation: core standard-cell area excluding fill/tap ÷ DEF row area '
+          'remaining after SRAM, halo and placement blockages; calculated from final DEF, '
+          'not the original global-placement log value. Wire length: core + wrapper '
+          'regular signal/clock routes; excludes SRAM internal wiring, PG, SPECIALNETS '
+          'patches and via vertical lengths. Sources: source-hashed core physical_summary.json '
+          'and wrapper final/metrics.json.\n')
 
 
 def cells(root, run, categories_path):
-    print('# Cell usage\n')
+    print('# Cell usage by Category\n')
     defs = list((run / 'final/def').glob('*.def'))
     if len(defs) != 1:
         print('Unavailable: expected one final wrapper DEF.\n')
@@ -86,44 +93,28 @@ def cells(root, run, categories_path):
     wrapper = def_cells(defs[0].read_text())
     if wrapper.pop('acc_hard_macro', 0) != 1:
         raise ValueError('Expected exactly one acc_hard_macro in wrapper DEF')
-    core = core_cells(root)
+    inventory = wrapper + core_cells(root)
     categories = json.loads(categories_path.read_text())
-
-    def category(cell):
+    grouped = {}
+    for cell, count in inventory.items():
         if not cell.startswith(PREFIX):
-            return 'Macro (not expanded)'
+            continue  # SRAM is not a standard cell.
         base = cell[len(PREFIX):].rsplit('_', 1)[0]
         index = categories['map'].get(base)
-        return categories['categories'][index] if index is not None else 'Unclassified standard cell'
+        category = categories['categories'][index] if index is not None else 'Unclassified'
+        if category in ('Fill', 'Tap'):
+            continue
+        group = grouped.setdefault(category, {'count': 0, 'cells': set()})
+        group['count'] += count
+        group['cells'].add(base)
+    def cell_link(name):
+        return f'[{name}](https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/{name}/README.html)'
 
-    grouped = []
-    for inventory in (wrapper, core):
-        counts = Counter()
-        for cell, count in inventory.items():
-            counts[category(cell)] += count
-        grouped.append(counts)
-    table(['Category', 'Wrapper', 'Core', 'Total'], [
-        [cat, grouped[0][cat], grouped[1][cat], grouped[0][cat] + grouped[1][cat]]
-        for cat in sorted(set(grouped[0]) | set(grouped[1]))
+    table(['Category', 'Cells', 'Count'], [
+        [category, ' '.join(cell_link(name) for name in sorted(data['cells'])), data['count']]
+        for category, data in sorted(grouped.items(), key=lambda item: item[1]['count'], reverse=True)
     ])
-    std = [sum(count for cell, count in inv.items() if cell.startswith(PREFIX)) for inv in (wrapper, core)]
-    active = [sum(count for cell, count in inv.items()
-                  if cell.startswith(PREFIX) and category(cell) not in ('Fill', 'Tap'))
-              for inv in (wrapper, core)]
-    table(['Count', 'Wrapper', 'Core', 'Total'], [
-        ['All standard cells, including fill/tap', *std, sum(std)],
-        ['Standard cells excluding fill/tap', *active, sum(active)],
-    ])
-    print('Sources: final wrapper DEF and hash-checked `acc_hard_macro.lvs.spice`, '
-          'generated from ICC2 `acc_hard_macro.pg.v`. The core container is expanded '
-          'once, not counted again. SRAM remains one macro; its transistors are not '
-          'standard cells. Fill/tap cells are shown separately.\n')
-    print('<details><summary>Cell usage by master</summary>\n')
-    table(['Cell master', 'Wrapper', 'Core', 'Total'], [
-        [cell, wrapper[cell], core[cell], wrapper[cell] + core[cell]]
-        for cell in sorted(set(wrapper) | set(core))
-    ])
-    print('</details>\n')
+    print(f"## {sum(data['count'] for data in grouped.values())} total cells (excluding fill and tap cells)\n")
 
 
 def main():
