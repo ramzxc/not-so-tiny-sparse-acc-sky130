@@ -14,6 +14,7 @@ import shlex
 import subprocess
 import sys
 import tempfile
+from sky130_lvs_models import narrow_nfet_rule, select_nfet_models
 
 ROOT = Path(__file__).resolve().parents[1]
 CORE = ROOT / 'macro/acc_hard_macro'
@@ -46,6 +47,9 @@ def main():
     sram_text, unit_count = re.subn(
         r'\b([wl])=([0-9.eE+-]+)u\b', r'\1=\2',
         sram_source.read_text(), flags=re.I)
+    magic_tech = pdk / 'libs.tech/magic/sky130A.tech'
+    model_rule = narrow_nfet_rule(magic_tech.read_text())
+    sram_text, narrow_count = select_nfet_models(sram_text, model_rule)
     cell_headers = headers(std_sp.read_text()) | headers(sram_text)
     text, supply_count = re.subn(r'\bsupply[01]\s+(VPWR|VGND)\s*;',
                                 r'wire \1;', source.read_text())
@@ -144,6 +148,8 @@ def main():
         'gds_sha256': digest(CORE / 'acc_hard_macro.gds'),
         'supply_declarations_represented_as_connected_wires': supply_count,
         'sram_W_L_micron_suffixes_normalized': unit_count,
+        'narrow_nfet_rule': model_rule,
+        'narrow_nfet_definitions_selected': narrow_count,
         'top_ports': len(ports), 'port_aliases': aliases,
         'physical_instances': sum(counts.values()), 'cells_by_type': dict(sorted(counts.items())),
         'unconnected_output_pins': dict(sorted(dangling.items())),
@@ -159,6 +165,7 @@ def main():
         'macro/acc_hard_macro/acc_hard_macro.lvs.spice': digest(core_output),
         'macro/acc_hard_macro/sram.lvs_micron.spice': digest(CORE / 'sram.lvs_micron.spice'),
     }
+    manifest['lvs_nfet_rule'] = model_rule
     manifest_path.write_text(json.dumps(manifest, indent=2) + '\n')
     print(f'Generated {sum(counts.values())} physical instances; {len(ports)} ports.')
 

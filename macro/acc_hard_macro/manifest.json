@@ -28,7 +28,11 @@
     "macro/acc_hard_macro/acc_hard_macro.pg.v": "cb7f3a4a233ddd44c8c79816392e4cf7c205c890b68c3f212a0976c00f34be3e",
     "memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.lvs.sp": "aecf2d431c88a9e6a144f23c69ec1eae3442e8054eb3da9a8ea30721d195bf3b",
     "macro/acc_hard_macro/acc_hard_macro.lvs.spice": "8e36f68091c5c0bcdfa3916b2315e9d09702405a14fb47bde80c7b34f45b5e0c",
-    "macro/acc_hard_macro/sram.lvs_micron.spice": "f6e25d29d38a08721eed0578a2933c8f27126d5644952567706ff15f3e66b163"
+    "macro/acc_hard_macro/sram.lvs_micron.spice": "02f4bea9e5339eee87b278366e3627d03dd5289b8a7094d2b7e5bf3d4e0b6f41"
   },
-  "lef_power_pins": "43 continuous M4 supply columns verified against actual GDS; full-height pins and matching M4 OBS subtraction. Reproduce with scripts/expose_core_power_pins.py."
+  "lef_power_pins": "43 continuous M4 supply columns verified against actual GDS; full-height pins and matching M4 OBS subtraction. Reproduce with scripts/expose_core_power_pins.py.",
+  "lvs_nfet_rule": {
+    "model": "sky130_fd_pr__special_nfet_01v8",
+    "width_lt_um": "0.42"
+  }
 }
