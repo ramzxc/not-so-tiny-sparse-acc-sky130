@@ -18,10 +18,11 @@
         "dir::../macro/acc_hard_macro/blackbox.v"
       ],
       "nl": [
+        "dir::../macro/acc_hard_macro/physical_cells.v",
         "dir::../macro/acc_hard_macro/acc_hard_macro.v"
       ],
       "pnl": [
-        "dir::../macro/acc_hard_macro/acc_hard_macro.pg.v"
+        "dir::../macro/acc_hard_macro/acc_hard_macro.v"
       ],
       "spef": {
         "*_tt_025C_1v80": [

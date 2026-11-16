@@ -12,7 +12,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-NETLIST = Path(os.environ.get('RESET_NETLIST', ROOT / 'macro/acc_hard_macro/acc_hard_macro.pg.v'))
+NETLIST = Path(os.environ.get('RESET_NETLIST', ROOT / 'macro/acc_hard_macro/acc_hard_macro.v'))
 MODULE = 'activation_ctrl_COMPUTE_WIDTH2_META_FIFO_DEPTH4_UB_ROWS64'
 TARGETS = {'n115': 'acc_req_addr[1]', 'n131': 'buffer_addr_cs[1]'}
 CONSTANTS = {'rst': 1, 'HFSNET_9': 0, 'HFSNET_10': 1}

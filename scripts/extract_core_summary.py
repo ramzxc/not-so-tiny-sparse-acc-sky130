@@ -50,7 +50,10 @@ def main():
     lefs = [pdk / 'techlef/sky130_fd_sc_hd__nom.tlef', pdk / 'lef/sky130_fd_sc_hd.lef',
             ROOT / 'memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.lef']
     # The DEF and powered netlist must come from the same export package.
-    if digest(source.with_suffix('.pg.v')) != digest(folder / 'acc_hard_macro.pg.v'):
+    exported = source.with_suffix('.pg.v')  # Historical ICC2 export name.
+    if not exported.exists():
+        exported = source.with_suffix('.v')
+    if digest(exported) != digest(folder / 'acc_hard_macro.v'):
         raise ValueError('DEF export package does not match the submitted powered netlist')
     tech = Tech()
     design = Design(tech)
@@ -95,7 +98,7 @@ def main():
     for net in block.getNets():
         if net.getSigType() not in ('POWER', 'GROUND') and net.getWire():
             lengths[str(net.getSigType()).lower()] += net.getWire().getLength() / units
-    assets = ['acc_hard_macro.gds', 'acc_hard_macro.lef', 'acc_hard_macro.pg.v', 'acc_hard_macro.lvs.spice']
+    assets = ['acc_hard_macro.gds', 'acc_hard_macro.lef', 'acc_hard_macro.v', 'acc_hard_macro.lvs.spice']
     result = {
         'schema': 1,
         'source_def': str(source.relative_to(ROOT)),

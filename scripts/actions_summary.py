@@ -31,7 +31,7 @@ def core_cells(root):
     manifest = json.loads((folder / 'manifest.json').read_text())
     # Both the original physical netlist and generated flattened inventory must
     # still match the provenance used to build the full-circuit LVS source.
-    for name in ('acc_hard_macro.pg.v', 'acc_hard_macro.lvs.spice'):
+    for name in ('acc_hard_macro.v', 'acc_hard_macro.lvs.spice'):
         path = folder / name
         key = path.relative_to(root).as_posix()
         if hashlib.sha256(path.read_bytes()).hexdigest() != manifest['lvs_inputs'][key]:

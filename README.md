@@ -1,69 +1,42 @@
-# Not-So-Tiny Sparse Accelerator
+![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
 
-An FP16 sparse accelerator for **Tiny Tapeout SKY130**, using **8×2 tiles**.
-It combines a two-lane compute engine, an SPI host interface, and a shared 512 B SRAM.
+# Tiny Tapeout Verilog Project Template
 
-[![GDS](https://github.com/ramzxc/not-so-tiny-sparse-acc-sky130/actions/workflows/gds.yaml/badge.svg)](https://github.com/ramzxc/not-so-tiny-sparse-acc-sky130/actions/workflows/gds.yaml)
-[![Tests](https://github.com/ramzxc/not-so-tiny-sparse-acc-sky130/actions/workflows/test.yaml/badge.svg)](https://github.com/ramzxc/not-so-tiny-sparse-acc-sky130/actions/workflows/test.yaml)
+- [Read the documentation for project](docs/info.md)
 
-## Features
+## What is Tiny Tapeout?
 
-- Two FP16 lanes sharing one physical MAC.
-- Sparsity control and ReLU, sigmoid, and tanh activation.
-- Software-managed weights and memory accumulation.
-- One 512 B OpenRAM SRAM, shared by UB (256 B), ACC (128 B), and WB (128 B).
-- SPI host interface and DMA request handling.
-- Two-entry instruction FIFO and a 10 MHz target clock.
+Tiny Tapeout is an educational project that aims to make it easier and cheaper than ever to get your digital and analog designs manufactured on a real chip.
 
-## Architecture
+To learn more and get started, visit https://tinytapeout.com.
 
-```text
-Tiny Tapeout pins → Wrapper → Accelerator core
-                             ├─ SPI host and DMA
-                             ├─ Compute, sparsity, and activation
-                             └─ Memory controller → 512 B SRAM
-```
+## Set up your Verilog project
 
-The core is synthesized with Design Compiler and placed and routed with ICC2.
-The Tiny Tapeout flow imports the finished core and builds the wrapper around it.
+1. Add your Verilog files to the `src` folder.
+2. Edit the [info.yaml](info.yaml) and update information about your project, paying special attention to the `source_files` and `top_module` properties. If you are upgrading an existing Tiny Tapeout project, check out our [online info.yaml migration tool](https://tinytapeout.github.io/tt-yaml-upgrade-tool/).
+3. Edit [docs/info.md](docs/info.md) and add a description of your project.
+4. Adapt the testbench to your design. See [test/README.md](test/README.md) for more information.
 
-## Repository layout
+The GitHub action will automatically build the ASIC files using [LibreLane](https://www.zerotoasiccourse.com/terminology/librelane/).
 
-| Path | Contents |
-| --- | --- |
-| `src/wrapper/` | Tiny Tapeout top module |
-| `src/rtl/` | Accelerator RTL |
-| `src/tcl/` | PDN and Magic scripts used by Actions |
-| `src/config.json` | Current 512 B integration settings |
-| `macro/acc_hard_macro/` | Core GDS, LEF, netlists, and SPEF |
-| `memory/openram/` | SRAM generator and macro files |
-| `test/` | RTL and gate-level tests |
-| `scripts/` | Integration and reporting tools |
-| `docs/` | Interface documentation and archived notes |
+## Enable GitHub actions to build the results page
 
-### Netlists
+- [Enabling GitHub Pages](https://tinytapeout.com/faq/#my-github-action-is-failing-on-the-pages-part)
 
-- **Post-route:** [acc_hard_macro.v](macro/acc_hard_macro/acc_hard_macro.v)
-- **Post-route with power pins:** [acc_hard_macro.pg.v](macro/acc_hard_macro/acc_hard_macro.pg.v)
-- **Post-synthesis, local build:** `syn/runs/<run>/acc_hard_macro_gate.v`
+## Resources
 
-## Testing
+- [FAQ](https://tinytapeout.com/faq/)
+- [Digital design lessons](https://tinytapeout.com/digital_design/)
+- [Learn how semiconductors work](https://tinytapeout.com/siliwiz/)
+- [Join the community](https://tinytapeout.com/discord)
+- [Build your design locally](https://www.tinytapeout.com/guides/local-hardening/)
 
-Requires Python, Make, and Verilator 5.036 or newer. CI uses Verilator 5.052.
-Run from the repository root:
+## What next?
 
-```sh
-python3 -m pip install -r test/requirements.txt
-make -C test SRAM_BYTES=512
-python3 -m cocotb_tools.check_results test/results.xml
-```
-
-GitHub Actions runs RTL tests, wrapper hardening, DRC/LVS, Tiny Tapeout precheck,
-and gate-level simulation. Build results include a 2D preview and a 3D viewer link.
-
-## Documentation
-
-- [Pin assignments](info.yaml)
-- [SPI interface](docs/info.md#pins-and-spi-timing)
-- [Archived development notes](docs/archive/README.md)
-- [Tiny Tapeout](https://tinytapeout.com)
+- [Submit your design to the next shuttle](https://app.tinytapeout.com/).
+- Edit [this README](README.md) and explain your design, how it works, and how to test it.
+- Share your project on your social network of choice:
+  - LinkedIn [#tinytapeout](https://www.linkedin.com/search/results/content/?keywords=%23tinytapeout) [@TinyTapeout](https://www.linkedin.com/company/100708654/)
+  - Mastodon [#tinytapeout](https://chaos.social/tags/tinytapeout) [@matthewvenn](https://chaos.social/@matthewvenn)
+  - X (formerly Twitter) [#tinytapeout](https://twitter.com/hashtag/tinytapeout) [@tinytapeout](https://twitter.com/tinytapeout)
+  - Bluesky [@tinytapeout.com](https://bsky.app/profile/tinytapeout.com)

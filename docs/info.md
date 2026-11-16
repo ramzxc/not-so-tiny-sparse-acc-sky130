@@ -1,81 +1,89 @@
 ## How it works
 
-Two-lane FP16 sparse accelerator imported from `/docker/projects/egru/acc/rtl`
-(with `lib/tpu_pkg.sv`). The original directory is preserved. The imported
-weight-cache version has been changed to a software-managed `weight_buffer`:
-`OPCODE_DRAM_TO_WEIGHT` (0x41) explicitly loads rows through DMA; a WEIGHT
-instruction then reads a local WB row, with no tags, replacement, or demand refill.
-The cache and replacement-policy files are retained for reference but excluded
-from both source manifests and the instantiated hierarchy.
+An FP16 sparse accelerator for **Tiny Tapeout SKY130**, using **8×2 tiles**.
+It combines a two-lane compute engine, an SPI host interface, and a shared 512 B SRAM.
 
-WB, UB and ACC now share one generated OpenRAM 64-bit 1RW macro through
-`mem_ctrl`. The compute width remains two FP16 lanes. Logical addresses are
-32-bit row indices within each region; even/odd rows occupy the low/high half
-of one physical word. The instruction format and 64-bit AXI interface are unchanged.
+### Features
 
-| Capacity | UB | ACC | WB | Physical words |
-|---|---|---|---|---|
-| 1 KiB | 512 B / 128 rows | 256 B / 64 rows | 256 B / 64 rows | 128 x 64 bits |
-| 512 B | 256 B / 64 rows | 128 B / 32 rows | 128 B / 32 rows | 64 x 64 bits |
+- Two FP16 lanes sharing one physical MAC.
+- Sparsity control and ReLU, sigmoid, and tanh activation.
+- Software-managed weights and memory accumulation.
+- One 512 B OpenRAM SRAM, shared by UB (256 B), ACC (128 B), and WB (128 B).
+- SPI host interface and DMA request handling.
+- Two-entry instruction FIFO and a 10 MHz target clock.
 
-Physical word bases are UB=0, ACC=64, WB=96 for 1 KiB and UB=0, ACC=32,
-WB=48 for 512 B. These physical bases are hidden from software. Programs whose
-logical addresses fit the smaller partitions run unchanged on both sizes.
+### Architecture
 
-Instruction, DMA, VPU metadata and activation metadata FIFO depths are all 4.
-DMA uses a data-only row FIFO and sequential local addresses. External DMA
-addresses must be 8-byte aligned; odd row counts use partial final beats.
-The controller round-robins twelve request channels. Read responses are registered on the clock edge after request acceptance. Each client has a response holding slot;
-backpressure on one client does not block the other clients. A write reads a
-physical word, optionally adds the two FP16 accumulator operands, and commits
-an updated word while preserving the other 32-bit row. This transaction occupies
-three clock edges and cannot interleave with another access. The macro has no
-byte write mask. VPU results are held until accepted; at most one VPU computation
-is in flight, so the old fully pipelined throughput is not retained.
+```text
+Tiny Tapeout pins → Wrapper → Accelerator core
+                             ├─ SPI host and DMA
+                             ├─ Compute, sparsity, and activation
+                             └─ Memory controller → 512 B SRAM
+```
 
-Instruction dependency checks and SYNC include pending memory operations.
-Memory contents are not reset. Reset cancels uncommitted controller requests;
-it does not undo writes already captured by the macro. Out-of-range requests
-never wrap into another region: reads return zero, writes are discarded, and
-status bit 6 latches an error until reset. Software must regard that transfer as
-failed and check bounds before submitting a multi-row command (earlier valid
-rows in an out-of-range burst may already have committed).
+The core is synthesized with Design Compiler and placed and routed with ICC2.
+The Tiny Tapeout flow imports the finished core and builds the wrapper around it.
 
-Select `ACC_SRAM_BYTES=512` or `1024` at compile time; the default is 512.
-Simulation uses `make -C test SRAM_BYTES=512` / `1024`. DC uses the environment
-variable with the same name. The current submission uses `src/config.json` and the hardened 512 B core.
-Earlier direct-RTL P&R settings are archived under `docs/archive/rtl-integration/`;
-switching the submitted macro to 1 KiB requires a new hardening run.
+### Shared memory
 
-The generated macros pass macro-level DRC/LVS, but their TT Liberty timing is
-an analytical estimate, not SPICE characterization. Full-chip placement,
-routing, PDN and timing signoff are not done. See `memory/openram/README.md`.
+The 512 B SRAM is a 64-bit × 64-word OpenRAM macro. The memory controller
+shares it between three regions. Each logical row holds two FP16 values
+(32 bits); two logical rows share one physical SRAM word.
 
-The top module is `tt_um_not_so_tiny_sparse_acc_ramzxc`. `rst_n=0` resets the
-interface and accelerator. `ena=0` also holds them in reset; deselection discards
-in-flight work. The system clock target is 10 MHz (`CLOCK_PERIOD=100` ns).
-`SLANG_ARGUMENTS` raises the bounded loop-unroll limit to 16384 for the nested
-FP16 activation functions. `USE_SLANG` enables package/packed-type support in the LibreLane synthesis flow;
-see the [LibreLane configuration reference](https://librelane.readthedocs.io/en/latest/reference/step_config_vars.html).
+| Region | Capacity | Logical rows |
+| --- | --- | --- |
+| UB | 256 B | 64 |
+| ACC | 128 B | 32 |
+| WB | 128 B | 32 |
+
+Software loads weights into WB before use. The controller also supports
+accumulating results into memory. SRAM contents are not cleared by reset,
+so software must load input data before reading it.
+
+The submitted core uses 512 B. A different SRAM capacity requires a new
+core synthesis and place-and-route run.
+
+The SRAM timing library uses analytical estimates rather than SPICE
+characterization. See [the SRAM documentation](../memory/openram/README.md).
+
+### Clock and reset
+
+The target system clock is 10 MHz. `rst_n=0` resets the interface and core.
+`ena=0` also holds them in reset and discards in-flight work. A running system
+clock is required for both SPI communication and computation.
+
+### Source files
+
+| Path | Contents |
+| --- | --- |
+| `src/wrapper/` | Tiny Tapeout top module |
+| `src/rtl/` | Accelerator RTL |
+| `src/tcl/` | PDN and Magic scripts used by Actions |
+| `src/config.json` | Current 512 B integration settings |
+| `macro/acc_hard_macro/` | Core GDS, LEF, netlists, and SPEF |
+| `memory/openram/` | SRAM generator and macro files |
+| `test/` | RTL and gate-level tests |
+| `scripts/` | Integration and reporting tools |
+| `docs/` | Interface documentation and archived notes |
+
+#### Netlists
+
+- **Post-route, including power pins:** [acc_hard_macro.v](../macro/acc_hard_macro/acc_hard_macro.v)
+- **Post-synthesis, local build:** `syn/runs/<run>/acc_hard_macro_gate.v`
 
 ## How to test
 
-Install Verilator 5.036 or newer (tested with 5.052) and the Python packages in `test/requirements.txt`, then run:
+Requires Python, Make, and Verilator 5.036 or newer. CI uses Verilator 5.052.
+Run from the repository root:
 
 ```sh
-cd test
-make
-python -m cocotb_tools.check_results results.xml
+python3 -m pip install -r test/requirements.txt
+make -C test SRAM_BYTES=512
+python3 -m cocotb_tools.check_results test/results.xml
 ```
 
-The default RTL simulator is Verilator because the source uses SystemVerilog
-packages, packed structures, and casts. Gate-netlist simulation can use
-`make GATES=yes SIM=icarus`. The pin-level test checks SPI ID, reset, aborted
-transactions, synchronization, a two-beat DMA round trip with backpressure,
-FP16 vector addition and accumulator readout, explicit two-row WB preloading,
-WB-based scalar multiplication, error reporting, and deselection.
-The imported core has width-conversion lint warnings; these are nonfatal in the
-simulation Makefile. The simulation is not a complete accelerator ISA regression.
+GitHub Actions runs RTL tests, wrapper hardening, DRC/LVS, Tiny Tapeout precheck,
+and gate-level simulation. Build results include a 2D preview and a 3D viewer link.
 
 ### Pins and SPI timing
 
@@ -99,8 +107,8 @@ Every transaction is exactly two bytes under one CS assertion:
 
 | Command byte | Second byte | Meaning |
 | --- | --- | --- |
-| `0x00 | address` | Dummy byte; read result appears on MISO | Read register |
-| `0x40 | address` | Data | Write staging register |
+| `0x00 \| address` | Dummy byte; read result appears on MISO | Read register |
+| `0x40 \| address` | Data | Write staging register |
 | `0x80` | Action mask | Perform actions |
 
 Addresses are six bits. Read and write maps are distinct. No auto-increment or
@@ -201,25 +209,3 @@ so these two rows share one beat; a single-row store uses byte strobe 0x0F.
 An SPI master (microcontroller or FPGA) plus a continuous system clock and reset.
 The host must run the memory-service protocol above and provide storage for the
 TPU's external tensors. Use IO levels appropriate to the Tiny Tapeout carrier.
-
-### Local synthesis
-
-Local Synopsys synthesis scripts and P&R experiments live in excluded `syn/`
-and `pnr/` directories. GitHub Actions uses `src/config.json` (512 B) and the
-checked-in OpenRAM views instead. The default RTL and test capacity is also 512 B.
-
-Latest local pre-layout result after DMA FIFO/address/count/register sharing
-optimizations, at 100 ns with analytical TT SRAM timing:
-
-| Version | Standard cells (um2) | SRAM (um2) | Total (um2) | 8x2 tile |
-|---|---:|---:|---:|---:|
-| Before DMA optimization, 512 B |141104.077|97582.711|238686.788|76.72%|
-| Current, 512 B |122288.532|97582.711|219871.243|70.67%|
-
-DMA area decreased from 31315.033 to 12549.536 um2. The 372-transfer DMA test
-and both integration tests passed. Setup slack is 27.42 ns with zero setup TNS;
-hold and max-transition violations remain. These are raw cell-area sums,
-not proof that placement/routing or chip-level DRC/LVS will pass.
-
-The `ci/sram-only-512b` branch isolates the same 512 B macro with a minimal
-wrapper so its Actions result can be compared with the full accelerator.

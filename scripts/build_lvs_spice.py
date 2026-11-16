@@ -40,7 +40,7 @@ def main():
     pdk = args.pdk.resolve()
     std_v = pdk / 'libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v'
     std_sp = pdk / 'libs.ref/sky130_fd_sc_hd/spice/sky130_fd_sc_hd.spice'
-    source = CORE / 'acc_hard_macro.pg.v'
+    source = CORE / 'acc_hard_macro.v'
     sram_source = SRAM / 'tt_sram_1rw_64x64_sky130.lvs.sp'
     # Netgen and the PDK's standard-cell SPICE use bare micron W/L values.
     # This derivative is for LVS only, never a replacement simulation model.
@@ -160,7 +160,7 @@ def main():
     manifest_path = CORE / 'manifest.json'
     manifest = json.loads(manifest_path.read_text())
     manifest['lvs_inputs'] = {
-        'macro/acc_hard_macro/acc_hard_macro.pg.v': digest(source),
+        'macro/acc_hard_macro/acc_hard_macro.v': digest(source),
         'memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.lvs.sp': digest(sram_source),
         'macro/acc_hard_macro/acc_hard_macro.lvs.spice': digest(core_output),
         'macro/acc_hard_macro/sram.lvs_micron.spice': digest(CORE / 'sram.lvs_micron.spice'),

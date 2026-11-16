@@ -5,8 +5,13 @@ Core extracted from ICC2 run final_1794485759; RTL baseline b22cd30.
 Placed as wrapper instance core at (5.52, 5.44) um, orientation N.
 Core SIZE: 1367.12 x 214.88 um. Parent TT 8x2: 1378.16 x 225.76 um.
 Synthesis uses blackbox.v. Physical flow uses LEF and merged GDS.
-Hierarchical nominal TT STA uses acc_hard_macro.v and the extracted SPEF.
-LVS and gate simulation use the powered acc_hard_macro.pg.v netlist.
+STA, Formality, LVS and gate simulation share the powered acc_hard_macro.v.
+This is the unchanged powered ICC2 export, renamed from acc_hard_macro.pg.v.
+STA/Formality also load physical_cells.v: five empty functional models copied
+from the official PDK (filler/tap cells have no logical function).
+Formality compares with unpowered RTL in the documented PG-pins-ON mode;
+check_power_connections.py first checks all physical supply/well connections.
+Full GDS LVS remains responsible for extracted physical connectivity.
 SRAM Liberty, LVS SPICE and simulation model remain in memory/openram/generated.
 The raw ICC2 exports remain in the source run. The packaged GDS adds the
 LEF-sized 235/4 PR boundary and exactly converts DBU from 0.1nm to 1nm for

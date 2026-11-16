@@ -1,6 +1,6 @@
 # Archived development notes
 
-See the [main README](../../README.md) for the current project.
+See the [project documentation](../info.md) for the current project.
 Files here describe past work, not the current submission.
 
 ## Original README — 2026-11-16
@@ -21,3 +21,10 @@ older stages. Relative paths refer to the old repository layout.
 settings from before the full accelerator became a hard macro. They are not
 runnable configurations for the current wrapper. Their old PDN scripts remain
 in git history. The active configuration is `src/config.json` (512 B).
+
+## Previous project documentation — 2026-11-16
+
+[info-before-cleanup-2026-11-16.md](info-before-cleanup-2026-11-16.md)
+is an unchanged copy of the previous `docs/info.md`. It includes historical
+memory-controller details, earlier FIFO sizes, and pre-layout area comparisons.
+Those figures do not describe the current hardened core.

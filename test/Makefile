@@ -36,7 +36,7 @@ COMPILE_ARGS    += -DUNIT_DELAY=\#1
 VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v
 VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
 
-VERILOG_SOURCES += $(SRC_DIR)/../macro/acc_hard_macro/acc_hard_macro.pg.v
+VERILOG_SOURCES += $(SRC_DIR)/../macro/acc_hard_macro/acc_hard_macro.v
 
 # this gets copied in by the GDS action workflow
 VERILOG_SOURCES += $(CURDIR)/gate_level_netlist.v
