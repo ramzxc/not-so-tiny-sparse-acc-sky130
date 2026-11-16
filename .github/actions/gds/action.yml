@@ -1,5 +1,5 @@
 # Based on TinyTapeout/tt-gds-action@ttsky26d (e013b994dc124e6bbce5e4ae54d93908ac98141e).
-# Modified only Routing summary and Cell usage summary commands for hard-macro inputs.
+# Modified summary commands for hard-macro inputs; source artifacts include nested directories.
 name: 'Tiny Tapeout GDS Action'
 description: 'This action builds a GDS file from your Tiny Tapeout project'
 branding:
@@ -166,7 +166,7 @@ runs:
       with:
         name: GDS_logs
         path: |
-          src/*
+          src/**
           runs/wokwi/*
 
     - name: Prepare tt_submission artifact
@@ -178,7 +178,7 @@ runs:
       with:
         name: tt_submission
         path: |
-          src/*
+          src/**
           docs/*
           tt_submission/*
           info.yaml

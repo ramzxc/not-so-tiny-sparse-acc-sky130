@@ -17,7 +17,7 @@ if {[info exists ::env(_MAGIC_SCRIPT)] &&
 
 if {[info exists ::env(_MAGIC_SCRIPT)] &&
     [file tail $::env(_MAGIC_SCRIPT)] eq "extract_spice.tcl"} {
-    set ::tt_lvs_scripts [file normalize [file join [file dirname [info script]] .. scripts]]
+    set ::tt_lvs_scripts [file normalize [file join [file dirname [info script]] .. .. scripts]]
     exec python3 [file join $::tt_lvs_scripts check_lvs_inputs.py]
     # Canonicalize only explicit ideal-zero aliases after extraction. Keep the
     # raw result and the independent transformation audit in the run directory.

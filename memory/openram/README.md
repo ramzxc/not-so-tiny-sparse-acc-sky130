@@ -1,6 +1,6 @@
 # Tiny Tapeout 8×2용 단일 SRAM 두 가지
 
-1 KiB(64×128)와 대체용 512 B(64×64)를 각각 독립적인 단일 1RW 매크로로 생성한다. 두 개를 동시에 쓰는 구성이 아니다. 현재 TPU는 compute width=2이며, 32-bit 논리 행 두 개를 64-bit 물리 word에 저장한다. `src/mem_ctrl.sv`가 UB/ACC/WB 요청을 중재하며 단일 매크로에 연결한다. 기본 분할은 UB 1/2, ACC 1/4, WB 1/4이다. `ACC_SRAM_BYTES=1024` 또는 `512`로 선택한다.
+1 KiB(64×128)와 대체용 512 B(64×64)를 각각 독립적인 단일 1RW 매크로로 생성한다. 두 개를 동시에 쓰는 구성이 아니다. 현재 TPU는 compute width=2이며, 32-bit 논리 행 두 개를 64-bit 물리 word에 저장한다. `src/rtl/mem_ctrl.sv`가 UB/ACC/WB 요청을 중재하며 단일 매크로에 연결한다. 기본 분할은 UB 1/2, ACC 1/4, WB 1/4이다. `ACC_SRAM_BYTES=1024` 또는 `512`로 선택한다.
 
 **2026-11-11: 두 용량 모두 매크로 단독 최종 DRC=0, LVS=0, LVS 치수 불일치 없음. 행동 모델 테스트와 전원 핀 포함 래퍼 컴파일도 통과했다.**
 
@@ -129,9 +129,9 @@ and equivalent in both streamouts; XOR remains mandatory.
 
 392 KLayout markers were via3 size/spacing violations at the SRAM power rings.
 Automatic macro M3/M4 stitching duplicated existing internal macro vias.
-`pdn_standard_grid.tcl` preserves LibreLane 3.0.14's standard-cell power grid
+The earlier `pdn_standard_grid.tcl` preserved LibreLane 3.0.14's standard-cell power grid
 (Apache-2.0 source), omitting its default macro grid; the explicit checked edge
-connections remain in `pdn_sram_connections.tcl`. Both supply connectivity checks
+connections were in `pdn_sram_connections.tcl` (both retained in git history). The current hardened-core integration uses `src/tcl/pdn.tcl`. Both supply connectivity checks
 must pass. This removes duplicate geometry rather than ignoring DRC.
 
 The other two markers were NSDM/PSDM overlap on active beneath the previously

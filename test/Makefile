@@ -10,7 +10,7 @@ endif
 FST ?= -fst # Use more efficient FST format
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(CURDIR)/../src
-PROJECT_SOURCES = project.v acc_hard_macro_rtl.v tpu_pkg.sv acc_host.sv mem_ctrl.sv shared_sram.sv acc_spi.sv activation.sv activation_ctrl.sv axi_master_adapter.sv dma.sv inst_decoder.sv inst_fifo.sv mac_unit.sv sparsity_ctrl.sv tpu.sv tpu_core.sv vpu.sv vpu_ctrl.sv weight_load_ctrl.sv
+PROJECT_SOURCES = wrapper/project.v rtl/acc_hard_macro_rtl.v rtl/tpu_pkg.sv rtl/acc_host.sv rtl/mem_ctrl.sv rtl/shared_sram.sv rtl/acc_spi.sv rtl/activation.sv rtl/activation_ctrl.sv rtl/axi_master_adapter.sv rtl/dma.sv rtl/inst_decoder.sv rtl/inst_fifo.sv rtl/mac_unit.sv rtl/sparsity_ctrl.sv rtl/tpu.sv rtl/tpu_core.sv rtl/vpu.sv rtl/vpu_ctrl.sv rtl/weight_load_ctrl.sv
 
 SRAM_BYTES ?= 512
 export SRAM_BYTES

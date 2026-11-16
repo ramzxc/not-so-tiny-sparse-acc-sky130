@@ -86,15 +86,13 @@
   "GRT_ALLOW_CONGESTION": 1,
   "FP_IO_HLENGTH": 2,
   "FP_IO_VLENGTH": 2,
-  "FP_PDN_VPITCH": 38.87,
   "RUN_CTS": 1,
-  "FP_PDN_MULTILAYER": 0,
   "MAGIC_DEF_LABELS": 0,
   "MAGIC_WRITE_LEF_PINONLY": 1,
   "VERILOG_DEFINES": [
     "ACC_SRAM_BYTES=512"
   ],
-  "PDN_CFG": "dir::pdn_core.tcl",
+  "PDN_CFG": "dir::tcl/pdn.tcl",
   "RUN_MAGIC_DRC": true,
   "RUN_LVS": true,
   "ERROR_ON_MAGIC_DRC": true,
@@ -108,7 +106,7 @@
   "LVS_INCLUDE_MARCO_NETLISTS": false,
   "FP_MACRO_HORIZONTAL_HALO": 0,
   "FP_MACRO_VERTICAL_HALO": 0,
-  "MAGICRC": "dir::magicrc.tcl",
+  "MAGICRC": "dir::tcl/magicrc.tcl",
   "MAGIC_EXT_USE_GDS": true,
   "MAGIC_EXT_SHORT_RESISTOR": true,
   "LVS_FLATTEN_CELLS": [
@@ -129,5 +127,10 @@
     "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_ef_sc_hd__fill_8.spice",
     "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_fd_sc_hd.spice",
     "dir::../macro/acc_hard_macro/acc_hard_macro.lvs.spice"
-  ]
+  ],
+  "PDN_MULTILAYER": false,
+  "PDN_VPITCH": 38.87,
+  "PDN_CORE_RING": false,
+  "PDN_ENABLE_RAILS": true,
+  "PDN_ENABLE_PINS": true
 }

@@ -39,7 +39,6 @@ test/gate_level_netlist.v
 /syn/
 /pnr/
 /sizing/
-/src/macros/
 /test/sim_build*/
 /test/results*.xml
 /memory/openram/generated/**/*.db
@@ -54,3 +53,6 @@ test/gate_level_netlist.v
 /memory/openram/debug/
 /memory/openram/experiments/
 /memory/openram/generated/**/.magicrc
+
+# Local retired macro files
+/memory/archive/

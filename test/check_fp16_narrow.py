@@ -20,7 +20,7 @@ with (out / 'test_build.log').open('w') as log:
     subprocess.run([
         'verilator', '--binary', '-j', '4', '-Wno-fatal',
         '--top-module', 'tb_fp16_narrow', '--Mdir', str(out / 'obj_test'),
-        str(root / 'src/tpu_pkg.sv'), str(out / 'fp16_reference_pkg.sv'),
+        str(root / 'src/rtl/tpu_pkg.sv'), str(out / 'fp16_reference_pkg.sv'),
         str(root / 'test/tb_fp16_narrow.sv'),
     ], stdout=log, stderr=subprocess.STDOUT, check=True)
 with (out / 'test_result.log').open('w') as log:
