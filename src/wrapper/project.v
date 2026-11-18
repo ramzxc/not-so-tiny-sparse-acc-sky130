@@ -1,5 +1,5 @@
 `default_nettype none
-// Current RTL core. Only the internal 512 B SRAM is a hard macro.
+// Hardened ICC2 core with internal 512 B SRAM.
 module tt_um_not_so_tiny_sparse_acc_ramzxc (
 `ifdef USE_POWER_PINS
     inout wire VPWR, VGND,
@@ -12,8 +12,13 @@ module tt_um_not_so_tiny_sparse_acc_ramzxc (
     input wire ena, clk, rst_n
 );
     acc_hard_macro core (
-        .ui_in(ui_in), .uo_out(uo_out), .uio_in(uio_in),
-        .uio_out(uio_out), .uio_oe(uio_oe), .ena(ena), .clk(clk), .rst_n(rst_n)
+`ifdef USE_POWER_PINS
+        .VPWR(VPWR), .VGND(VGND),
+`endif
+        .uart_rx_i(ui_in[3]), .uo_out(uo_out),
+        .qspi_dq_i({uio_in[5:4], uio_in[2:1]}),
+        .uio_out(uio_out), .uio_oe(uio_oe), .clk(clk), .rst_n(rst_n)
     );
+    wire _unused = &{ui_in[7:4], ui_in[2:0], uio_in[7:6], uio_in[3], uio_in[0], ena, 1'b0};
 endmodule
 `default_nettype wire

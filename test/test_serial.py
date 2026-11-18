@@ -13,7 +13,10 @@ class Host:
             await Timer(50,unit='ns')
             self.d.clk.value=1
             await Timer(50,unit='ns')
-            tx=(int(self.d.uo_out.value)>>4)&1
+            # UART output is not sampled while reset is asserted.
+            if not int(self.d.rst_n.value):
+                continue
+            tx=int(self.d.uo_out.value[4])
             if self.state==-1:
                 if not tx:self.state=0;self.counter=self.period+self.period//2;self.byte=0
             else:

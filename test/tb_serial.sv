@@ -127,7 +127,7 @@ module tb_serial;
     wire [3:0] flash_dq;
 `ifdef GL_TEST
     // Observe the SRAM model response, not a synthesis-dependent core net.
-    wire [64:0] mem_observe_row = dut.\core.itf.memory.size_512.macro .dout0;
+    wire [64:0] mem_observe_row = dut.core.itf.memory.size_512_macro.dout0;
     wire [31:0] mem_observe_data = observe_upper ? mem_observe_row[63:32] : mem_observe_row[31:0];
     wire VPWR = 1'b1;
     wire VGND = 1'b0;
@@ -137,7 +137,11 @@ module tb_serial;
     );
 `else
     wire [31:0] mem_observe_data = dut.itf.read_data;
-    acc_hard_macro #(.UART_CLKS_PER_BIT(8)) dut (.*);
+    acc_hard_macro #(.UART_CLKS_PER_BIT(8)) dut (
+        .clk(clk), .rst_n(rst_n), .uart_rx_i(ui_in[3]),
+        .qspi_dq_i({uio_in[5:4], uio_in[2:1]}),
+        .uo_out(uo_out), .uio_out(uio_out), .uio_oe(uio_oe)
+    );
 `endif
     assign uio_in = {2'b11, flash_dq[3:2], 1'b0, flash_dq[1:0], 1'b1};
     qspi_nor_model #(.BOARD_PREPARED(1)) flash_model (

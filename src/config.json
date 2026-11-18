@@ -1,5 +1,5 @@
 {
-  "//": "Yosys RTL flow with one 512 B SRAM. Full GDS LVS uses the SRAM transistor SPICE; its Verilog blackbox is not a circuit model.",
+  "//": "Full LVS uses actual GDS and complete core/SRAM SPICE models. Macro Verilog import is disabled only to avoid duplicate circuit definitions.",
   "PL_TARGET_DENSITY_PCT": 70,
   "CLOCK_PERIOD": 100,
   "USE_SLANG": true,
@@ -7,6 +7,38 @@
     "--unroll-limit=16384"
   ],
   "MACROS": {
+    "acc_hard_macro": {
+      "gds": [
+        "dir::../macro/acc_hard_macro/acc_hard_macro.gds"
+      ],
+      "lef": [
+        "dir::../macro/acc_hard_macro/acc_hard_macro.lef"
+      ],
+      "vh": [
+        "dir::../macro/acc_hard_macro/blackbox.v"
+      ],
+      "nl": [
+        "dir::../macro/acc_hard_macro/physical_cells.v",
+        "dir::../macro/acc_hard_macro/acc_hard_macro.v"
+      ],
+      "pnl": [
+        "dir::../macro/acc_hard_macro/acc_hard_macro.v"
+      ],
+      "spef": {
+        "*_tt_025C_1v80": [
+          "dir::../macro/acc_hard_macro/acc_hard_macro.opensta.spef.gz"
+        ]
+      },
+      "instances": {
+        "core": {
+          "location": [
+            5.52,
+            5.44
+          ],
+          "orientation": "N"
+        }
+      }
+    },
     "tt_sram_1rw_64x64_sky130": {
       "gds": [
         "dir::../memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.gds"
@@ -23,17 +55,9 @@
         ]
       },
       "spice": [
-        "dir::../memory/openram/generated/tt_sram_1rw_64x64_sky130/sram.lvs_micron.spice"
+        "dir::../memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.lvs.sp"
       ],
-      "instances": {
-        "core.itf.memory.size_512.macro": {
-          "location": [
-            420,
-            19.135
-          ],
-          "orientation": "N"
-        }
-      }
+      "instances": {}
     }
   },
   "STA_CORNERS": [
@@ -43,7 +67,7 @@
     "nom_tt_025C_1v80"
   ],
   "PDN_MACRO_CONNECTIONS": [
-    ".*\\.memory\\.size_.*\\.macro VPWR VGND vccd1 vssd1"
+    "core VPWR VGND VPWR VGND"
   ],
   "PL_RESIZER_HOLD_SLACK_MARGIN": 0.1,
   "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.05,
@@ -70,15 +94,6 @@
     "ACC_SRAM_BYTES=512"
   ],
   "PDN_CFG": "dir::tcl/pdn.tcl",
-  "PDN_OBSTRUCTIONS": [
-    [
-      "met4",
-      410,
-      9.135,
-      950.455,
-      216.63
-    ]
-  ],
   "RUN_MAGIC_DRC": true,
   "RUN_LVS": true,
   "ERROR_ON_MAGIC_DRC": true,
@@ -88,16 +103,35 @@
   "ERROR_ON_TR_DRC": true,
   "ERROR_ON_XOR_ERROR": true,
   "KLAYOUT_CONFLICT_RESOLUTION": "OverwriteCell",
-  "VERILOG_INCLUDE_DIRS": [
-    "dir::rtl",
-    "dir::rtl/core"
-  ],
-  "PDN_VPITCH": 38.87,
-  "PDN_MULTILAYER": false,
-  "MAGIC_EXT_USE_GDS": true,
+  "STA_MACRO_PRIORITIZE_NL": true,
+  "LVS_INCLUDE_MARCO_NETLISTS": false,
+  "FP_MACRO_HORIZONTAL_HALO": 0,
+  "FP_MACRO_VERTICAL_HALO": 0,
   "MAGICRC": "dir::tcl/magicrc.tcl",
-  "EXTRA_SPICE_MODELS": [
-    "dir::../memory/openram/generated/tt_sram_1rw_64x64_sky130/sram.lvs_micron.spice"
+  "MAGIC_EXT_USE_GDS": true,
+  "MAGIC_EXT_SHORT_RESISTOR": true,
+  "LVS_FLATTEN_CELLS": [
+    "acc_hard_macro"
   ],
-  "LVS_INCLUDE_MARCO_NETLISTS": false
+  "EXTRA_SPICE_MODELS": [
+    "dir::../macro/acc_hard_macro/sram.lvs_micron.spice"
+  ],
+  "CELL_SPICE_MODELS": [
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_ef_sc_hd__decap_12.spice",
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_ef_sc_hd__decap_20_12.spice",
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_ef_sc_hd__decap_40_12.spice",
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_ef_sc_hd__decap_60_12.spice",
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_ef_sc_hd__decap_80_12.spice",
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_ef_sc_hd__fill_12.spice",
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_ef_sc_hd__fill_2.spice",
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_ef_sc_hd__fill_4.spice",
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_ef_sc_hd__fill_8.spice",
+    "pdk_dir::libs.ref/sky130_fd_sc_hd/spice/sky130_fd_sc_hd.spice",
+    "dir::../macro/acc_hard_macro/acc_hard_macro.lvs.spice"
+  ],
+  "PDN_MULTILAYER": false,
+  "PDN_VPITCH": 38.87,
+  "PDN_CORE_RING": false,
+  "PDN_ENABLE_RAILS": true,
+  "PDN_ENABLE_PINS": true
 }

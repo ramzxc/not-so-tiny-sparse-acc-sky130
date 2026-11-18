@@ -2,7 +2,7 @@
 #
 # Design name:  acc_hard_macro
 #
-# Created by icc2 write_sdc on Thu Nov 12 21:16:12 2026
+# Created by icc2 write_sdc on Thu Nov 19 01:56:30 2026
 #
 ################################################################################
 
@@ -74,80 +74,32 @@ set_timing_derate -early 0.95 -net_delay -data
 set_timing_derate -late 1.05 -net_delay -data 
 # Set latency for io paths.
 # -origin useful_skew
-set_clock_latency -min 1.0852 [get_clocks {clk}]
+set_clock_latency -min 0.742763 [get_clocks {clk}]
 # -origin useful_skew
-set_clock_latency -max 1.19946 [get_clocks {clk}]
+set_clock_latency -max 0.820916 [get_clocks {clk}]
 # Set propagated on clock sources to avoid removing latency for IO paths.
 set_propagated_clock  [get_ports {clk}]
 set_clock_uncertainty 0.25 [get_clocks {clk}]
 # /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
 #   10
 set_driving_cell -lib_cell sky130_fd_sc_hd__inv_2 -pin Y -input_transition_rise \
-    0 -input_transition_fall 0 [get_ports {ui_in[7]}]
+    0 -input_transition_fall 0 [get_ports {uart_rx_i}]
 # /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
 #   10
 set_driving_cell -lib_cell sky130_fd_sc_hd__inv_2 -pin Y -input_transition_rise \
-    0 -input_transition_fall 0 [get_ports {ui_in[6]}]
+    0 -input_transition_fall 0 [get_ports {qspi_dq_i[3]}]
 # /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
 #   10
 set_driving_cell -lib_cell sky130_fd_sc_hd__inv_2 -pin Y -input_transition_rise \
-    0 -input_transition_fall 0 [get_ports {ui_in[5]}]
+    0 -input_transition_fall 0 [get_ports {qspi_dq_i[2]}]
 # /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
 #   10
 set_driving_cell -lib_cell sky130_fd_sc_hd__inv_2 -pin Y -input_transition_rise \
-    0 -input_transition_fall 0 [get_ports {ui_in[4]}]
+    0 -input_transition_fall 0 [get_ports {qspi_dq_i[1]}]
 # /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
 #   10
 set_driving_cell -lib_cell sky130_fd_sc_hd__inv_2 -pin Y -input_transition_rise \
-    0 -input_transition_fall 0 [get_ports {ui_in[3]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   10
-set_driving_cell -lib_cell sky130_fd_sc_hd__inv_2 -pin Y -input_transition_rise \
-    0 -input_transition_fall 0 [get_ports {ui_in[2]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   10
-set_driving_cell -lib_cell sky130_fd_sc_hd__inv_2 -pin Y -input_transition_rise \
-    0 -input_transition_fall 0 [get_ports {ui_in[1]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   10
-set_driving_cell -lib_cell sky130_fd_sc_hd__inv_2 -pin Y -input_transition_rise \
-    0 -input_transition_fall 0 [get_ports {ui_in[0]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   10
-set_driving_cell -lib_cell sky130_fd_sc_hd__inv_2 -pin Y -input_transition_rise \
-    0 -input_transition_fall 0 [get_ports {uio_in[7]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   10
-set_driving_cell -lib_cell sky130_fd_sc_hd__inv_2 -pin Y -input_transition_rise \
-    0 -input_transition_fall 0 [get_ports {uio_in[6]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   10
-set_driving_cell -lib_cell sky130_fd_sc_hd__inv_2 -pin Y -input_transition_rise \
-    0 -input_transition_fall 0 [get_ports {uio_in[5]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   10
-set_driving_cell -lib_cell sky130_fd_sc_hd__inv_2 -pin Y -input_transition_rise \
-    0 -input_transition_fall 0 [get_ports {uio_in[4]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   10
-set_driving_cell -lib_cell sky130_fd_sc_hd__inv_2 -pin Y -input_transition_rise \
-    0 -input_transition_fall 0 [get_ports {uio_in[3]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   10
-set_driving_cell -lib_cell sky130_fd_sc_hd__inv_2 -pin Y -input_transition_rise \
-    0 -input_transition_fall 0 [get_ports {uio_in[2]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   10
-set_driving_cell -lib_cell sky130_fd_sc_hd__inv_2 -pin Y -input_transition_rise \
-    0 -input_transition_fall 0 [get_ports {uio_in[1]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   10
-set_driving_cell -lib_cell sky130_fd_sc_hd__inv_2 -pin Y -input_transition_rise \
-    0 -input_transition_fall 0 [get_ports {uio_in[0]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   10
-set_driving_cell -lib_cell sky130_fd_sc_hd__inv_2 -pin Y -input_transition_rise \
-    0 -input_transition_fall 0 [get_ports {ena}]
+    0 -input_transition_fall 0 [get_ports {qspi_dq_i[0]}]
 # /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
 #   10
 set_driving_cell -lib_cell sky130_fd_sc_hd__inv_2 -pin Y -input_transition_rise \
@@ -158,28 +110,7 @@ set_driving_cell -lib_cell sky130_fd_sc_hd__inv_2 -pin Y -input_transition_rise 
     0 -input_transition_fall 0 [get_ports {rst_n}]
 # /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
 #   8
-set_input_delay -clock [get_clocks {clk}] 20 [get_ports {ui_in[7]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   8
-set_input_delay -clock [get_clocks {clk}] 20 [get_ports {ui_in[6]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   8
-set_input_delay -clock [get_clocks {clk}] 20 [get_ports {ui_in[5]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   8
-set_input_delay -clock [get_clocks {clk}] 20 [get_ports {ui_in[4]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   8
-set_input_delay -clock [get_clocks {clk}] 20 [get_ports {ui_in[3]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   8
-set_input_delay -clock [get_clocks {clk}] 20 [get_ports {ui_in[2]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   8
-set_input_delay -clock [get_clocks {clk}] 20 [get_ports {ui_in[1]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   8
-set_input_delay -clock [get_clocks {clk}] 20 [get_ports {ui_in[0]}]
+set_input_delay -clock [get_clocks {clk}] 20 [get_ports {uart_rx_i}]
 # /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
 #   9
 set_output_delay -clock [get_clocks {clk}] 20 [get_ports {uo_out[7]}]
@@ -206,28 +137,16 @@ set_output_delay -clock [get_clocks {clk}] 20 [get_ports {uo_out[1]}]
 set_output_delay -clock [get_clocks {clk}] 20 [get_ports {uo_out[0]}]
 # /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
 #   8
-set_input_delay -clock [get_clocks {clk}] 20 [get_ports {uio_in[7]}]
+set_input_delay -clock [get_clocks {clk}] 20 [get_ports {qspi_dq_i[3]}]
 # /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
 #   8
-set_input_delay -clock [get_clocks {clk}] 20 [get_ports {uio_in[6]}]
+set_input_delay -clock [get_clocks {clk}] 20 [get_ports {qspi_dq_i[2]}]
 # /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
 #   8
-set_input_delay -clock [get_clocks {clk}] 20 [get_ports {uio_in[5]}]
+set_input_delay -clock [get_clocks {clk}] 20 [get_ports {qspi_dq_i[1]}]
 # /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
 #   8
-set_input_delay -clock [get_clocks {clk}] 20 [get_ports {uio_in[4]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   8
-set_input_delay -clock [get_clocks {clk}] 20 [get_ports {uio_in[3]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   8
-set_input_delay -clock [get_clocks {clk}] 20 [get_ports {uio_in[2]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   8
-set_input_delay -clock [get_clocks {clk}] 20 [get_ports {uio_in[1]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   8
-set_input_delay -clock [get_clocks {clk}] 20 [get_ports {uio_in[0]}]
+set_input_delay -clock [get_clocks {clk}] 20 [get_ports {qspi_dq_i[0]}]
 # /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
 #   9
 set_output_delay -clock [get_clocks {clk}] 20 [get_ports {uio_out[7]}]
@@ -276,9 +195,6 @@ set_output_delay -clock [get_clocks {clk}] 20 [get_ports {uio_oe[1]}]
 # /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
 #   9
 set_output_delay -clock [get_clocks {clk}] 20 [get_ports {uio_oe[0]}]
-# /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
-#   8
-set_input_delay -clock [get_clocks {clk}] 20 [get_ports {ena}]
 # /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/syn/cons/top.sdc, line \
 #   8
 set_input_delay -clock [get_clocks {clk}] 20 [get_ports {rst_n}]

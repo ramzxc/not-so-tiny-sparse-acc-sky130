@@ -18,18 +18,6 @@ project:
   # Keep the plain-Verilog wrapper first for Tiny Tapeout port discovery.
   source_files:
     - "wrapper/project.v"
-    - "rtl/shared_sram.sv"
-    - "rtl/project.v"
-    - "rtl/uart/uart_rx.v"
-    - "rtl/uart/uart_tx.v"
-    - "rtl/core/inst_fifo.v"
-    - "rtl/core/micro_ctrl.v"
-    - "rtl/core/dma_ctrl.v"
-    - "rtl/core/inst_decoder.v"
-    - "rtl/core/data_ctrl.v"
-    - "rtl/core/exec_unit.sv"
-    - "rtl/mem_itf.sv"
-    - "rtl/qspi_ctrl.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).

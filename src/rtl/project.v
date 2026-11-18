@@ -4,12 +4,11 @@
 `default_nettype none
 
 module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87) (
-    input  wire [7:0] ui_in,
+    input  wire uart_rx_i,
     output wire [7:0] uo_out,
-    input  wire [7:0] uio_in,
+    input  wire [3:0] qspi_dq_i,
     output wire [7:0] uio_out,
     output wire [7:0] uio_oe,
-    input  wire ena,
     input  wire clk,
     input  wire rst_n
 );
@@ -46,7 +45,7 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87) (
     wire [3:0] dq_out, dq_oe;
 
     uart_rx #(.CLKS_PER_BIT(UART_CLKS_PER_BIT)) receiver (
-        .clk(clk), .rst_n(core_rst_n), .rx(ui_in[3]),
+        .clk(clk), .rst_n(core_rst_n), .rx(uart_rx_i),
         .inst(rx_inst), .inst_val(rx_inst_val)
     );
     uart_tx #(.CLKS_PER_BIT(UART_CLKS_PER_BIT)) transmitter (
@@ -117,13 +116,13 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87) (
         .req_addr(qspi_addr), .req_device(qspi_device), .req_data(qspi_write_data),
         .read_data(qspi_read_data), .read_data_val(qspi_read_data_val),
         .sck(sck), .flash_sc_n(flash_cs), .psram_a_sc_n(ram_a_cs), .psram_b_sc_n(ram_b_cs),
-        .dq_in({uio_in[5:4], uio_in[2:1]}), .dq_out(dq_out), .dq_oe(dq_oe)
+        .dq_in(qspi_dq_i), .dq_out(dq_out), .dq_oe(dq_oe)
     );
 
     // TinyQV Pmod order, preserved from the original wrapper.
     assign uio_out = {ram_b_cs, ram_a_cs, dq_out[3:2], sck, dq_out[1:0], flash_cs};
     assign uio_oe  = {2'b11, dq_oe[3:2], 1'b1, dq_oe[1:0], 1'b1};
     assign uo_out  = {3'b0, tx, 2'b0, (memory_error | micro_error | dma_error), decoder_rdy};
-    wire _unused = &{ui_in[7:4], ui_in[2:0], uio_in[7:6], uio_in[3], uio_in[0], ena, micro_busy, 1'b0};
+    wire _unused = &{micro_busy, 1'b0};
 endmodule
 `default_nettype wire

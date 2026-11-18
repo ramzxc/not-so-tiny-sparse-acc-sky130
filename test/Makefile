@@ -11,6 +11,7 @@ SIM ?= icarus
 COMPILE_ARGS += -DGL_TEST -DUSE_POWER_PINS -DFUNCTIONAL -DSIM -DUNIT_DELAY=\#1
 VERILOG_SOURCES = $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v
 VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
+VERILOG_SOURCES += $(ROOT)/macro/acc_hard_macro/acc_hard_macro.v
 VERILOG_SOURCES += $(CURDIR)/gate_level_netlist.v
 else
 SIM = verilator

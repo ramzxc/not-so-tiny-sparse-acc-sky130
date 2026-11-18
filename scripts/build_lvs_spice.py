@@ -131,7 +131,11 @@ def main():
                  if (t := line.split()) and t[0].startswith('X')]
     assert roundtrip == connectivity
     assert counts['tt_sram_1rw_64x64_sky130'] == 1
-    assert len(ports) == 45
+    import gdstk
+    lib = gdstk.read_gds(CORE / 'acc_hard_macro.gds')
+    top = next(c for c in lib.cells if c.name == 'acc_hard_macro')
+    labels = {label.text for label in top.labels}
+    assert set(ports) == labels, 'GDS and powered netlist ports differ'
     core_output = CORE / 'acc_hard_macro.lvs.spice'
     core_output.write_text(emitted)
     with tempfile.TemporaryDirectory(prefix='tt-lvs-alias-') as tmp:

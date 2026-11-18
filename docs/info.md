@@ -20,9 +20,9 @@ The memory interface selects external Flash or internal 512 B SRAM. PSRAM is
 not used. A small blocking DMA copies Flash blocks to SRAM without arithmetic.
 Set source, destination and length, then wait for completion before RUN.
 
-GitHub Actions synthesizes this RTL with Yosys and places and routes it with
-OpenROAD. Only the 512 B SRAM uses prebuilt physical views. Local DC/ICC2 runs
-are a separate comparison flow; their outputs do not replace the Actions RTL.
+This branch tests the ICC2 core GDS as a hard macro. GitHub Actions builds
+and routes the Tiny Tapeout wrapper around it. The core includes the 512 B
+SRAM. Full DRC and LVS remain enabled.
 
 ### Source files
 
@@ -37,7 +37,7 @@ are a separate comparison flow; their outputs do not replace the Actions RTL.
 | `src/rtl/qspi_ctrl.v` | Byte transfers to Flash |
 | `src/sources.f` | RTL source list |
 | `memory/openram/` | SRAM models and physical views |
-| `macro/acc_hard_macro/` | Previous hardened core |
+| `macro/acc_hard_macro/` | Current ICC2 core GDS, LEF, netlist, and parasitics |
 
 The existing post-route netlist is
 [acc_hard_macro.v](../macro/acc_hard_macro/acc_hard_macro.v).
