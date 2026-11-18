@@ -1,0 +1,11 @@
+SIM = verilator
+TOPLEVEL_LANG = verilog
+TOPLEVEL = micro_ctrl
+COCOTB_TEST_MODULES = test_micro
+ROOT := $(abspath $(CURDIR)/..)
+BUILD ?= /tmp/acc-micro
+SIM_BUILD = $(BUILD)/sim
+COCOTB_RESULTS_FILE = $(BUILD)/results.xml
+VERILOG_SOURCES = $(ROOT)/src/rtl/core/micro_ctrl.v
+COMPILE_ARGS += -I$(ROOT)/src/rtl/core -Wno-fatal --timing --timescale-override 1ns/1ps
+include $(shell cocotb-config --makefiles)/Makefile.sim

@@ -1,4 +1,5 @@
-"""Compare narrow arithmetic against a saved pre-change tpu_pkg.sv.
+"""Compare core arithmetic against a saved pre-change fp16_pkg.sv.
+Hard sigmoid/tanh/STEP are intentionally excluded: their specification changed.
 
 Usage: python3 test/check_fp16_narrow.py --reference PATH --output DIR
 Requires Verilator and a C++ compiler; no cocotb dependency.
@@ -14,13 +15,13 @@ args = parser.parse_args()
 root = Path(__file__).resolve().parents[1]
 out = args.output.resolve()
 out.mkdir(parents=True, exist_ok=True)
-reference = args.reference.read_text().replace('package tpu_pkg;', 'package fp16_reference_pkg;')
+reference = args.reference.read_text().replace('package fp16_pkg;', 'package fp16_reference_pkg;').replace('package tpu_pkg;', 'package fp16_reference_pkg;')
 (out / 'fp16_reference_pkg.sv').write_text(reference)
 with (out / 'test_build.log').open('w') as log:
     subprocess.run([
         'verilator', '--binary', '-j', '4', '-Wno-fatal',
         '--top-module', 'tb_fp16_narrow', '--Mdir', str(out / 'obj_test'),
-        str(root / 'src/rtl/tpu_pkg.sv'), str(out / 'fp16_reference_pkg.sv'),
+        '-I' + str(root / 'src/rtl'), str(out / 'fp16_reference_pkg.sv'),
         str(root / 'test/tb_fp16_narrow.sv'),
     ], stdout=log, stderr=subprocess.STDOUT, check=True)
 with (out / 'test_result.log').open('w') as log:

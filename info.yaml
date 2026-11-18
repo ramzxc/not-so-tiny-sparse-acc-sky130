@@ -15,43 +15,54 @@ project:
 
   # List your project's source files here.
   # Source files must be in ./src and you must list each source file separately, one per line.
-  # Don't forget to also update `PROJECT_SOURCES` in test/Makefile.
-  # Keep the plain-Verilog top first for Tiny Tapeout port discovery.
+  # Keep the plain-Verilog wrapper first for Tiny Tapeout port discovery.
   source_files:
     - "wrapper/project.v"
+    - "rtl/shared_sram.sv"
+    - "rtl/project.v"
+    - "rtl/uart/uart_rx.v"
+    - "rtl/uart/uart_tx.v"
+    - "rtl/core/inst_fifo.v"
+    - "rtl/core/micro_ctrl.v"
+    - "rtl/core/dma_ctrl.v"
+    - "rtl/core/inst_decoder.v"
+    - "rtl/core/data_ctrl.v"
+    - "rtl/core/exec_unit.sv"
+    - "rtl/mem_itf.sv"
+    - "rtl/qspi_ctrl.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
 pinout:
   # Inputs
-  ui[0]: "SPI_SCK"
-  ui[1]: "SPI_CS_N"
-  ui[2]: "SPI_MOSI"
-  ui[3]: ""
+  ui[0]: ""
+  ui[1]: ""
+  ui[2]: ""
+  ui[3]: "UART_RX"
   ui[4]: ""
   ui[5]: ""
   ui[6]: ""
   ui[7]: ""
 
   # Outputs
-  uo[0]: "AXI_AWVALID"
-  uo[1]: "AXI_WVALID"
-  uo[2]: "AXI_ARVALID"
-  uo[3]: "INST_EMPTY"
-  uo[4]: "INST_FULL"
-  uo[5]: "SYNC_DONE"
-  uo[6]: "AXI_ERROR"
-  uo[7]: "HOST_ERROR"
+  uo[0]: "DECODER_READY"
+  uo[1]: "ERROR"
+  uo[2]: ""
+  uo[3]: ""
+  uo[4]: "UART_TX"
+  uo[5]: ""
+  uo[6]: ""
+  uo[7]: ""
 
   # Bidirectional pins
-  uio[0]: "SPI_MISO"
-  uio[1]: ""
-  uio[2]: ""
-  uio[3]: ""
-  uio[4]: ""
-  uio[5]: ""
-  uio[6]: ""
-  uio[7]: ""
+  uio[0]: "FLASH_CS_N"
+  uio[1]: "QSPI_DQ0"
+  uio[2]: "QSPI_DQ1"
+  uio[3]: "QSPI_SCK"
+  uio[4]: "QSPI_DQ2"
+  uio[5]: "QSPI_DQ3"
+  uio[6]: "PSRAM_A_CS_N_UNUSED"
+  uio[7]: "PSRAM_B_CS_N_UNUSED"
 
 # Do not change!
 yaml_version: 6

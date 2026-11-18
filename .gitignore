@@ -17,17 +17,6 @@ test/gate_level_netlist.v
 /default.svf
 /filenames*.log
 
-# Reproducible sizing executables and bulky raw traces
-/sizing/build/
-/sizing/__pycache__/
-/sizing/results/*/*.bin
-/sizing/results/*/run_cache*.csv
-/sizing/results/*/*.log
-/sizing/results/selection.log
-/sizing/results/candidates.csv
-/sizing/results/common_candidates.csv
-/sizing/results/layouts.json
-
 # OpenRAM exploratory runs (selected deliverables are stored separately)
 /memory/openram/runs/
 /memory/openram/__pycache__/
@@ -38,7 +27,7 @@ test/gate_level_netlist.v
 # Local synthesis / place-and-route experiments (not submission inputs)
 /syn/
 /pnr/
-/sizing/
+/memory/sizing/
 /test/sim_build*/
 /test/results*.xml
 /memory/openram/generated/**/*.db
@@ -54,5 +43,12 @@ test/gate_level_netlist.v
 /memory/openram/experiments/
 /memory/openram/generated/**/.magicrc
 
+/sta/
+
 # Local retired macro files
 /memory/archive/
+
+# Local validation records and Python caches
+/scripts/__pycache__/
+/reports/
+/macro/acc_hard_macro/*_validation.json

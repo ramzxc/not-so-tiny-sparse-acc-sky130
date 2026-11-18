@@ -43,14 +43,16 @@ jobs:
       - name: Check shared activation and 512 B memory
         run: |
           cd test
-          make -f Makefile.activation
-          make -f Makefile.sparsity
-          make -f Makefile.fifo
           make -f Makefile.dma
-          python -m cocotb_tools.check_results sim_build/dma_opt/results.xml
-          make -f Makefile.vpu
-          make -f Makefile.mem SRAM_BYTES=512
-          python -m cocotb_tools.check_results sim_build/mem_512/results.xml
+          python -m cocotb_tools.check_results /tmp/acc-dma/results.xml
+          make -f Makefile.micro
+          python -m cocotb_tools.check_results /tmp/acc-micro/results.xml
+          make -f Makefile.data_ctrl
+          make -f Makefile.activation
+          make -f Makefile.exec BUILD=/tmp/acc-fp16-exec
+          python -m cocotb_tools.check_results /tmp/acc-fp16-exec/results.xml
+          make -f Makefile.mem_itf BUILD=/tmp/acc-mem-itf
+          python -m cocotb_tools.check_results /tmp/acc-mem-itf/results.xml
 
       - name: Test Summary
         uses: test-summary/action@v2.4

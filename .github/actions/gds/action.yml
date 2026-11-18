@@ -1,5 +1,5 @@
 # Based on TinyTapeout/tt-gds-action@ttsky26d (e013b994dc124e6bbce5e4ae54d93908ac98141e).
-# Modified summary commands for hard-macro inputs; source artifacts include nested directories.
+# Standard RTL summaries; source artifacts include nested directories.
 name: 'Tiny Tapeout GDS Action'
 description: 'This action builds a GDS file from your Tiny Tapeout project'
 branding:
@@ -154,11 +154,11 @@ runs:
 
     - name: Routing summary
       shell: bash
-      run: python3 scripts/actions_summary.py routing >> $GITHUB_STEP_SUMMARY
+      run: ./tt/tt_tool.py --print-stats $TT_ARGS >> $GITHUB_STEP_SUMMARY
 
     - name: Cell usage summary
       shell: bash
-      run: python3 scripts/actions_summary.py cells >> $GITHUB_STEP_SUMMARY
+      run: ./tt/tt_tool.py --print-cell-summary $TT_ARGS >> $GITHUB_STEP_SUMMARY
 
     - name: Publish build logs
       if: success() || failure()

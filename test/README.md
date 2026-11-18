@@ -1,80 +1,49 @@
-# Sample testbench for a Tiny Tapeout project
+# RTL tests
 
-This is a sample testbench for a Tiny Tapeout project. It uses [cocotb](https://docs.cocotb.org/en/stable/) to drive the DUT and check the outputs.
-See below to get started or for more information, check the [website](https://tinytapeout.com/hdl/testing/).
-
-## Setting up
-
-1. Edit [Makefile](Makefile) and modify `PROJECT_SOURCES` to point to your Verilog files.
-2. Edit [tb.v](tb.v) and replace `tt_um_example` with your module name.
-
-## How to run
-
-To run the RTL simulation:
+Install Verilator >= 5.036 and `requirements.txt`. Run from the repository root:
 
 ```sh
-make -B
+make -C test
+python3 -m cocotb_tools.check_results test/results.xml
+make -C test -f Makefile.exec
+python3 -m cocotb_tools.check_results /tmp/acc-fp16-exec/results.xml
+make -C test -f Makefile.mem_itf
+python3 -m cocotb_tools.check_results /tmp/acc-mem-itf/results.xml
+make -C test -f Makefile.micro
+python3 -m cocotb_tools.check_results /tmp/acc-micro/results.xml
+make -C test -f Makefile.data_ctrl
+make -C test -f Makefile.activation
 ```
 
-To run gatelevel simulation, first harden your project and copy `../runs/wokwi/results/final/verilog/gl/{your_module_name}.v` to `gate_level_netlist.v`.
+- The default test drives real UART instructions and QSPI Flash pins. Only the
+  external Flash model is preloaded. It exercises FP16 execution, SRAM storage,
+  accumulation, sparse reads, boundary addresses and retained data after reset.
+- `Makefile.exec` checks FP16 operations and activations against a Python model,
+  scalar selection, sparse zero bypass and snapshots during execution.
+- The UART test also exercises two prefetched inputs, explicit column selection,
+  repeated accumulation, selected-zero weight skipping and nonzero subnormals.
+- `Makefile.mem_itf` checks all 128 SRAM vectors, neighboring halves of a word,
+  accumulation, invalid accesses and reset cancellation using the OpenRAM model.
+- `Makefile.dma` checks random request/response delays, completion after writes,
+  full-range validation, zero length, reset and fault draining. UART tests copy
+  all 512 B bit-for-bit, preserve adjacent SRAM halves and execution operands,
+  and run batched computation from DMA-loaded inputs.
+- `Makefile.micro` checks the emitted instruction stream under random stalls,
+  automatic cur, zero columns, pointer carry, maximum loop counts, faults and reset.
+  The UART tests check full SRAM partial-sum updates from Flash/SRAM operands,
+  repeated runs, dense NaNs, zero lengths and output-range errors. Batch tests
+  cover randomized stalls, sizes 2/3/128, SRAM bounds and weight-read reuse.
+  The UART batch test checks separate partial sums and repeated tile accumulation.
+- `Makefile.data_ctrl` checks address post-increment during stalls, sparse skips,
+  carry, overflow and reset. The UART test also checks consecutive Flash/SRAM
+  reads, writes, accumulation and the SRAM end boundary.
+- `Makefile.activation` checks all 65,536 FP16 encodings for each of five
+  activation modes through EXEC multiply-by-one against an independent Python
+  oracle, including NaNs, signed zero, atomic output updates, held outputs and reset.
 
-Then run:
+Build outputs default to `/tmp`; the default test writes `test/results.xml`.
+`BUILD=/tmp/another-build` selects a different build directory.
 
-```sh
-make -B GATES=yes
-```
-
-If you wish to save the waveform in VCD format instead of FST format, edit tb.v to use `$dumpfile("tb.vcd");` and then run:
-
-```sh
-make -B FST=
-```
-
-This will generate `tb.vcd` instead of `tb.fst`.
-
-## How to view the waveform file
-
-The shared activation datapath is checked against the unchanged FP16 helper
-functions for all 65,536 binary16 patterns per supported activation, including
-output stalls and reset. Run this check and the 512 B memory stress test with:
-
-```sh
-make -f Makefile.activation
-make -f Makefile.sparsity
-make -f Makefile.fifo
-make -f Makefile.dma
-python -m cocotb_tools.check_results sim_build/dma_opt/results.xml
-make -f Makefile.vpu
-make -f Makefile.mem SRAM_BYTES=512
-python -m cocotb_tools.check_results sim_build/mem_512/results.xml
-```
-
-The memory test also resets both halves of accumulated writes before commit,
-checking that interrupted operations leave the SRAM contents unchanged.
-It fills both shared response slots, checks that writes can bypass a blocked
-third read, releases each slot independently, and resets with both slots full.
-
-The VPU check compares 20,000 lane results from the single shared MAC against
-the FP16 helpers, including arbitrary binary16 values and reset during each
-issue/drain phase. The architectural vector width remains two lanes.
-
-Activation uses one adder/shifter across both lanes. The exhaustive check
-still compares every supported function against the unchanged FP16 helpers.
-The sparsity check drives 512 entries through the two-entry FIFO, including
-full conditions, pointer wrap, independent value/mask stalls, and invalid
-addresses. Instruction, DMA and sparsity FIFOs now use two physical entries
-with one usable entry. The instruction FIFO check exercises simultaneous
-replacement while full, stalls, wrap and reset; the DMA stress test covers
-maximum-length transfers, boundaries, odd tails and independent stalls.
-
-Using GTKWave
-
-```sh
-gtkwave tb.fst tb.gtkw
-```
-
-Using Surfer
-
-```sh
-surfer tb.fst
-```
+`GATES=yes` selects the packaged gate netlist and cell models. The checked-in
+macro still implements the previous core, so it needs rebuilding before the
+new protocol can pass gate-level tests. RTL tests are not post-layout validation.

@@ -1,9 +1,11 @@
 SIM = verilator
 TOPLEVEL_LANG = verilog
-TOPLEVEL = dma
+TOPLEVEL = dma_ctrl
 COCOTB_TEST_MODULES = test_dma
-SIM_BUILD = sim_build/dma_opt
-VERILOG_SOURCES = $(CURDIR)/../src/rtl/tpu_pkg.sv $(CURDIR)/../src/rtl/dma.sv
-COMPILE_ARGS += -Wno-fatal --timing --timescale-override 1ns/1ps
-COCOTB_RESULTS_FILE = $(CURDIR)/$(SIM_BUILD)/results.xml
+ROOT := $(abspath $(CURDIR)/..)
+BUILD ?= /tmp/acc-dma
+SIM_BUILD = $(BUILD)/sim
+COCOTB_RESULTS_FILE = $(BUILD)/results.xml
+VERILOG_SOURCES = $(ROOT)/src/rtl/core/dma_ctrl.v
+COMPILE_ARGS += -I$(ROOT)/src/rtl/core -Wno-fatal --timing --timescale-override 1ns/1ps
 include $(shell cocotb-config --makefiles)/Makefile.sim

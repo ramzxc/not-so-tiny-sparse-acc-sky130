@@ -1,56 +1,75 @@
 `timescale 1ns/1ps
+// Test every activation input through real EXEC MUL-by-one instructions.
 module tb_activation_shared;
-    import tpu_pkg::*;
-    logic clk=0, rst=1, valid=0, ready, out_valid, out_ready=1;
-    activation_type fn;
-    fp16_type [1:0] din, dout;
-    activation #(.COMPUTE_WIDTH(2)) dut(clk,rst,din,valid,ready,fn,dout,out_valid,out_ready);
+    logic clk=0, rst_n=0, valid=0, ready, out_valid;
+    logic [5:0] inst;
+    logic [31:0] din, dout;
+    logic operand_valid=0, weight=0;
+    exec_unit dut (
+        .clk(clk), .rst_n(rst_n), .exec_inst_in(inst), .exec_inst_in_val(valid),
+        .exec_rdy(ready), .data_in(din), .data_in_val(operand_valid), .is_weight(weight),
+        .data_out(dout), .data_out_val(out_valid),
+        .input_scalar_mode(1'b0), .input_select(1'b0), .input_sparse(1'b0)
+    );
     always #5 clk=~clk;
-    function automatic fp16_type reference(input fp16_type x,input activation_type f);
-        case(f)
-            sigmoid: reference=fp16_sigmoid(x);
-            tanh: reference=fp16_tanh(x);
-            relu: reference=fp16_relu(x);
-            heaviside_step: reference=fp16_heaviside_step(x);
-            default: reference=x;
+    reg [15:0] golden [0:327679];
+    string reference_file;
+    initial begin
+        if (!$value$plusargs("REFERENCE=%s",reference_file)) $fatal(1,"Missing independent reference vectors");
+        $readmemh(reference_file,golden);
+    end
+    // Oracle order: NONE, RELU, SIGMOID, TANH, STEP. ISA swaps SIGMOID/TANH.
+    function automatic logic [2:0] isa_activation(input integer op);
+        case(op)
+            2: isa_activation=3;
+            3: isa_activation=2;
+            default: isa_activation=3'(op);
         endcase
     endfunction
     integer checks=0;
-    activation_type tested_functions [5] = '{no_activation,relu,sigmoid,tanh,heaviside_step};
-    task automatic transact(input fp16_type a,b,input activation_type f,input bit stall);
-        fp16_type [1:0] expected, held;
-        expected[0]=reference(a,f);expected[1]=reference(b,f);
+    task automatic load_ones;
+        @(negedge clk);weight=1;din=32'h3c003c00;operand_valid=1;
+        @(negedge clk);operand_valid=0;weight=0;
+    endtask
+    task automatic transact(input logic [15:0] a,b,input integer op,input bit hold_check);
+        logic [31:0] expected, held;
+        expected={golden[op*65536+int'(b)],golden[op*65536+int'(a)]};
         @(negedge clk);
         while (!ready) @(negedge clk);
-        din[0]=a;din[1]=b;fn=f;valid=1;
-        out_ready=0;
+        din={b,a};operand_valid=1;
+        @(negedge clk);operand_valid=0;
+        inst={1'b0,2'b10,isa_activation(op)};valid=1;held=dout;
         @(negedge clk);valid=0;
-        while (!out_valid) @(negedge clk);
-        if (dout !== expected) $fatal(1,"fn=%0d in=%h,%h got=%h expected=%h",f,a,b,dout,expected);
-        held=dout;
-        if(stall) repeat(3) begin
-            din=~din;fn=no_activation;
+        while (!out_valid) begin
+            if (dout!==held || ready) $fatal(1,"partial output published during EXEC");
             @(negedge clk);
-            if(!out_valid || dout!==held || ready) $fatal(1,"stalled output changed");
         end
-        out_ready=1;
-        @(negedge clk);
+        if (dout !== expected) $fatal(1,"op=%0d in=%h,%h got=%h expected=%h",op,a,b,dout,expected);
+        if (!ready) $fatal(1,"completed EXEC not ready");
+        if(hold_check) repeat(3) begin
+            din=~din;inst=0;
+            @(negedge clk);
+            if(out_valid || dout!==expected || !ready) $fatal(1,"held output changed");
+        end
         checks+=2;
     endtask
     initial begin
-        repeat(2) @(negedge clk);rst=0;
-        for(int f=0;f<5;f++) begin
+        inst=0;din=0;
+        repeat(2) @(negedge clk);rst_n=1;
+        load_ones();
+        for(int op=0;op<5;op++) begin
             for(int i=0;i<65536;i+=2)
-                transact(16'(i),16'(65535-i),tested_functions[f],(i%1024)==0);
+                transact(16'(i),16'(65535-i),op,(i%1024)==0);
         end
-        // Reset must discard a request in flight and any pending response.
-        @(negedge clk);fn=tanh;din='0;valid=1;
+        // Cancel in the activation phase, then prove recovery.
+        @(negedge clk);inst={1'b0,2'b10,3'd3};valid=1;
         @(negedge clk);valid=0;
-        @(negedge clk);rst=1;
-        @(negedge clk);rst=0;
-        if(out_valid || !ready) $fatal(1,"reset did not flush activation");
-        transact(16'h3c00,16'hbc00,sigmoid,1);
-        $display("PASS: %0d activation bit-exact checks, stalls and reset",checks);
+        repeat(4) @(negedge clk);
+        rst_n=0;
+        @(negedge clk);rst_n=1;#1;
+        if(out_valid || !ready) $fatal(1,"reset did not flush EXEC");
+        load_ones();transact(16'h3c00,16'hbc00,2,1);
+        $display("PASS: %0d integrated activation bit-exact checks, held outputs and reset",checks);
         $finish;
     end
     initial begin #100000000; $fatal(1,"timeout"); end
