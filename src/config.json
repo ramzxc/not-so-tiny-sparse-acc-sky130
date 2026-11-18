@@ -1,6 +1,6 @@
 {
   "//": "Yosys RTL flow with one 512 B SRAM. Full GDS LVS uses the SRAM transistor SPICE; its Verilog blackbox is not a circuit model.",
-  "PL_TARGET_DENSITY_PCT": 60,
+  "PL_TARGET_DENSITY_PCT": 70,
   "CLOCK_PERIOD": 100,
   "USE_SLANG": true,
   "SLANG_ARGUMENTS": [
