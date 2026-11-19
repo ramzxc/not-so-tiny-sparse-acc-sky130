@@ -1,0 +1,36 @@
+--- a/compiler/modules/sense_amp_array.py
++++ b/compiler/modules/sense_amp_array.py
+@@ -117,10 +117,8 @@
+         else:
+             precharge_width = cell.width
+ 
+-        if precharge_width > self.amp.width:
+-            self.amp_spacing = precharge_width
+-        else:
+-            self.amp_spacing = self.amp.width
++        self.amp_spacing = precharge_width
++        assert self.words_per_row * precharge_width >= self.amp.width, "Output driver does not fit column pitch"
+ 
+         if not self.offsets:
+             self.offsets = []
+@@ -174,8 +172,8 @@
+                                 height=dout_pin.height())
+ 
+     def route_supplies(self):
+-        self.route_horizontal_pins("vdd")
+-        self.route_horizontal_pins("gnd")
++        self.route_horizontal_pins("vdd", layer="m3")
++        self.route_horizontal_pins("gnd", layer="m3")
+ 
+     def route_rails(self):
+         # Add enable across the array
+--- a/technology/sky130/tech/tech_configs/tech_custom_cell.py
++++ b/technology/sky130/tech/tech_configs/tech_custom_cell.py
+@@ -875,4 +875,7 @@
+                   "sky130_fd_bd_sram__sram_sp_wlstrap_ce",
+                   "sky130_fd_bd_sram__sram_sp_wlstrap",
+                   "sky130_fd_bd_sram__sram_sp_wlstrap_p_ce",
+-                  "sky130_fd_bd_sram__sram_sp_wlstrap_p"]+                  "sky130_fd_bd_sram__sram_sp_wlstrap_p"]
++# Experimental local output driver; original sense device is unchanged.
++tech_modules['sense_amp'] = 'sense_amp_buffered'
++tech_modules['sense_amp_leaf'] = 'sense_amp'

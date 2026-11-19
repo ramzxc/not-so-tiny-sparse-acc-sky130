@@ -1,31 +1,20 @@
 {
   "name": "tt_sram_1rw_64x128_sky130",
   "usable_bytes": 1024,
-  "word_bits": 64,
-  "words": 128,
-  "words_per_row": 4,
-  "bitcell": "sky130_custom_cell",
-  "physical_data_port_bits": 65,
-  "spare_column": "unused; spare_wen0 tied low",
-  "ports": "1RW",
-  "width_um": 840.455,
+  "width_um": 842.335,
   "height_um": 214.355,
-  "area_um2": 180155.731525,
-  "outline_fits_8x2": true,
-  "outline_vertical_margin_each_um": 5.702500000000001,
-  "physical_checks": {
+  "area_um2": 180558.718925,
+  "variant": "local pbuf size 8 after every sense amplifier",
+  "macro_physical_checks": {
     "drc_errors": 0,
     "lvs_errors": 0,
     "lvs_property_errors": false,
     "final_verification": true,
     "checked_sha256": {
-      ".gds": "77871d565cc5add6f23f7dbd0eb46e46d9d1e9f9ac01273a7096174b841cc145",
-      ".lvs.sp": "f128a00b35a717e34fbd7cb052a5e4fdcab467cc75de9fc25479d3d4d052aa9b"
-    },
-    "klayout_drc_errors": 0,
-    "scope": "Current SRAM masks: standalone KLayout DRC and whole-core Magic DRC / unique transistor LVS. Integrated top-level checks and timing signoff are separate."
+      ".gds": "baa5fdb19e81eef7076579e223353bcc2f63e414df344b2d87870adba83ac037",
+      ".lvs.sp": "bf62209933d187ee20799b95da89fec0a899733224892947fb85d3f00f8aae1f"
+    }
   },
-  "release_status": "Macro geometry checked; integrated Actions and timing verification remain separate.",
-  "liberty": "analytical TT estimate, not SPICE timing characterization",
-  "top_level_pnr": "ICC2 integration candidate; no timing signoff"
+  "liberty": "regenerated analytical TT model, original load grid unchanged; NOT SPICE/PVT signoff",
+  "release_status": "integration candidate"
 }

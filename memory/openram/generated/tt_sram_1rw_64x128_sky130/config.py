@@ -1,3 +1,4 @@
+# Requires the source patches in memory/openram/experimental/output_buffer/.
 import os
 word_size = 64
 num_words = 128
@@ -23,3 +24,6 @@ perimeter_pins = False
 route_supplies = os.environ.get("TT_ROUTE_SUPPLIES", "1") == "1"
 output_name = "tt_sram_1rw_64x128_sky130"
 output_path = os.environ["TT_SRAM_OUTPUT"]
+
+# Experimental candidate; never replace the passing macro automatically.
+output_name = "tt_sram_1rw_64x128_sky130"

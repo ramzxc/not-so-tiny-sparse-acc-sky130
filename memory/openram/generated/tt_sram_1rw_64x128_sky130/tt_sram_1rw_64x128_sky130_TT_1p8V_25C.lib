@@ -81,7 +81,7 @@ cell (tt_sram_1rw_64x128_sky130){
     dont_use  : true;
     map_only   : true;
     dont_touch : true;
-    area : 180155.731525;
+    area : 180558.718925;
 
     pg_pin(vccd1) {
          voltage_name : VCCD1;
@@ -94,9 +94,9 @@ cell (tt_sram_1rw_64x128_sky130){
     }
 
     leakage_power () {
-      value : 0.008544;
+      value : 0.008674;
     }
-    cell_leakage_power : 0.008544;
+    cell_leakage_power : 0.008674;
     bus(din0){
         bus_type  : data; 
         direction  : input; 
@@ -150,24 +150,24 @@ cell (tt_sram_1rw_64x128_sky130){
             related_pin : "clk0"; 
             timing_type : falling_edge; 
             cell_rise(CELL_TABLE) {
-            values("0.421, 0.45, 0.566",\
-                   "0.421, 0.45, 0.566",\
-                   "0.421, 0.45, 0.566");
+            values("0.438, 0.44, 0.451",\
+                   "0.438, 0.44, 0.451",\
+                   "0.438, 0.44, 0.451");
             }
             cell_fall(CELL_TABLE) {
-            values("0.421, 0.45, 0.566",\
-                   "0.421, 0.45, 0.566",\
-                   "0.421, 0.45, 0.566");
+            values("0.438, 0.44, 0.451",\
+                   "0.438, 0.44, 0.451",\
+                   "0.438, 0.44, 0.451");
             }
             rise_transition(CELL_TABLE) {
-            values("0.002, 0.005, 0.016",\
-                   "0.002, 0.005, 0.016",\
-                   "0.002, 0.005, 0.016");
+            values("0.001, 0.001, 0.002",\
+                   "0.001, 0.001, 0.002",\
+                   "0.001, 0.001, 0.002");
             }
             fall_transition(CELL_TABLE) {
-            values("0.002, 0.005, 0.016",\
-                   "0.002, 0.005, 0.016",\
-                   "0.002, 0.005, 0.016");
+            values("0.001, 0.001, 0.002",\
+                   "0.001, 0.001, 0.002",\
+                   "0.001, 0.001, 0.002");
             }
         }
         }
@@ -353,20 +353,20 @@ cell (tt_sram_1rw_64x128_sky130){
             timing_type : "min_pulse_width"; 
             related_pin  : clk0; 
             rise_constraint(scalar) {
-                values("1.047"); 
+                values("0.835"); 
             }
             fall_constraint(scalar) {
-                values("1.047"); 
+                values("0.835"); 
             }
          }
         timing(){ 
             timing_type : "minimum_period"; 
             related_pin  : clk0; 
             rise_constraint(scalar) {
-                values("2.094"); 
+                values("1.67"); 
             }
             fall_constraint(scalar) {
-                values("2.094"); 
+                values("1.67"); 
             }
          }
     }

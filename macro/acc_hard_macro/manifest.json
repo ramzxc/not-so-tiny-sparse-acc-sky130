@@ -1,16 +1,16 @@
 {
-  "source_export": "final_1795082906",
+  "source_export": "final_1795089048",
   "sha256": {
-    "acc_hard_macro.gds": "7b8b808a3bd0212cf0580762af2cea8c149a95d68ae1ed1aa7141d30cb908452",
-    "acc_hard_macro.lef": "4ea247ef17282a4d8694fc7d3e862a8f34873dcb7f4420d8f936447d25805c13"
+    "acc_hard_macro.gds": "3fc4020776409f8922827e51182fde82b8b5659d8d0e4cc4d31f2cf67f69382b",
+    "acc_hard_macro.lef": "23cf9d73d7a10569f733b8cd875c803669e9e8a8ffe32a4da0e24609903014a3"
   },
   "lef_obstructions": "Removed only empty M1 margins after checking all GDS M1 geometry; pins and GDS unchanged. Regenerate with scripts/fix_core_lef_obstructions.py.",
   "lef_power_pins": "26 continuous M4 supply columns verified against actual GDS; full-height pins and matching M4 OBS subtraction. Reproduce with scripts/expose_core_power_pins.py.",
   "lvs_inputs": {
-    "macro/acc_hard_macro/acc_hard_macro.v": "77964c931f151dcf7f904b75a4538b4d1d0abe79e498747dad87c853b81c9d6d",
-    "memory/openram/generated/tt_sram_1rw_64x128_sky130/tt_sram_1rw_64x128_sky130.lvs.sp": "f128a00b35a717e34fbd7cb052a5e4fdcab467cc75de9fc25479d3d4d052aa9b",
-    "macro/acc_hard_macro/acc_hard_macro.lvs.spice": "85ef16f026d016a9b62dd03f6a2149f898277886ae2d470420f70973cff728c8",
-    "macro/acc_hard_macro/sram.lvs_micron.spice": "b49d87bad5077aa32cdfea493e5bdf84afdfaa0a2f6e6ba371ca580de1f50b44"
+    "macro/acc_hard_macro/acc_hard_macro.v": "388114ce9297db9fc358d34adc9efb63aedff3af31feaaac3b767a8045be5e32",
+    "memory/openram/generated/tt_sram_1rw_64x128_sky130/tt_sram_1rw_64x128_sky130.lvs.sp": "bf62209933d187ee20799b95da89fec0a899733224892947fb85d3f00f8aae1f",
+    "macro/acc_hard_macro/acc_hard_macro.lvs.spice": "dd4204bbe586c563d54280e9b9d8754005d8f8ce2c03ef76ce0b8a6af0180e88",
+    "macro/acc_hard_macro/sram.lvs_micron.spice": "6eee267b4c23b17688a307d0c6a5dbcfb4ae3b108da32f5972205a4b74e7d7f3"
   },
   "lvs_nfet_rule": {
     "model": null,
