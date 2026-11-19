@@ -1,9 +1,9 @@
 // IC Compiler II Version Y-2026.03 Verilog Writer
-// Generated on 11/19/2026 at 17:37:53
+// Generated on 11/19/2026 at 18:5:16
 // Library Name: acc_hard_macro.ndm
 // Block Name: acc_hard_macro
-// User Label: final
-// Write Command: write_verilog -include { all_physical_cells pg_netlist pg_objects } /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/pnr/runs/final_1795077467/acc_hard_macro.v
+// User Label: li_blocked
+// Write Command: write_verilog -include { all_physical_cells pg_netlist pg_objects } /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/pnr/runs/final_1795079110/acc_hard_macro.v
 module qspi_ctrl ( clk , rst_n , req_val , req_rdy , req_write , 
     req_continue , abort_read , req_addr , req_device , req_data , read_data , 
     read_data_val , sck , flash_sc_n , psram_a_sc_n , psram_b_sc_n , dq_in , 
@@ -12241,7 +12241,7 @@ module dma_ctrl ( clk , rst_n , host_inst , host_valid , host_ready ,
     core_inst , core_valid , core_ready , units_idle , staging_addr , 
     mem_ready , mem_read_valid , memory_error , mem_read , mem_write , 
     mem_read_continue , mem_addr , busy , error , VPWR , VGND , HFSNET_2 , 
-    HFSNET_4 , ZCTSNET_1 , ZCTSNET_2 , ZCTSNET_3 ) ;
+    HFSNET_4 , h_incr0 , ZCTSNET_1 , ZCTSNET_2 , ZCTSNET_3 ) ;
 input  clk ;
 input  rst_n ;
 input  [15:0] host_inst ;
@@ -12265,6 +12265,7 @@ input  VPWR ;
 input  VGND ;
 input  HFSNET_2 ;
 output HFSNET_4 ;
+input  h_incr0 ;
 input  ZCTSNET_1 ;
 input  ZCTSNET_2 ;
 input  ZCTSNET_3 ;
@@ -12419,9 +12420,9 @@ sky130_fd_sc_hd__dfxtp_2 remaining_reg_5_ ( .D ( n158 ) , .CLK ( clk ) ,
 sky130_fd_sc_hd__dfxtp_2 remaining_reg_6_ ( .D ( n157 ) , .CLK ( clk ) , 
     .Q ( remaining[6] ) , .VPWR ( VPWR ) , .VNB ( VGND ) , .VPB ( VPWR ) , 
     .VGND ( VGND ) ) ;
-sky130_fd_sc_hd__dfxtp_2 remaining_reg_7_ ( .D ( n156 ) , .CLK ( clk ) , 
-    .Q ( remaining[7] ) , .VPWR ( VPWR ) , .VNB ( VGND ) , .VPB ( VPWR ) , 
-    .VGND ( VGND ) ) ;
+sky130_fd_sc_hd__dfxtp_2 remaining_reg_7_ ( .D ( TT_DMA_RESET_D ) , 
+    .CLK ( clk ) , .Q ( remaining[7] ) , .VPWR ( VPWR ) , .VNB ( VGND ) , 
+    .VPB ( VPWR ) , .VGND ( VGND ) ) ;
 sky130_fd_sc_hd__inv_2 U3 ( .A ( n289 ) , .Y ( n1 ) , .VPWR ( VPWR ) , 
     .VNB ( VGND ) , .VPB ( VPWR ) , .VGND ( VGND ) ) ;
 sky130_fd_sc_hd__inv_2 U4 ( .A ( n1 ) , .Y ( n2 ) , .VPWR ( VPWR ) , 
@@ -13162,6 +13163,9 @@ sky130_fd_sc_hd__nor2_1 U273 ( .A ( n204 ) , .B ( n2 ) , .Y ( n203 ) ,
 sky130_fd_sc_hd__o21ai_1 ctmTdsLR_3_713 ( .A1 ( tmp_net166 ) , .A2 ( n3 ) , 
     .B1 ( source[8] ) , .Y ( tmp_net168 ) , .VPWR ( VPWR ) , .VNB ( VGND ) , 
     .VPB ( VPWR ) , .VGND ( VGND ) ) ;
+sky130_fd_sc_hd__and2_1 TT_DMA_RESET ( .A ( n156 ) , .B ( h_incr0 ) , 
+    .X ( TT_DMA_RESET_D ) , .VPWR ( VPWR ) , .VNB ( VGND ) , .VPB ( VPWR ) , 
+    .VGND ( VGND ) ) ;
 sky130_fd_sc_hd__o221ai_1 ctmTdsLR_1_809 ( .A1 ( n175 ) , .A2 ( n181 ) , 
     .B1 ( n174 ) , .B2 ( n183 ) , .C1 ( n178 ) , .Y ( n157 ) , 
     .VPWR ( VPWR ) , .VNB ( VGND ) , .VPB ( VPWR ) , .VGND ( VGND ) ) ;
@@ -17189,8 +17193,9 @@ dma_ctrl dma ( .clk ( ZCTSNET_7 ) , .rst_n ( HFSNET_7 ) ,
     .mem_write ( dma_write ) , .mem_read_continue ( dma_read_continue ) , 
     .mem_addr ( dma_addr ) , .busy ( dma_busy ) , .error ( dma_error ) , 
     .VPWR ( VPWR ) , .VGND ( VGND ) , .HFSNET_2 ( HFSNET_8 ) , 
-    .HFSNET_4 ( HFSNET_16 ) , .ZCTSNET_1 ( ZCTSNET_8 ) , 
-    .ZCTSNET_2 ( ZCTSNET_11 ) , .ZCTSNET_3 ( ZCTSNET_14 ) ) ;
+    .HFSNET_4 ( HFSNET_16 ) , .h_incr0 ( reset_sync[1] ) , 
+    .ZCTSNET_1 ( ZCTSNET_8 ) , .ZCTSNET_2 ( ZCTSNET_11 ) , 
+    .ZCTSNET_3 ( ZCTSNET_14 ) ) ;
 inst_decoder decode ( .rst_n ( HFSNET_8 ) , .inst_in ( dispatched_inst ) , 
     .inst_in_val ( dispatched_valid ) , .decoder_rdy ( dispatched_ready ) , 
     .exec_rdy ( exec_rdy ) , .data_rdy ( data_rdy ) , 
@@ -38247,9 +38252,7 @@ sky130_fd_sc_hd__fill_2 \xofiller!TT_FILL!sky130_fd_sc_hd__fill_2!x2400800y54440
     .VGND ( VGND ) , .VNB ( VGND ) , .VPB ( VPWR ) , .VPWR ( VPWR ) ) ;
 sky130_fd_sc_hd__fill_1 \xofiller!TT_FILL!sky130_fd_sc_hd__fill_1!x2520400y544400 ( 
     .VGND ( VGND ) , .VNB ( VGND ) , .VPB ( VPWR ) , .VPWR ( VPWR ) ) ;
-sky130_fd_sc_hd__fill_4 \xofiller!TT_FILL!sky130_fd_sc_hd__fill_4!x2580200y544400 ( 
-    .VGND ( VGND ) , .VNB ( VGND ) , .VPB ( VPWR ) , .VPWR ( VPWR ) ) ;
-sky130_fd_sc_hd__fill_2 \xofiller!TT_FILL!sky130_fd_sc_hd__fill_2!x2598600y544400 ( 
+sky130_fd_sc_hd__fill_1 \xofiller!TT_FILL!sky130_fd_sc_hd__fill_1!x2603200y544400 ( 
     .VGND ( VGND ) , .VNB ( VGND ) , .VPB ( VPWR ) , .VPWR ( VPWR ) ) ;
 sky130_fd_sc_hd__fill_2 \xofiller!TT_FILL!sky130_fd_sc_hd__fill_2!x2722800y544400 ( 
     .VGND ( VGND ) , .VNB ( VGND ) , .VPB ( VPWR ) , .VPWR ( VPWR ) ) ;

@@ -1,20 +1,21 @@
 {
-  "source_export": "final_1795077467",
+  "source_export": "final_1795079110",
   "sha256": {
-    "acc_hard_macro.gds": "df68a2fa84e2892f0086b599cb715ba4792b93d017ca47f7f4ca9f9fb356ab52",
+    "acc_hard_macro.gds": "73a2ec3da5fa4594b17670701ccf8ef72ea27baf629a756167a4a453adb69f70",
     "acc_hard_macro.lef": "80c53856d8344b4f820798be926dc9454cd8b0ed2c4a45f58c6f6ffbf7a128f0"
   },
   "lef_obstructions": "Removed only empty M1 margins after checking all GDS M1 geometry; pins and GDS unchanged. Regenerate with scripts/fix_core_lef_obstructions.py.",
   "lef_power_pins": "43 continuous M4 supply columns verified against actual GDS; full-height pins and matching M4 OBS subtraction. Reproduce with scripts/expose_core_power_pins.py.",
   "lvs_inputs": {
-    "macro/acc_hard_macro/acc_hard_macro.v": "10af79316f82b251c5be348a074b7d8dfcd06827386d1dd9093243fcf76c3df5",
+    "macro/acc_hard_macro/acc_hard_macro.v": "47e4a857ccd79627a5c1d6e9c87ae3a77c1c8506e7d22591c9cf9afb7e00a68f",
     "memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.lvs.sp": "aecf2d431c88a9e6a144f23c69ec1eae3442e8054eb3da9a8ea30721d195bf3b",
-    "macro/acc_hard_macro/acc_hard_macro.lvs.spice": "f73a26f118702dba20ed4683511a3cad636bc2bb5566e653fc1c473b268e7c73",
+    "macro/acc_hard_macro/acc_hard_macro.lvs.spice": "e7c06a0a4b2eb7a0fa8403a3360cd6e4fb2317d5c4b35526e720ed84e40a3a84",
     "macro/acc_hard_macro/sram.lvs_micron.spice": "f6e25d29d38a08721eed0578a2933c8f27126d5644952567706ff15f3e66b163"
   },
   "lvs_nfet_rule": {
     "model": null,
     "width_lt_um": null
   },
-  "packaging": "Added top PR boundary and exactly rescaled GDS database units without rounding; manufacturing geometry unchanged."
+  "packaging": "Added top PR boundary and exactly rescaled GDS database units without rounding; manufacturing geometry unchanged.",
+  "functional_eco": "One and2_1 gate on dma.remaining_reg_7_ D enforces synchronous reset with reset_sync[1]; binary-equivalent to the original reset cone. Physically placed, powered and routed."
 }

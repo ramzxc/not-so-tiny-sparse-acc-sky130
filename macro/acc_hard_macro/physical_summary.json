@@ -1,17 +1,17 @@
 {
   "schema": 1,
-  "source_def": "final_1795077467/acc_hard_macro.def",
-  "source_def_sha256": "2e56bf99c801b502c9a7f45e445b69d01f6db07b87796779b5e2873aeaa9ce89",
+  "source_def": "final_1795079110/acc_hard_macro.def",
+  "source_def_sha256": "2549466c457b14726244cd08eb5c442f44294378492e99d4b9513bd86138de18",
   "source_lefs_sha256": {
     "sky130_fd_sc_hd__nom.tlef": "1a18b353fb5457caf0eca5b3cb28b2c0c9bbacdbbdeee7c4fc64a115932066c2",
     "sky130_fd_sc_hd.lef": "e474188a0756bb8a03ce2b4c56c20f4ce37dc4747ed45980745914c29a42afdf",
     "tt_sram_1rw_64x64_sky130.lef": "25561c0ed3d25d88d22747a6ebeb602f4e639073380e6dec8b8ccc8261457a06"
   },
   "submitted_assets_sha256": {
-    "acc_hard_macro.gds": "df68a2fa84e2892f0086b599cb715ba4792b93d017ca47f7f4ca9f9fb356ab52",
+    "acc_hard_macro.gds": "73a2ec3da5fa4594b17670701ccf8ef72ea27baf629a756167a4a453adb69f70",
     "acc_hard_macro.lef": "80c53856d8344b4f820798be926dc9454cd8b0ed2c4a45f58c6f6ffbf7a128f0",
-    "acc_hard_macro.v": "10af79316f82b251c5be348a074b7d8dfcd06827386d1dd9093243fcf76c3df5",
-    "acc_hard_macro.lvs.spice": "f73a26f118702dba20ed4683511a3cad636bc2bb5566e653fc1c473b268e7c73"
+    "acc_hard_macro.v": "47e4a857ccd79627a5c1d6e9c87ae3a77c1c8506e7d22591c9cf9afb7e00a68f",
+    "acc_hard_macro.lvs.spice": "e7c06a0a4b2eb7a0fa8403a3360cd6e4fb2317d5c4b35526e720ed84e40a3a84"
   },
   "method": "OpenROAD readDef; dbWire.getLength for non-PG regular NETS; LEF master area; union of DEF rows minus macro+halo and placement blockages",
   "wire_exclusions": "SRAM internal wiring, POWER/GROUND, SPECIALNETS shapes (including signal patches), via vertical lengths and pin metal",
@@ -48,7 +48,7 @@
     "sky130_fd_sc_hd__a32o_2": 16,
     "sky130_fd_sc_hd__a41o_1": 2,
     "sky130_fd_sc_hd__a41o_2": 2,
-    "sky130_fd_sc_hd__and2_1": 75,
+    "sky130_fd_sc_hd__and2_1": 76,
     "sky130_fd_sc_hd__and2_2": 11,
     "sky130_fd_sc_hd__and2b_1": 3,
     "sky130_fd_sc_hd__and2b_2": 2,
@@ -85,9 +85,9 @@
     "sky130_fd_sc_hd__diode_2": 19,
     "sky130_fd_sc_hd__fa_1": 157,
     "sky130_fd_sc_hd__fa_2": 2,
-    "sky130_fd_sc_hd__fill_1": 3605,
-    "sky130_fd_sc_hd__fill_2": 3610,
-    "sky130_fd_sc_hd__fill_4": 19764,
+    "sky130_fd_sc_hd__fill_1": 3606,
+    "sky130_fd_sc_hd__fill_2": 3609,
+    "sky130_fd_sc_hd__fill_4": 19763,
     "sky130_fd_sc_hd__inv_1": 57,
     "sky130_fd_sc_hd__inv_2": 582,
     "sky130_fd_sc_hd__inv_6": 1,
@@ -158,19 +158,19 @@
     "tt_sram_1rw_64x64_sky130": 1
   },
   "area_um2": {
-    "functional": 58838.9312,
+    "functional": 58845.1872,
     "macro": 97582.710225,
-    "fill": 112459.1072,
+    "fill": 112452.8512,
     "tap": 3324.4384,
     "rows": 281469.952,
     "available_rows": 175263.856975
   },
   "utilization_pct": {
-    "excluding_fill_tap": 33.571628637838835
+    "excluding_fill_tap": 33.57519811309059
   },
   "wirelength_um": {
-    "signal": 317020.21500000055,
+    "signal": 317400.73500000057,
     "clock": 8714.605000000001
   },
-  "wirelength_total_um": 325734.82000000053
+  "wirelength_total_um": 326115.34000000055
 }
