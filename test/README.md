@@ -121,3 +121,19 @@ This tests current production RTL with five explicit delay scenarios, checks
 write/CS timing. It covers the full-period PSRAM read sampling fix. Delay values
 are sensitivity assumptions, not guaranteed board/PVT timing. See
 [board timing review](../docs/board_timing.md).
+
+## Experimental no-PC-buffer ingress
+
+`program_ctrl.v` is under `src/rtl/`, outside the compute core directory.
+Run the new four-slot queue stress tests from `test/`:
+
+```sh
+make BUILD=/tmp/acc-no-pc-queue COCOTB_RESULTS_FILE=/tmp/acc-no-pc-queue/results.xml COCOTB_TEST_MODULES=test_psram_queue QUEUE_SLOT_BITS=2
+python -m cocotb_tools.check_results /tmp/acc-no-pc-queue/results.xml
+```
+
+The existing default tests still cover legacy operation. Test both arbitration
+modes with `make -f Makefile.arbiter FETCH_WRITES=0` and `FETCH_WRITES=1` using
+different BUILD paths. Full-network fixed-rate tests run from the repository root
+with `make -f test/Makefile.no_pc build run`, using existing Bishop fixtures.
+See [experiment scope and results](../docs/no_pc_buffer.md).

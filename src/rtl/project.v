@@ -3,7 +3,7 @@
 `include "defs/mem_defs.vh"
 `default_nettype none
 
-module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87) (
+module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87, parameter integer QUEUE_SLOT_BITS=14) (
     input  wire uart_rx_i,
     output wire [7:0] uo_out,
     input  wire [3:0] qspi_dq_i,
@@ -21,6 +21,16 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87) (
 
     wire tx, fifo_rdy, rx_inst_val, inst_val, decoder_rdy;
     wire host_error,host_busy,input_write,uart_error;
+    wire frontend_ready,frontend_rx_valid,queue_error,stream_mode;
+    wire [15:0] frontend_rx_word;
+    wire queue_valid,queue_write,queue_ready,queue_done,queue_byte_valid;
+    wire [22:0] queue_addr;
+    wire [15:0] queue_data;
+    wire core_bus_ready,core_bus_done,core_bus_byte_valid,queue_bus_busy;
+    wire serial_valid,serial_write;
+    wire [22:0] serial_addr;
+    wire [3:0] serial_bytes;
+    wire [15:0] serial_data;
     wire [9:0] input_addr;
     wire [15:0] input_data;
     wire fetch_valid,fetch_ready,fetch_done,fetch_byte_valid;
@@ -66,9 +76,16 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87) (
     uart_tx #(.CLKS_PER_BIT(UART_CLKS_PER_BIT)) transmitter (
         .clk(clk), .rst_n(core_rst_n), .inst_fifo_rdy(fifo_rdy), .tx(tx)
     );
-    program_ctrl frontend (
+    uart_psram_queue #(.SLOT_BITS(QUEUE_SLOT_BITS)) ingress (
         .clk(clk),.rst_n(core_rst_n),.rx_word(rx_inst),.rx_valid(rx_inst_val),
-        .rx_ready(fifo_rdy),.error(host_error),.busy(host_busy),
+        .rx_ready(fifo_rdy),.stream_mode(stream_mode),.error(queue_error),
+        .frontend_word(frontend_rx_word),.frontend_valid(frontend_rx_valid),.frontend_ready(frontend_ready),
+        .req_valid(queue_valid),.req_write(queue_write),.req_addr(queue_addr),.req_data(queue_data),
+        .req_ready(queue_ready),.req_done(queue_done),.req_byte_valid(queue_byte_valid),.req_rdata(qspi_read_data)
+    );
+    program_ctrl frontend (
+        .clk(clk),.rst_n(core_rst_n),.rx_word(frontend_rx_word),.rx_valid(frontend_rx_valid),
+        .rx_ready(frontend_ready),.error(host_error),.busy(host_busy),
         .units_idle(exec_rdy && data_rdy && !dma_busy && !micro_busy && !bus_busy),
         .memory_error(memory_error | dma_error | micro_error | uart_error),
         .inst(inst),.inst_valid(inst_val),.inst_ready(decoder_rdy),
@@ -141,13 +158,27 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87) (
         .data_bytes(qspi_bytes),.data_wdata(qspi_write_data),.data_ready(qspi_req_rdy),
         .data_done(qspi_done),.data_byte_valid(qspi_byte_valid),
         .fetch_valid(fetch_valid),.fetch_addr(fetch_addr),.fetch_bytes(fetch_bytes),
+        .fetch_write(1'b0),.fetch_wdata(16'b0),
         .fetch_ready(fetch_ready),.fetch_done(fetch_done),.fetch_byte_valid(fetch_byte_valid),
         .req_valid(bus_valid),.req_write(bus_write),.req_addr(bus_addr),.req_bytes(bus_bytes),
-        .req_data(bus_data),.req_ready(bus_ready),.done(bus_done),.byte_valid(bus_byte_valid),.busy(bus_busy)
+        .req_data(bus_data),.req_ready(core_bus_ready),.done(core_bus_done),.byte_valid(core_bus_byte_valid),.busy(bus_busy)
+    );
+    // Existing arbiter owns the core request; a second transaction arbiter
+    // grants sparse UART queue traffic priority without interrupting a burst.
+    psram_arbiter #(.FETCH_WRITES(1)) ingress_owner (
+        .clk(clk),.rst_n(core_rst_n),
+        .data_valid(queue_valid),.data_write(queue_write),.data_addr(queue_addr),
+        .data_bytes(4'd2),.data_wdata(queue_data),.data_ready(queue_ready),
+        .data_done(queue_done),.data_byte_valid(queue_byte_valid),
+        .fetch_valid(bus_valid),.fetch_addr(bus_addr),.fetch_bytes(bus_bytes),
+        .fetch_write(bus_write),.fetch_wdata(bus_data),
+        .fetch_ready(core_bus_ready),.fetch_done(core_bus_done),.fetch_byte_valid(core_bus_byte_valid),
+        .req_valid(serial_valid),.req_write(serial_write),.req_addr(serial_addr),.req_bytes(serial_bytes),
+        .req_data(serial_data),.req_ready(bus_ready),.done(bus_done),.byte_valid(bus_byte_valid),.busy(queue_bus_busy)
     );
     qspi_ctrl serial_memory (
-        .clk(clk),.rst_n(core_rst_n),.req_valid(bus_valid),.req_ready(bus_ready),
-        .req_write(bus_write),.req_addr(bus_addr),.req_bytes(bus_bytes),.req_data(bus_data),
+        .clk(clk),.rst_n(core_rst_n),.req_valid(serial_valid),.req_ready(bus_ready),
+        .req_write(serial_write),.req_addr(serial_addr),.req_bytes(serial_bytes),.req_data(serial_data),
         .read_data(qspi_read_data),.byte_valid(bus_byte_valid),.done(bus_done),
         .sck(sck),.cs_n(ram_a_cs),.dq_in(qspi_dq_i),.dq_out(dq_out),.dq_oe(dq_oe)
     );
@@ -155,7 +186,7 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87) (
     // TinyQV Pmod order, preserved from the original wrapper.
     assign uio_out = {1'b1,ram_a_cs,dq_out[3:2],sck,dq_out[1:0],1'b1};
     assign uio_oe = core_rst_n && rst_n ? {2'b11,dq_oe[3:2],1'b1,dq_oe[1:0],1'b1} : 8'b0;
-    assign uo_out  = {3'b0, tx, 2'b0, (memory_error | micro_error | dma_error | host_error | uart_error), !host_busy};
+    assign uo_out  = {3'b0, tx, 1'b0,stream_mode, (memory_error | micro_error | dma_error | host_error | uart_error | queue_error), !host_busy};
     wire _unused = &{micro_busy,dma_write,1'b0};
 endmodule
 `default_nettype wire

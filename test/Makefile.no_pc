@@ -1,0 +1,7 @@
+# Run from repository root. Reuses pre-generated Bishop network fixtures.
+BUILD ?= /tmp/acc-no-pc-network
+.PHONY: build run
+build:
+	verilator --binary --timing -j 2 -Wno-fatal --top-module tb_no_pc_network --Mdir $(BUILD) -f src/sources.f memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.v test/qspi_psram_model.sv test/tb_psram_stream.sv test/tb_no_pc_network.sv
+run:
+	python3 scripts/run_no_pc_network.py --binary $(BUILD)/Vtb_no_pc_network

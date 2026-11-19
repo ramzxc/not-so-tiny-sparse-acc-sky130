@@ -7,5 +7,6 @@ BUILD ?= /tmp/acc-psram-arbiter
 SIM_BUILD = $(BUILD)/sim
 COCOTB_RESULTS_FILE = $(BUILD)/results.xml
 VERILOG_SOURCES = $(ROOT)/src/rtl/psram_arbiter.v
-COMPILE_ARGS += -Wno-fatal --timing --timescale-override 1ns/1ps
+export FETCH_WRITES ?= 0
+COMPILE_ARGS += -GFETCH_WRITES=$(FETCH_WRITES) -Wno-fatal --timing --timescale-override 1ns/1ps
 include $(shell cocotb-config --makefiles)/Makefile.sim

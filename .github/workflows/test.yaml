@@ -39,6 +39,8 @@ jobs:
           make
           # make will return success even if the tests fail, so check results.xml for failed tests
           python -m cocotb_tools.check_results results.xml
+          make BUILD=/tmp/acc-no-pc-queue COCOTB_RESULTS_FILE=/tmp/acc-no-pc-queue/results.xml COCOTB_TEST_MODULES=test_psram_queue QUEUE_SLOT_BITS=2
+          python -m cocotb_tools.check_results /tmp/acc-no-pc-queue/results.xml
 
       - name: Check FP8 arithmetic and 1 KiB memory
         run: |
@@ -48,6 +50,8 @@ jobs:
           cd test
           make -f Makefile.arbiter
           python -m cocotb_tools.check_results /tmp/acc-psram-arbiter/results.xml
+          make -f Makefile.arbiter BUILD=/tmp/acc-psram-arbiter-write FETCH_WRITES=1
+          python -m cocotb_tools.check_results /tmp/acc-psram-arbiter-write/results.xml
           make -f Makefile.dma
           python -m cocotb_tools.check_results /tmp/acc-dma/results.xml
           make -f Makefile.micro

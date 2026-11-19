@@ -1,16 +1,24 @@
 `timescale 1ns/1ps
-module tb_psram_stream #(parameter integer UART_CLKS_PER_BIT=8);
+module tb_psram_stream #(parameter integer UART_CLKS_PER_BIT=8, parameter integer QUEUE_SLOT_BITS=14);
     logic clk,rst_n,ena;
     logic [7:0] ui_in;
     wire [7:0] uo_out,uio_out,uio_oe;
     wire [3:0] dq;
-    acc_hard_macro #(.UART_CLKS_PER_BIT(UART_CLKS_PER_BIT)) dut (
+    acc_hard_macro #(.UART_CLKS_PER_BIT(UART_CLKS_PER_BIT),.QUEUE_SLOT_BITS(QUEUE_SLOT_BITS)) dut (
         .clk(clk),.rst_n(rst_n),.uart_rx_i(ui_in[3]),.qspi_dq_i(dq),
         .uo_out(uo_out),.uio_out(uio_out),.uio_oe(uio_oe));
     defparam dut.itf.memory.size_1k.macro.VERBOSE=0;
     qspi_psram_model psram_model (
         .sck(uio_oe[3] ? uio_out[3] : 1'b0),.cs_n(uio_oe[6] ? uio_out[6] : 1'b1),
         .dq_out({uio_out[5:4],uio_out[2:1]}),.dq_oe({uio_oe[5:4],uio_oe[2:1]}),.dq_in(dq));
+    wire [QUEUE_SLOT_BITS:0] queue_count=dut.ingress.queued;
+    wire [QUEUE_SLOT_BITS-1:0] queue_write_slot=dut.ingress.write_slot;
+    wire queue_pending=dut.ingress.pending;
+    logic [31:0] completed=0;
+    always @(posedge clk)begin
+        if(!rst_n)completed<=0;
+        else if(dut.frontend.state==10 && dut.frontend.units_idle)completed<=completed+1;
+    end
     logic [22:0] observe_addr;
     wire [15:0] observe_data={psram_model.mem[observe_addr+1],psram_model.mem[observe_addr]};
     wire [8191:0] sram_snapshot;

@@ -35,7 +35,7 @@ pinout:
   # Outputs
   uo[0]: "DECODER_READY"
   uo[1]: "ERROR"
-  uo[2]: ""
+  uo[2]: "RAW_STREAM_MODE"
   uo[3]: ""
   uo[4]: "UART_TX"
   uo[5]: ""

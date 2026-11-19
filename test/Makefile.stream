@@ -9,7 +9,8 @@ SIM_BUILD = $(BUILD)/sim
 COCOTB_RESULTS_FILE ?= $(BUILD)/results.xml
 export STREAM_FIXTURE=$(BUILD)/psram.hex
 export PERF_UART_CLKS_PER_BIT ?= 8
-COMPILE_ARGS += -I$(ROOT)/src/rtl -I$(ROOT)/src/rtl/core -Wno-fatal --timing --timescale-override 1ns/1ps -GUART_CLKS_PER_BIT=$(PERF_UART_CLKS_PER_BIT)
+QUEUE_SLOT_BITS ?= 14
+COMPILE_ARGS += -I$(ROOT)/src/rtl -I$(ROOT)/src/rtl/core -Wno-fatal --timing --timescale-override 1ns/1ps -GUART_CLKS_PER_BIT=$(PERF_UART_CLKS_PER_BIT) -GQUEUE_SLOT_BITS=$(QUEUE_SLOT_BITS)
 VERILOG_SOURCES = $(addprefix $(ROOT)/,$(shell sed '/^+/d' $(ROOT)/src/sources.f))
 VERILOG_SOURCES += $(ROOT)/memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.v $(CURDIR)/tb_psram_stream.sv $(CURDIR)/qspi_psram_model.sv
 CUSTOM_SIM_DEPS += $(BUILD)/psram.hex

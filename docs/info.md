@@ -26,7 +26,8 @@ complete UART, boot and ownership contract, and [rebuild](rebuild.md) for the IS
 | Path | Contents |
 |---|---|
 | `src/rtl/project.v` | Core wiring and reset synchronization |
-| `src/rtl/core/program_ctrl.v` | UART framing, input commit, sequential program fetch/replay |
+| `src/rtl/program_ctrl.v` | UART framing, input commit, sequential program fetch/replay |
+| `src/rtl/uart_psram_queue.v` | Experimental PSRAM-backed raw UART input queue |
 | `src/rtl/psram_arbiter.v` | Exclusive fetch/data transaction ownership |
 | `src/rtl/core/micro_ctrl.v` | Generic column/batch sequencer |
 | `src/rtl/core/dma_ctrl.v` | PSRAM-to-SRAM vector copies |
