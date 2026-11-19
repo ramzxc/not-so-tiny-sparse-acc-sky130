@@ -171,3 +171,20 @@ which the GL action does not install. Its job environment now sets SIM=icarus,
 covering both clean and the GATES=yes invocation. The actual successful-CI
 netlist passes the existing full-512-byte read/write/overwrite/reset/enable
 test under Icarus. Evidence is in `provenance/512b-precheck-gl/`.
+
+### 1 KiB integration
+
+The FP8 core uses the 64-bit × 128-row macro. Its NSDM, PSDM and NPC spacing
+repair follows the 512 B procedure. The two control-logic bridges are translated
+by 26.860 µm in Y. `repair_1k_masks.py` checks the original GDS hash before editing.
+It preserves all original geometry and checks that opposite implants do not
+overlap on active.
+
+Generate the exact routing abstract with `lef_from_gds.py`, then apply
+`guard_sram_obstructions.py`. The latter reserves the internal lower layers and
+adds routing clearance around upper-metal and via obstructions. It preserves
+all port definitions and verifies that no original obstruction is removed.
+These are abstract-only restrictions; the SRAM metal and devices do not change.
+
+The original input is available in commit `e61311b`. Full core and wrapper checks
+are still required after routing. The Liberty timing model is analytical.

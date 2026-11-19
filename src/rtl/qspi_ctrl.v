@@ -1,5 +1,5 @@
 `include "defs/defs.vh"
-// Wire-protocol bytes stay 8 bits independently of FP16 compute width.
+// Wire-protocol bytes stay 8 bits independently of the compute format.
 
 // Protocol reference: TinyQV TT06 cpu/qspi_ctrl.v, commit
 // dfbd5e3882442c07e4627bfb5f627ba7bff00baf (Michael Bell).

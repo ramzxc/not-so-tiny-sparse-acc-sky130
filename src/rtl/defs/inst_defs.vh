@@ -17,7 +17,7 @@
 `define DMA_RUN    3'd2
 `define INST_DMA_SOURCE {`OPCODE_DMA, `DMA_SOURCE, 10'b0}
 `define INST_DMA_DEST   {`OPCODE_DMA, `DMA_DEST, 10'b0}
-// Count is an 8-bit number of 4-byte vectors (0..128); zero is a no-op.
+// Count is an 8-bit number of 2-byte vectors (0..255); zero is a no-op.
 `define INST_DMA_RUN(count) {`OPCODE_DMA, `DMA_RUN, 2'b0, (count)}
 
 // Fixed column sequencer configuration. Address commands capture the current ADDR.
@@ -28,6 +28,11 @@
 `define MICRO_COLUMNS 3'd4
 `define MICRO_RUN     3'd5
 `define MICRO_BATCH   3'd6
+`define MICRO_TILE    3'd7
+// TILE bit 0 selects the captured ADDR: SRAM buffer (0), Flash column stride (1).
+// A zero stride uses the packed width (2 * GROUPS bytes).
+`define INST_MICRO_BUFFER {`OPCODE_MICRO, `MICRO_TILE, 10'b0}
+`define INST_MICRO_STRIDE {`OPCODE_MICRO, `MICRO_TILE, 9'b0, 1'b1}
 // 1..128; reset default is 1. Use an 8-bit count.
 `define INST_MICRO_BATCH(count) {`OPCODE_MICRO, `MICRO_BATCH, 2'b0, (count)}
 `define INST_MICRO_INPUT(sram) {`OPCODE_MICRO, `MICRO_INPUT, 9'b0, (sram)}
@@ -36,6 +41,8 @@
 `define INST_MICRO_GROUPS(count) {`OPCODE_MICRO, `MICRO_GROUPS, 2'b0, (count)}
 `define INST_MICRO_COLUMNS(count) {`OPCODE_MICRO, `MICRO_COLUMNS, 2'b0, (count)}
 `define INST_MICRO_RUN(sparse) {`OPCODE_MICRO, `MICRO_RUN, 9'b0, (sparse)}
+// RUN bit 1 enables automatic Flash -> SRAM weight tiles for the configured batch.
+`define INST_MICRO_RUN_DMA(sparse) {`OPCODE_MICRO, `MICRO_RUN, 8'b0, 1'b1, (sparse)}
 
 // opcode: nop
 `define NOP 16'b0000000000000000
@@ -99,7 +106,7 @@
 // SRAM-only memory accumulation uses formerly reserved MEM bit 9.
 `define INST_SRAM_ACCUMULATE {`OPCODE_MEM, `MEM_WRITE, 2'b01, 1'b1, 9'b0}
 
-// Optional post-increment (+4 bytes) for any MEM preset, including accumulation.
+// Optional post-increment (+2 bytes) for any MEM preset, including accumulation.
 `define INST_MEM_POSTINC(inst) ((inst) | 16'h0100)
 `define INST_SRAM_READ_INC `INST_MEM_POSTINC(`INST_SRAM_READ)
 `define INST_SRAM_WRITE_INC `INST_MEM_POSTINC(`INST_SRAM_WRITE)

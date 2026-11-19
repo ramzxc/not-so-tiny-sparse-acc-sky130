@@ -1,54 +1,38 @@
-# RTL tests
+# FP8 E4M3FN / 1 KiB tests
 
-Install Verilator >= 5.036 and `requirements.txt`. Run from the repository root:
+Run from this directory with cocotb 2.x, Verilator and Icarus available:
 
 ```sh
-make -C test
-python3 -m cocotb_tools.check_results test/results.xml
-make -C test -f Makefile.exec
-python3 -m cocotb_tools.check_results /tmp/acc-fp16-exec/results.xml
-make -C test -f Makefile.mem_itf
-python3 -m cocotb_tools.check_results /tmp/acc-mem-itf/results.xml
-make -C test -f Makefile.qspi
-python3 -m cocotb_tools.check_results /tmp/acc-qspi-burst/results.xml
-make -C test -f Makefile.micro
-python3 -m cocotb_tools.check_results /tmp/acc-micro/results.xml
-make -C test -f Makefile.data_ctrl
-make -C test -f Makefile.activation
+make BUILD=/tmp/acc-fp8-serial COCOTB_RESULTS_FILE=/tmp/acc-fp8-serial/results.xml
+python -m cocotb_tools.check_results /tmp/acc-fp8-serial/results.xml
+make -f Makefile.exec
+make -f Makefile.micro
+make -f Makefile.dma
+make -f Makefile.mem_itf
+make -f Makefile.data_ctrl
+bash run_fp8_math.sh
 ```
 
-- The default test drives real UART instructions and QSPI Flash pins. Only the
-  external Flash model is preloaded. It exercises FP16 execution, SRAM storage,
-  accumulation, sparse reads, boundary addresses and retained data after reset.
-- `Makefile.exec` checks FP16 operations and activations against a Python model,
-  scalar selection, sparse zero bypass and snapshots during execution.
-- The UART test also exercises two prefetched inputs, explicit column selection,
-  repeated accumulation, selected-zero weight skipping and nonzero subnormals.
-- `Makefile.mem_itf` checks all 128 SRAM vectors, neighboring halves of a word,
-  accumulation, invalid accesses and reset cancellation using the OpenRAM model.
-- `Makefile.dma` checks random request/response delays, completion after writes,
-  full-range validation, zero length, reset and fault draining. UART tests copy
-  all 512 B bit-for-bit in one Flash read transaction, preserve adjacent SRAM halves and execution operands,
-  and run computation from DMA-loaded inputs and weights.
-- `Makefile.qspi` checks burst bytes and CS continuity under random consumer
-  stalls, unaligned/page-crossing reads, busy polling, paused-stream abort, reset,
-  and fresh transactions after a burst. It compares single-byte/burst cycles.
-- `Makefile.micro` checks the emitted instruction stream under random stalls,
-  automatic cur, zero columns, pointer carry, maximum loop counts, faults and reset.
-  The UART tests check full SRAM partial-sum updates from Flash/SRAM operands,
-  repeated runs, dense NaNs, zero lengths and output-range errors. Batch tests
-  cover randomized stalls, sizes 2/3/128, SRAM bounds and weight-read reuse.
-  The UART batch test checks separate partial sums and repeated tile accumulation.
-- `Makefile.data_ctrl` checks address post-increment during stalls, sparse skips,
-  carry, overflow and reset. The UART test also checks consecutive Flash/SRAM
-  reads, writes, accumulation and the SRAM end boundary.
-- `Makefile.activation` checks all 65,536 FP16 encodings for each of five
-  activation modes through EXEC multiply-by-one against an independent Python
-  oracle, including NaNs, signed zero, atomic output updates, held outputs and reset.
+Use `cocotb_tools.check_results` on each cocotb suite's output XML. The default
+serial suite uses `tb_fp8_serial.sv`, UART divider 8, real QSPI pins and the
+existing 64x128 OpenRAM timing model. All stimuli are in external Flash; SRAM
+snapshots are read-only observations. No DUT/SRAM backdoor initialization is used.
 
-Build outputs default to `/tmp`; the default test writes `test/results.xml`.
-`BUILD=/tmp/another-build` selects a different build directory.
+Coverage includes all 1,024 SRAM bytes and four independently preserved vector
+slots per row, FP8 read-add-write, 255-vector burst copies, address 1022, odd and
+out-of-range rejection, post-increment, strided output tiles, batch 1/3/4,
+Flash/SRAM inputs, sparse/dense NaNs, reset and transition to ordinary MICRO.
+The sequencer unit test checks batch 1..128 representative cases, 255 groups,
+DMA reuse and randomized backpressure. Arithmetic tests use the independent
+exact-rational oracle: all 65,536 ADD and MUL pairs, pack rounding, every FP8
+activation input, vector/scalar snapshots and accumulation.
 
-`GATES=yes` selects the packaged gate netlist and cell models. The checked-in
-macro still implements the previous core, so it needs rebuilding before the
-new protocol can pass gate-level tests. RTL tests are not post-layout validation.
+`Makefile.activation` selects the exhaustive activation test alone.
+`Makefile.perf` runs **FP8 component-only** timing measurements at UART divider 87
+and writes `measurements.json` under BUILD. It is not a full-network benchmark.
+
+The old FP16 fixtures and experiments remain for provenance; they are not valid
+FP8 input images. See [README.fp16_512.md](README.fp16_512.md) for their historical
+instructions. `test_serial.py` still supplies the format-independent UART Host,
+but its FP16 test functions are not the default suite. Old gate-level netlists
+and the old GL harness are not validated against this new build.

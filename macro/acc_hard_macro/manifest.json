@@ -1,16 +1,16 @@
 {
-  "source_export": "final_1795079110",
+  "source_export": "final_1795082906",
   "sha256": {
-    "acc_hard_macro.gds": "73a2ec3da5fa4594b17670701ccf8ef72ea27baf629a756167a4a453adb69f70",
-    "acc_hard_macro.lef": "80c53856d8344b4f820798be926dc9454cd8b0ed2c4a45f58c6f6ffbf7a128f0"
+    "acc_hard_macro.gds": "7b8b808a3bd0212cf0580762af2cea8c149a95d68ae1ed1aa7141d30cb908452",
+    "acc_hard_macro.lef": "4ea247ef17282a4d8694fc7d3e862a8f34873dcb7f4420d8f936447d25805c13"
   },
   "lef_obstructions": "Removed only empty M1 margins after checking all GDS M1 geometry; pins and GDS unchanged. Regenerate with scripts/fix_core_lef_obstructions.py.",
-  "lef_power_pins": "43 continuous M4 supply columns verified against actual GDS; full-height pins and matching M4 OBS subtraction. Reproduce with scripts/expose_core_power_pins.py.",
+  "lef_power_pins": "26 continuous M4 supply columns verified against actual GDS; full-height pins and matching M4 OBS subtraction. Reproduce with scripts/expose_core_power_pins.py.",
   "lvs_inputs": {
-    "macro/acc_hard_macro/acc_hard_macro.v": "47e4a857ccd79627a5c1d6e9c87ae3a77c1c8506e7d22591c9cf9afb7e00a68f",
-    "memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.lvs.sp": "aecf2d431c88a9e6a144f23c69ec1eae3442e8054eb3da9a8ea30721d195bf3b",
-    "macro/acc_hard_macro/acc_hard_macro.lvs.spice": "e7c06a0a4b2eb7a0fa8403a3360cd6e4fb2317d5c4b35526e720ed84e40a3a84",
-    "macro/acc_hard_macro/sram.lvs_micron.spice": "f6e25d29d38a08721eed0578a2933c8f27126d5644952567706ff15f3e66b163"
+    "macro/acc_hard_macro/acc_hard_macro.v": "77964c931f151dcf7f904b75a4538b4d1d0abe79e498747dad87c853b81c9d6d",
+    "memory/openram/generated/tt_sram_1rw_64x128_sky130/tt_sram_1rw_64x128_sky130.lvs.sp": "f128a00b35a717e34fbd7cb052a5e4fdcab467cc75de9fc25479d3d4d052aa9b",
+    "macro/acc_hard_macro/acc_hard_macro.lvs.spice": "85ef16f026d016a9b62dd03f6a2149f898277886ae2d470420f70973cff728c8",
+    "macro/acc_hard_macro/sram.lvs_micron.spice": "b49d87bad5077aa32cdfea493e5bdf84afdfaa0a2f6e6ba371ca580de1f50b44"
   },
   "lvs_nfet_rule": {
     "model": null,

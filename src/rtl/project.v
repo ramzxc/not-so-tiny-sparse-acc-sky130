@@ -105,7 +105,7 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87) (
         .read_burst(dma_busy), .read_continue(dma_read_continue),
         .error(memory_error), .addr(dma_busy ? dma_addr : addr),
         .device(dma_busy ? (dma_write ? `MEM_SRAM : `MEM_FLASH) : device),
-        // read_data is held across writes by mem_itf; copy all 32 bits verbatim.
+        // read_data is held across writes by mem_itf; copy both FP8 bytes verbatim.
         .write_data(dma_busy ? read_data : write_data), .read_data(read_data), .read_data_val(read_data_val),
         .qspi_req_val(qspi_req_val), .qspi_req_rdy(qspi_req_rdy),
         .qspi_req_write(qspi_req_write), .qspi_req_addr(qspi_addr),

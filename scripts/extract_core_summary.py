@@ -48,7 +48,7 @@ def main():
     source = Path(os.environ['CORE_DEF']) if 'CORE_DEF' in os.environ else ROOT / manifest['source_run'] / 'acc_hard_macro.def'
     pdk = Path(os.environ['PDK_ROOT']) / 'sky130A/libs.ref/sky130_fd_sc_hd'
     lefs = [pdk / 'techlef/sky130_fd_sc_hd__nom.tlef', pdk / 'lef/sky130_fd_sc_hd.lef',
-            ROOT / 'memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.lef']
+            ROOT / 'memory/openram/generated/tt_sram_1rw_64x128_sky130/tt_sram_1rw_64x128_sky130.lef']
     # The DEF and powered netlist must come from the same export package.
     exported = source.with_suffix('.pg.v')  # Historical ICC2 export name.
     if not exported.exists():

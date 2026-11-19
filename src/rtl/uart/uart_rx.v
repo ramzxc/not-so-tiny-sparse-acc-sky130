@@ -1,5 +1,5 @@
 `include "defs/defs.vh"
-// Wire-protocol bytes stay 8 bits independently of FP16 compute width.
+// Wire-protocol bytes stay 8 bits independently of the compute format.
 
 // Collect `INST_WIDTH/8 UART bytes, low byte first, into one external job.
 module uart_rx # (

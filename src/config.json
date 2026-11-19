@@ -39,23 +39,23 @@
         }
       }
     },
-    "tt_sram_1rw_64x64_sky130": {
+    "tt_sram_1rw_64x128_sky130": {
       "gds": [
-        "dir::../memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.gds"
+        "dir::../memory/openram/generated/tt_sram_1rw_64x128_sky130/tt_sram_1rw_64x128_sky130.gds"
       ],
       "lef": [
-        "dir::../memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.lef"
+        "dir::../memory/openram/generated/tt_sram_1rw_64x128_sky130/tt_sram_1rw_64x128_sky130.lef"
       ],
       "vh": [
-        "dir::../memory/openram/generated/tt_sram_1rw_64x64_sky130/blackbox.v"
+        "dir::../memory/openram/generated/tt_sram_1rw_64x128_sky130/blackbox.v"
       ],
       "lib": {
         "*_tt_025C_1v80": [
-          "dir::../memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130_TT_1p8V_25C.lib"
+          "dir::../memory/openram/generated/tt_sram_1rw_64x128_sky130/tt_sram_1rw_64x128_sky130_TT_1p8V_25C.lib"
         ]
       },
       "spice": [
-        "dir::../memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.lvs.sp"
+        "dir::../memory/openram/generated/tt_sram_1rw_64x128_sky130/tt_sram_1rw_64x128_sky130.lvs.sp"
       ],
       "instances": {}
     }
@@ -91,7 +91,7 @@
   "MAGIC_DEF_LABELS": 0,
   "MAGIC_WRITE_LEF_PINONLY": 1,
   "VERILOG_DEFINES": [
-    "ACC_SRAM_BYTES=512"
+    "ACC_SRAM_BYTES=1024"
   ],
   "PDN_CFG": "dir::tcl/pdn.tcl",
   "RUN_MAGIC_DRC": true,

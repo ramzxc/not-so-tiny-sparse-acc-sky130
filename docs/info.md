@@ -1,35 +1,39 @@
 ## How it works
 
-Not-So-Tiny Sparse Accelerator is an FP16 accelerator for Tiny Tapeout SKY130
+Not-So-Tiny Sparse Accelerator is an FP8 E4M3FN accelerator for Tiny Tapeout SKY130
 8×2 tiles. It uses the tiny-sparse-acc rebuild structure: UART, instruction FIFO,
 decoder, data control, execution unit, memory interface and QSPI controller.
 DATA can select either prefetched input element and broadcast it to both lanes
 for column-wise computation. Sparse mode tests that selected element.
-Instructions are 16 bits. Two FP16 lanes share one arithmetic multiplier and
+Instructions are 16 bits. Two FP8 E4M3FN lanes share one arithmetic multiplier and
 adder. ReLU, hard sigmoid, hard tanh, STEP, accumulation and sparse weight reads
 are supported. Hard sigmoid clamps `x/4 + 0.5` to `[0,1]`; hard tanh clamps
-`x` to `[-1,1]`. Arithmetic remains FP16.
+`x` to `[-1,1]`. Products, accumulators and stored values are FP8 E4M3FN (RNE, finite saturation).
 
 A small micro sequencer can run a fixed column-wise loop. It loads input pairs,
 selects each element, reads weights and accumulates products into SRAM. Configure
 the input count, number of output groups and batch size, then issue RUN and SYNC.
 Batch size 1 keeps the original order. Larger batches reuse each weight vector
-across samples and keep separate SRAM partial sums.
+across samples and keep separate SRAM partial sums. Optional automatic DMA mode
+copies each active Flash weight column into a configured SRAM buffer before
+computing it. Sparse mode skips DMA when the entire batch column is zero.
+Configurable column stride supports output tiles of larger matrices; this is a
+generic matrix primitive, with activations and network scheduling left to the host.
 
-The memory interface selects external Flash or internal 512 B SRAM. PSRAM is
+The memory interface selects external Flash or internal 1 KiB SRAM. PSRAM is
 not used. A small blocking DMA copies Flash blocks to SRAM without arithmetic.
 Set source, destination and length, then wait for completion before RUN.
 
-This branch tests the ICC2 core GDS as a hard macro. GitHub Actions builds
-and routes the Tiny Tapeout wrapper around it. The core includes the 512 B
-SRAM. Full DRC and LVS remain enabled.
+GitHub Actions uses Yosys and OpenROAD. The FP8/1 KiB physical implementation
+has not been revalidated; existing placement and PDN dimensions need review. Only the 1 KiB SRAM uses prebuilt physical views. Local DC/ICC2 runs
+are a separate comparison flow; their outputs do not replace the Actions RTL.
 
 ### Source files
 
 | Path | Contents |
 | --- | --- |
 | `src/rtl/project.v` | Logical top (`acc_hard_macro`) and module connections |
-| `src/rtl/core/` | Micro sequencer, FIFO, decoder, data control, FP16 execution and activation |
+| `src/rtl/core/` | Micro sequencer, FIFO, decoder, data control, FP8 E4M3FN execution and activation |
 | `src/rtl/uart/` | UART receiver and READY transmitter |
 | `src/rtl/defs/` | Instruction and width definitions |
 | `src/rtl/mem_itf.sv` | Flash/SRAM selection and vector transfers |
@@ -37,7 +41,7 @@ SRAM. Full DRC and LVS remain enabled.
 | `src/rtl/qspi_ctrl.v` | Byte transfers to Flash |
 | `src/sources.f` | RTL source list |
 | `memory/openram/` | SRAM models and physical views |
-| `macro/acc_hard_macro/` | Current ICC2 core GDS, LEF, netlist, and parasitics |
+| `macro/acc_hard_macro/` | Previous hardened core |
 
 The existing post-route netlist is
 [acc_hard_macro.v](../macro/acc_hard_macro/acc_hard_macro.v).
@@ -75,7 +79,7 @@ As in tiny, `ena` is unused inside the core.
 | `01` | Internal SRAM | `0..511`; vector bases `0,4,...,508` |
 | `10`, `11` | Unsupported | Requests rejected |
 
-Each vector contains two FP16 values (4 bytes), with lane 0 in the low 16 bits.
+Each vector contains two FP8 E4M3FN values (4 bytes), with lane 0 in the low 16 bits.
 SRAM is one continuous space with no fixed input, weight or accumulator regions.
 Two vectors share each physical 64-bit SRAM word. Writes preserve the other
 vector. Initialize SRAM before reading it; reset does not clear its contents.
@@ -97,7 +101,7 @@ make -C test -f Makefile.mem_itf
 python3 -m cocotb_tools.check_results /tmp/acc-mem-itf/results.xml
 ```
 
-Tests cover FP16 execution, UART instructions, QSPI Flash pins, SRAM bounds,
+Tests cover FP8 E4M3FN execution, UART instructions, QSPI Flash pins, SRAM bounds,
 neighbor preservation, accumulation, sparse reads and reset behavior.
 The pin test uses a shorter UART divider; hardware uses 87 clocks per bit.
 The previous physical macro cannot pass the new instruction protocol test.

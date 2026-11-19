@@ -51,7 +51,7 @@ module data_ctrl (
     reg load_weight;
     reg write_reg;
     reg auto_increment;
-    localparam integer VECTOR_BYTES = `DATA_WIDTH * `COMPUTE_WIDTH / 8;
+    localparam [23:0] VECTOR_BYTES = `DATA_WIDTH * `COMPUTE_WIDTH / 8;
     reg result_valid;
 
     wire [2:0] opcode = data_inst_in[15:13];
@@ -129,7 +129,7 @@ module data_ctrl (
                             if (data_inst_in[12] == `MEM_READ &&
                                 load_weight && sparse_en && input_zero) begin
                                 // No bus request. Supply zero instead of an old
-                                // weight (which could even be NaN in FP16).
+                                // weight (which could even be NaN in FP8).
                                 exec_data_out       <= 0;
                                 exec_data_out_val   <= 1;
                                 exec_data_is_weight <= 1;
@@ -167,8 +167,8 @@ module data_ctrl (
 
 `ifndef SYNTHESIS
     initial begin
-        if (`DATA_WIDTH != 16 || `COMPUTE_WIDTH < 1)
-            $fatal(1, "data_ctrl requires FP16 elements and a valid positive lane count");
+        if (`DATA_WIDTH != 8 || `COMPUTE_WIDTH < 1)
+            $fatal(1, "data_ctrl requires FP8 elements and a valid positive lane count");
     end
     // Invalid regions are rejected by mem_itf and reported on its error output.
 `endif

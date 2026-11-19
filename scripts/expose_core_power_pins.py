@@ -23,7 +23,7 @@ for name in ('VPWR', 'VGND'):
     assert re.findall(r'LAYER\s+(\w+)\s*;', pin) == ['met4']
     rects = [list(map(float,v.split())) for v in re.findall(r'RECT\s+([^;]+);', pin)]
     columns = sorted({(v[0],v[2]) for v in rects})
-    assert len(columns) == {'VPWR':22,'VGND':21}[name]
+    assert len(columns) == {'VPWR':13,'VGND':13}[name]
     rows = []
     for x1,x2 in columns:
         stripe = gdstk.rectangle((x1,0),(x2,height))
@@ -54,6 +54,6 @@ s=s[:start]+re.sub(r'^(    LAYER met4(?: SPACING 0)? ;)(.*?)(?=^    LAYER|^  END
 p.write_text(s)
 mp=macro/'manifest.json';m=json.loads(mp.read_text())
 m['sha256']['acc_hard_macro.lef']=hashlib.sha256(p.read_bytes()).hexdigest()
-m['lef_power_pins']='43 continuous M4 supply columns verified against actual GDS; full-height pins and matching M4 OBS subtraction. Reproduce with scripts/expose_core_power_pins.py.'
+m['lef_power_pins']='26 continuous M4 supply columns verified against actual GDS; full-height pins and matching M4 OBS subtraction. Reproduce with scripts/expose_core_power_pins.py.'
 mp.write_text(json.dumps(m,indent=2)+'\n')
 print('Verified existing GDS coverage and exposed supply columns:',counts)

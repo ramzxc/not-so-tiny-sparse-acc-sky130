@@ -1,9 +1,9 @@
 SIM = verilator
 TOPLEVEL_LANG = verilog
 TOPLEVEL = exec_unit
-COCOTB_TEST_MODULES = test_fp16_exec
+COCOTB_TEST_MODULES = test_fp8_exec
 ROOT := $(abspath $(CURDIR)/..)
-BUILD ?= /tmp/acc-fp16-exec
+BUILD ?= /tmp/acc-fp8-exec
 SIM_BUILD = $(BUILD)/sim
 COCOTB_RESULTS_FILE = $(BUILD)/results.xml
 VERILOG_SOURCES = $(ROOT)/src/rtl/core/exec_unit.sv

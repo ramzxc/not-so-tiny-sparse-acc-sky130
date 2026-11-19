@@ -1,6 +1,6 @@
 // Select exactly one generated OpenRAM 1RW macro. The 65th bit is a spare.
 module shared_sram #(
-    parameter int SRAM_BYTES = 512,
+    parameter int SRAM_BYTES = 1024,
     parameter int ADDR_WIDTH = $clog2(SRAM_BYTES / 8)
 )(
     input logic clk, enable, write,

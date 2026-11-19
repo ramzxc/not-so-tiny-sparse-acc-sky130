@@ -40,8 +40,9 @@ jobs:
           # make will return success even if the tests fail, so check results.xml for failed tests
           python -m cocotb_tools.check_results results.xml
 
-      - name: Check QSPI burst, shared activation and 512 B memory
+      - name: Check FP8 arithmetic and 1 KiB memory
         run: |
+          bash test/run_fp8_math.sh
           cd test
           make -f Makefile.qspi
           python -m cocotb_tools.check_results /tmp/acc-qspi-burst/results.xml
@@ -51,8 +52,8 @@ jobs:
           python -m cocotb_tools.check_results /tmp/acc-micro/results.xml
           make -f Makefile.data_ctrl
           make -f Makefile.activation
-          make -f Makefile.exec BUILD=/tmp/acc-fp16-exec
-          python -m cocotb_tools.check_results /tmp/acc-fp16-exec/results.xml
+          make -f Makefile.exec BUILD=/tmp/acc-fp8-exec
+          python -m cocotb_tools.check_results /tmp/acc-fp8-exec/results.xml
           make -f Makefile.mem_itf BUILD=/tmp/acc-mem-itf
           python -m cocotb_tools.check_results /tmp/acc-mem-itf/results.xml
 
