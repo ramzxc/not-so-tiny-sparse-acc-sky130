@@ -13,6 +13,7 @@ async def local_sram(d):
     async def reset():
         d.rst_n.value=0;d.read_en.value=0;d.write_en.value=0;d.write_accumulate.value=0
         d.addr.value=0;d.device.value=1;d.write_data.value=0
+        d.read_burst.value=0;d.read_continue.value=0
         d.qspi_req_rdy.value=0;d.qspi_read_data.value=0;d.qspi_read_data_val.value=0
         for _ in range(3):await tick()
         d.rst_n.value=1

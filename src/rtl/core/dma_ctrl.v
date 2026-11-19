@@ -2,6 +2,7 @@
 
 // Blocking, bit-preserving Flash -> SRAM copy. Shares mem_itf and its held
 // read_data register; no arithmetic, FIFO, or second QSPI engine is needed.
+// One RUN is one Flash read burst, paused while each SRAM vector commits.
 module dma_ctrl (
     input wire clk, rst_n,
     input wire [15:0] host_inst,
@@ -12,7 +13,7 @@ module dma_ctrl (
     input wire core_ready, units_idle,
     input wire [23:0] staging_addr,
     input wire mem_ready, mem_read_valid, memory_error,
-    output wire mem_read, mem_write,
+    output wire mem_read, mem_write, mem_read_continue,
     output wire [23:0] mem_addr,
     output wire busy,
     output reg error
@@ -31,6 +32,8 @@ module dma_ctrl (
     assign core_inst = host_inst;
     assign core_valid = rst_n && !busy && host_valid && !is_dma;
     assign mem_read = rst_n && state == READ_SEND && !memory_error;
+    // Keep the Flash transaction open across intermediate SRAM writes.
+    assign mem_read_continue = remaining > 1;
     assign mem_write = rst_n && state == WRITE_SEND && !memory_error;
     assign mem_addr = (state == READ_SEND || state == READ_WAIT) ? source : {15'b0,destination};
     always @(posedge clk) begin

@@ -2,7 +2,7 @@
 #
 # Design name:  acc_hard_macro
 #
-# Created by icc2 write_sdc on Thu Nov 19 16:06:36 2026
+# Created by icc2 write_sdc on Thu Nov 19 17:18:48 2026
 #
 ################################################################################
 
@@ -74,9 +74,9 @@ set_timing_derate -early 0.95 -net_delay -data
 set_timing_derate -late 1.05 -net_delay -data 
 # Set latency for io paths.
 # -origin useful_skew
-set_clock_latency -min 0.742763 [get_clocks {clk}]
+set_clock_latency -min 0.764929 [get_clocks {clk}]
 # -origin useful_skew
-set_clock_latency -max 0.820916 [get_clocks {clk}]
+set_clock_latency -max 0.845416 [get_clocks {clk}]
 # Set propagated on clock sources to avoid removing latency for IO paths.
 set_propagated_clock  [get_ports {clk}]
 set_clock_uncertainty 0.25 [get_clocks {clk}]

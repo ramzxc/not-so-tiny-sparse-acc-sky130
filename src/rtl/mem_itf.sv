@@ -1,10 +1,12 @@
 `include "defs/defs.vh"
 `include "defs/mem_defs.vh"
 
-// Tiny's vector memory interface: Flash retains its byte QSPI backend.
+// Vector memory interface with a byte handshake to QSPI. DMA reads keep
+// the Flash transaction open within/across vectors; ordinary MEM stays single-byte.
 // Device 01 adds flat 512 B SRAM, with two 32-bit vectors per 64-bit word.
 module mem_itf (
     input wire clk, rst_n, read_en, write_en, write_accumulate,
+    input wire read_burst, read_continue,
     output wire rdy,
     input wire [23:0] addr,
     input wire [1:0] device,
@@ -13,7 +15,7 @@ module mem_itf (
     output reg read_data_val, error,
     output wire qspi_req_val,
     input wire qspi_req_rdy,
-    output wire qspi_req_write,
+    output wire qspi_req_write, qspi_req_continue,
     output wire [23:0] qspi_req_addr,
     output wire [1:0] qspi_req_device,
     output wire [7:0] qspi_req_data,
@@ -28,7 +30,7 @@ module mem_itf (
     state_t state;
     reg [23:0] saved_addr;
     reg [31:0] saved_data, old_vector;
-    reg saved_write, saved_accumulate;
+    reg saved_write, saved_accumulate, saved_burst, saved_continue;
     reg [1:0] byte_index;
     reg [63:0] write_word;
     wire [63:0] macro_data;
@@ -39,6 +41,7 @@ module mem_itf (
     assign rdy = rst_n && state == IDLE;
     assign qspi_req_val = rst_n && state == FLASH_SEND;
     assign qspi_req_write = saved_write;
+    assign qspi_req_continue = saved_burst && (byte_index != 3 || saved_continue);
     assign qspi_req_addr = saved_addr + {22'b0, byte_index};
     assign qspi_req_device = `MEM_FLASH;
     assign qspi_req_data = saved_data[byte_index*8 +: 8];
@@ -52,6 +55,7 @@ module mem_itf (
             state <= IDLE;
             saved_addr <= 0; saved_data <= 0; old_vector <= 0; write_word <= 0;
             saved_write <= 0; saved_accumulate <= 0; byte_index <= 0;
+            saved_burst <= 0; saved_continue <= 0;
             read_data <= 0; read_data_val <= 0; error <= 0;
         end else begin
             read_data_val <= 0;
@@ -71,6 +75,8 @@ module mem_itf (
                         saved_data <= write_data;
                         saved_write <= write_en;
                         saved_accumulate <= write_accumulate;
+                        saved_burst <= read_burst && read_en && device == `MEM_FLASH;
+                        saved_continue <= read_continue;
                         byte_index <= 0;
                         state <= device == `MEM_SRAM ? SRAM_READ : FLASH_SEND;
                     end

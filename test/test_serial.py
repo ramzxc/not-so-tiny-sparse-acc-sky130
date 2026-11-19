@@ -13,9 +13,7 @@ class Host:
             await Timer(50,unit='ns')
             self.d.clk.value=1
             await Timer(50,unit='ns')
-            # UART output is not sampled while reset is asserted.
-            if not int(self.d.rst_n.value):
-                continue
+            # UART observes TX only; READY is not valid for an empty FIFO head.
             tx=int(self.d.uo_out.value[4])
             if self.state==-1:
                 if not tx:self.state=0;self.counter=self.period+self.period//2;self.byte=0
@@ -262,7 +260,8 @@ async def dma_bit_exact_and_bounds(d):
     # Real Flash -> DMA -> SRAM path; no arithmetic or SRAM backdoor preload.
     before=int(d.flash_read_ops.value)
     await h.dma_copy(0x800,0,128)
-    assert int(d.flash_read_ops.value)-before==512 and not int(d.uo_out.value)&2
+    assert int(d.flash_read_ops.value)-before==1 and not int(d.uo_out.value)&2
+    assert int(d.uio_out.value)&1, "DMA completed with Flash still selected"
     async def raw(local,expected):
         d.observe_upper.value=bool(local&4)
         await h.load(local,1);await h.sync()
@@ -283,3 +282,47 @@ async def dma_bit_exact_and_bounds(d):
         await h.dma_copy(source,dest,count)
         assert int(d.uo_out.value)&2 and int(d.flash_read_ops.value)==before
         await h.reset();await raw(0,pattern[:4]);await raw(508,pattern[:4])
+
+
+@cocotb.test()
+async def dma_burst_weights_to_micro(d):
+    h=Host(d);await h.reset()
+    # Keep input, weight and output tiles separate in the existing 512 B SRAM.
+    before=int(d.flash_read_ops.value)
+    for source,dest,count in [(0x200,0,3),(0x300,16,10),(12,128,1),(12,132,1)]:
+        await h.dma_copy(source,dest,count)
+    assert int(d.flash_read_ops.value)-before==4
+    await h.address(0);await h.instruction(0xa001)
+    await h.address(16);await h.instruction(0xa401)
+    await h.address(128);await h.instruction(0xa800)
+    await h.instruction(0xac02);await h.instruction(0xb005)
+    before=int(d.flash_read_ops.value)
+    await h.instruction(0xb401);await h.sync()
+    assert int(d.flash_read_ops.value)==before and not int(d.uo_out.value)&2
+    for addr,expected in [(128,0x518050c0),(132,0x53005240)]:
+        await h.load(addr,1);await h.sync()
+        assert int(d.mem_observe_data.value)==expected
+
+
+@cocotb.test()
+async def dma_burst_reset(d):
+    h=Host(d);await h.reset()
+    await h.address(0x800);await h.instruction(0xc000)
+    await h.address(0);await h.instruction(0xc400)
+    before=int(d.flash_read_ops.value)
+    await h.instruction(0xc880)
+    for _ in range(1000):
+        if int(d.flash_read_ops.value)>before:break
+        await h.cycles()
+    else:raise AssertionError('DMA never started its Flash burst')
+    await h.cycles(200)
+    assert not int(d.uio_out.value)&1, '512 B burst ended unexpectedly early'
+    await h.reset()
+    assert int(d.uio_out.value)&1 and not int(d.uio_out.value)&8
+    assert not int(d.uo_out.value)&2
+    # A fresh copy must start from its new address, not resume the aborted stream.
+    before=int(d.flash_read_ops.value)
+    await h.dma_copy(0x804,508,1)
+    assert int(d.flash_read_ops.value)==before+1
+    await h.load(508,1);await h.sync()
+    assert int(d.mem_observe_data.value)==0x7d017c00

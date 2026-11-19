@@ -24,7 +24,7 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87) (
     wire sequenced_valid, sequenced_ready, micro_error, micro_busy;
     wire [15:0] dispatched_inst;
     wire dispatched_valid, dispatched_ready;
-    wire dma_busy, dma_error, dma_read, dma_write;
+    wire dma_busy, dma_error, dma_read, dma_write, dma_read_continue;
     wire [23:0] dma_addr;
     wire [1:0] loaded_input_zero_mask;
     wire [`EXEC_INST_WIDTH-1:0] exec_inst;
@@ -37,7 +37,7 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87) (
     wire [`MEM_ADDR_WIDTH-1:0] addr;
     wire [`MEM_DEVICE_WIDTH-1:0] device;
     wire [`DATA_WIDTH*`COMPUTE_WIDTH-1:0] write_data, read_data;
-    wire qspi_req_val, qspi_req_rdy, qspi_req_write, qspi_read_data_val;
+    wire qspi_req_val, qspi_req_rdy, qspi_req_write, qspi_read_data_val, qspi_req_continue;
     wire [`MEM_ADDR_WIDTH-1:0] qspi_addr;
     wire [`MEM_DEVICE_WIDTH-1:0] qspi_device;
     wire [7:0] qspi_write_data, qspi_read_data;
@@ -70,6 +70,7 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87) (
         .units_idle(exec_rdy && data_rdy), .staging_addr(addr),
         .mem_ready(mem_rdy), .mem_read_valid(read_data_val), .memory_error(memory_error),
         .mem_read(dma_read), .mem_write(dma_write), .mem_addr(dma_addr),
+        .mem_read_continue(dma_read_continue),
         .busy(dma_busy), .error(dma_error)
     );
     inst_decoder decode (
@@ -101,12 +102,14 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87) (
         .clk(clk), .rst_n(core_rst_n), .rdy(mem_rdy),
         .read_en(dma_busy ? dma_read : read_en), .write_en(dma_busy ? dma_write : write_en),
         .write_accumulate(!dma_busy && write_accumulate),
+        .read_burst(dma_busy), .read_continue(dma_read_continue),
         .error(memory_error), .addr(dma_busy ? dma_addr : addr),
         .device(dma_busy ? (dma_write ? `MEM_SRAM : `MEM_FLASH) : device),
         // read_data is held across writes by mem_itf; copy all 32 bits verbatim.
         .write_data(dma_busy ? read_data : write_data), .read_data(read_data), .read_data_val(read_data_val),
         .qspi_req_val(qspi_req_val), .qspi_req_rdy(qspi_req_rdy),
         .qspi_req_write(qspi_req_write), .qspi_req_addr(qspi_addr),
+        .qspi_req_continue(qspi_req_continue),
         .qspi_req_device(qspi_device), .qspi_req_data(qspi_write_data),
         .qspi_read_data(qspi_read_data), .qspi_read_data_val(qspi_read_data_val)
     );
@@ -114,6 +117,7 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87) (
         .clk(clk), .rst_n(core_rst_n),
         .req_val(qspi_req_val), .req_rdy(qspi_req_rdy), .req_write(qspi_req_write),
         .req_addr(qspi_addr), .req_device(qspi_device), .req_data(qspi_write_data),
+        .req_continue(qspi_req_continue), .abort_read(memory_error | dma_error),
         .read_data(qspi_read_data), .read_data_val(qspi_read_data_val),
         .sck(sck), .flash_sc_n(flash_cs), .psram_a_sc_n(ram_a_cs), .psram_b_sc_n(ram_b_cs),
         .dq_in(qspi_dq_i), .dq_out(dq_out), .dq_oe(dq_oe)

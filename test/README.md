@@ -9,6 +9,8 @@ make -C test -f Makefile.exec
 python3 -m cocotb_tools.check_results /tmp/acc-fp16-exec/results.xml
 make -C test -f Makefile.mem_itf
 python3 -m cocotb_tools.check_results /tmp/acc-mem-itf/results.xml
+make -C test -f Makefile.qspi
+python3 -m cocotb_tools.check_results /tmp/acc-qspi-burst/results.xml
 make -C test -f Makefile.micro
 python3 -m cocotb_tools.check_results /tmp/acc-micro/results.xml
 make -C test -f Makefile.data_ctrl
@@ -26,8 +28,11 @@ make -C test -f Makefile.activation
   accumulation, invalid accesses and reset cancellation using the OpenRAM model.
 - `Makefile.dma` checks random request/response delays, completion after writes,
   full-range validation, zero length, reset and fault draining. UART tests copy
-  all 512 B bit-for-bit, preserve adjacent SRAM halves and execution operands,
-  and run batched computation from DMA-loaded inputs.
+  all 512 B bit-for-bit in one Flash read transaction, preserve adjacent SRAM halves and execution operands,
+  and run computation from DMA-loaded inputs and weights.
+- `Makefile.qspi` checks burst bytes and CS continuity under random consumer
+  stalls, unaligned/page-crossing reads, busy polling, paused-stream abort, reset,
+  and fresh transactions after a burst. It compares single-byte/burst cycles.
 - `Makefile.micro` checks the emitted instruction stream under random stalls,
   automatic cur, zero columns, pointer carry, maximum loop counts, faults and reset.
   The UART tests check full SRAM partial-sum updates from Flash/SRAM operands,

@@ -40,9 +40,11 @@ jobs:
           # make will return success even if the tests fail, so check results.xml for failed tests
           python -m cocotb_tools.check_results results.xml
 
-      - name: Check shared activation and 512 B memory
+      - name: Check QSPI burst, shared activation and 512 B memory
         run: |
           cd test
+          make -f Makefile.qspi
+          python -m cocotb_tools.check_results /tmp/acc-qspi-burst/results.xml
           make -f Makefile.dma
           python -m cocotb_tools.check_results /tmp/acc-dma/results.xml
           make -f Makefile.micro

@@ -9,11 +9,15 @@
 //
 // One 8-bit request at a time. Mode 0, SCK = clk / 2.
 // req_addr must remain stable from acceptance until read_data_val.
+// abort_read closes a paused stream; it does not cancel an accepted byte.
 // req_write/req_data are captured on acceptance and may change afterward.
 // Board setup: PSRAMs in QPI; Flash in SPI with QE=1, not continuous read.
 // Flash program targets must already be erased/unprotected. No erase interface.
 // Separate device select: 00=Flash, 10=PSRAM A, 11=PSRAM B.
 // One data byte per request; every byte address is supported.
+// Flash read continuation keeps CS low and pauses SCK low between requests.
+// The caller supplies consecutive bytes and clears req_continue on the last.
+// No address counter or burst data buffer is duplicated here.
 // Status polling has no timeout/error port: failed WREN or permanent busy waits.
 // Reset aborts the bus transaction; it cannot undo a memory write already made.
 module qspi_ctrl (
@@ -23,6 +27,7 @@ module qspi_ctrl (
     input  wire req_val,
     output wire req_rdy,
     input  wire req_write,
+    input  wire req_continue, abort_read,
     input  wire [23:0] req_addr,
     input  wire [1:0] req_device,
     input  wire [8-1:0] req_data,
@@ -44,7 +49,7 @@ module qspi_ctrl (
     localparam [3:0]
         IDLE = 0, SELECT = 1, CMD = 2, ADDR = 3,
         DUMMY = 4, DATA = 5, STATUS = 6, DESELECT = 7,
-        CHECK = 8;
+        CHECK = 8, READ_PAUSE = 9;
 
     // Each Flash operation may require several separate CS transactions.
     localparam [2:0]
@@ -54,7 +59,7 @@ module qspi_ctrl (
     reg [3:0] state;
     reg [2:0] operation;
     reg [1:0] chip;
-    reg write_reg;
+    reg write_reg, continue_reg;
     reg [8-1:0] data_shift;
     reg [1:0] status_shift; // Keep only the last two status bits: WEL and WIP.
     reg [4:0] cycles_left;
@@ -76,7 +81,7 @@ module qspi_ctrl (
         (operation == WRITE_ENABLE ? 8'h06 : 8'h05);
 
     // Single-byte transfers accept both even and odd addresses.
-    assign req_rdy = rst_n && state == IDLE;
+    assign req_rdy = rst_n && (state == IDLE || (state == READ_PAUSE && !abort_read));
 
     // SPI headers/status keep Flash WP_n and HOLD_n high.
     // QPI headers and payloads use all four pins. Reads release the bus.
@@ -120,6 +125,7 @@ module qspi_ctrl (
             operation <= MEMORY;
             chip <= 0;
             write_reg <= 0;
+            continue_reg <= 0;
             data_shift <= 0;
             status_shift <= 0;
             cycles_left <= 0;
@@ -128,6 +134,10 @@ module qspi_ctrl (
             flash_sc_n <= 1;
             psram_a_sc_n <= 1;
             psram_b_sc_n <= 1;
+        end else if (abort_read && state == READ_PAUSE) begin
+            // A failed DMA must not leave Flash selected while host dispatch resumes.
+            state <= IDLE; sck <= 0; read_data_val <= 0; continue_reg <= 0;
+            flash_sc_n <= 1; psram_a_sc_n <= 1; psram_b_sc_n <= 1;
         end else begin
             read_data_val <= 0;
 
@@ -136,10 +146,20 @@ module qspi_ctrl (
                     if (req_val && req_rdy) begin
                         chip <= req_device;
                         write_reg <= req_write;
+                        continue_reg <= req_continue && !req_write && req_device == 0;
                         // Most significant nibble first.
                         data_shift <= req_data;
                         operation <= req_device[1] ? MEMORY : WAIT_READY;
                         state <= SELECT;
+                    end
+                end
+
+                READ_PAUSE: begin
+                    // SRAM can commit the preceding vector while the bus is paused.
+                    if (req_val && req_rdy) begin
+                        continue_reg <= req_continue;
+                        cycles_left <= 1;
+                        state <= DATA;
                     end
                 end
 
@@ -197,7 +217,10 @@ module qspi_ctrl (
                                     state <= DATA;
                                 end
                                 DATA: begin
-                                    state <= DESELECT;
+                                    if (continue_reg) begin
+                                        read_data_val <= 1;
+                                        state <= READ_PAUSE;
+                                    end else state <= DESELECT;
                                 end
                                 STATUS: state <= DESELECT;
                                 default: state <= DESELECT;
@@ -273,13 +296,16 @@ module qspi_ctrl (
         if (!rst_n)
             accepted_addr <= 0;
         else if (req_val && req_rdy) begin
+            if (state == READ_PAUSE && (req_write || req_device != 0 ||
+                accepted_addr == 24'hffffff || req_addr !== accepted_addr + 24'd1))
+                $fatal(1, "Flash burst requests must be consecutive reads");
             accepted_addr <= req_addr;
             if (req_device == 2'b01)
                 $fatal(1, "Reserved memory device selector");
             if (req_device[1] && req_addr[23])
                 $fatal(1, "PSRAM byte address must fit in 23 bits");
         end
-        else if (state != IDLE && req_addr !== accepted_addr)
+        else if (state != IDLE && state != READ_PAUSE && !abort_read && req_addr !== accepted_addr)
             $fatal(1, "qspi_ctrl req_addr changed before completion");
     end
 

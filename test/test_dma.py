@@ -31,6 +31,7 @@ async def copy_control(d):
                     assert int(d.busy.value) and not int(d.host_ready.value) and not int(d.core_valid.value)
                     assert int(d.mem_write.value)==writing and int(d.mem_read.value)==(not writing)
                     assert int(d.mem_addr.value)==(dst+4*i if writing else src+4*i)
+                    assert int(d.mem_read_continue.value)==(i<count-1)
                     await tick()
                 d.mem_ready.value=1;await tick();d.mem_ready.value=0
                 for _ in range(rng.randrange(1,10)):
