@@ -300,6 +300,7 @@ async def dma_burst_weights_to_micro(d):
     await h.instruction(0xb401);await h.sync()
     assert int(d.flash_read_ops.value)==before and not int(d.uo_out.value)&2
     for addr,expected in [(128,0x518050c0),(132,0x53005240)]:
+        d.observe_upper.value=bool(addr&4)
         await h.load(addr,1);await h.sync()
         assert int(d.mem_observe_data.value)==expected
 
@@ -324,5 +325,6 @@ async def dma_burst_reset(d):
     before=int(d.flash_read_ops.value)
     await h.dma_copy(0x804,508,1)
     assert int(d.flash_read_ops.value)==before+1
+    d.observe_upper.value=1
     await h.load(508,1);await h.sync()
     assert int(d.mem_observe_data.value)==0x7d017c00

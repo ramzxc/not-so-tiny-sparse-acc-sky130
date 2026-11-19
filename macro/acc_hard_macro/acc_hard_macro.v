@@ -1,9 +1,9 @@
 // IC Compiler II Version Y-2026.03 Verilog Writer
-// Generated on 11/19/2026 at 17:18:47
+// Generated on 11/19/2026 at 17:37:53
 // Library Name: acc_hard_macro.ndm
 // Block Name: acc_hard_macro
-// User Label: 
-// Write Command: write_verilog -include { all_physical_cells pg_netlist pg_objects } /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/pnr/runs/final_1795076321/acc_hard_macro.v
+// User Label: final
+// Write Command: write_verilog -include { all_physical_cells pg_netlist pg_objects } /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/pnr/runs/final_1795077467/acc_hard_macro.v
 module qspi_ctrl ( clk , rst_n , req_val , req_rdy , req_write , 
     req_continue , abort_read , req_addr , req_device , req_data , read_data , 
     read_data_val , sck , flash_sc_n , psram_a_sc_n , psram_b_sc_n , dq_in , 

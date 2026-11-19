@@ -1,6 +1,6 @@
 Hardened FP16 accelerator with 512 B SRAM
 
-ICC2 export: final_1795076321 (DMA Flash read bursts).
+ICC2 export: final_1795077467 (DMA Flash read bursts, SRAM LI1 routing excluded).
 Core location in the Tiny Tapeout wrapper: (5.52, 5.44) um, orientation N.
 Core dimensions: 1367.12 x 214.88 um.
 GDS contains the complete standard-cell and SRAM geometry.
