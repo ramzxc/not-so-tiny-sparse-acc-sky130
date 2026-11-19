@@ -32,7 +32,12 @@ module tb_data_postinc;
         @(negedge clk);mem_ready=0;
         repeat(4) begin tick();expect_addr(before_addr);end
         @(negedge clk);read_valid=1;tick();expect_addr(before_addr);
-        @(negedge clk);read_valid=0;mem_ready=1;tick();expect_addr(after_addr);
+        @(negedge clk);read_valid=0;mem_ready=1;
+        instruction=16'hffff;#1;
+        if(!ready || !operand_valid) $fatal(1,"SYNC must retire with operand capture");
+        instruction=16'h4000;#1;
+        if(ready) $fatal(1,"ordinary MEM cannot enter during operand capture");
+        tick();expect_addr(after_addr);
         repeat(3) begin tick();expect_addr(after_addr);end
     endtask
     initial begin
@@ -56,6 +61,16 @@ module tb_data_postinc;
         // Overflow remains invalid, never wraps to zero.
         address(24'hfffffe);issue(16'h4100);tick();expect_addr(24'hffffff);
         issue(16'h4100);tick();expect_addr(24'hffffff);
+        // A write SYNC may retire with the backend completion, never before it.
+        address(24'd80);issue(16'h9000);issue(16'h5500);
+        mem_ready=0;repeat(3)tick();expect_addr(80);
+        @(negedge clk);mem_ready=1;tick();
+        @(negedge clk);mem_ready=0;instruction=16'hffff;#1;
+        if(ready) $fatal(1,"SYNC passed a pending write");
+        repeat(3)tick();expect_addr(80);
+        @(negedge clk);mem_ready=1;#1;
+        if(!ready) $fatal(1,"SYNC missed write retirement");
+        tick();expect_addr(82);
         // Reset during a pending read cancels the increment and clears address.
         issue(16'h8000);address(24'd100);issue(16'h4500);mem_ready=0;tick();
         @(negedge clk);rst_n=0;tick();expect_addr(0);

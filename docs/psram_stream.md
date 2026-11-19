@@ -125,7 +125,7 @@ make -f test/Makefile.psram_network
 ```
 
 `prepare_psram_network.py` builds a board-preloaded PSRAM image with the program
-at 0x600000. Its input DMA is omitted: the input is supplied only through UART.
+at 0x300000 (below the raw-input queue reserved at 0x400000). Its input DMA is omitted: the input is supplied only through UART.
 `psram_stream_host.py` is the corresponding host sender (pyserial for its CLI).
 Tests are functional RTL simulation, not hardware or physical timing signoff.
 

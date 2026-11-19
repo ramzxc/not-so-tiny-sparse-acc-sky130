@@ -67,7 +67,13 @@ module data_ctrl (
 
     // STORE waits for at least one result, not for a coincident valid pulse.
     // Software uses SYNC if it needs a newer EXEC result instead of the held one.
-    assign data_rdy = rst_n && state == IDLE && mem_itf_rdy &&
+    // SYNC can retire on the operand-capture/write-retirement edge itself.
+    // Ordinary instructions still require IDLE: no second request is accepted
+    // while DELIVER/WAIT performs its final state or pointer update.
+    wire sync_only=opcode==`OPCODE_SYNC && compact_kind>=12;
+    wire retiring=state==DELIVER || (state==WAIT && write_reg);
+    assign data_rdy = rst_n && mem_itf_rdy &&
+        (state==IDLE || (sync_only && retiring)) &&
         (!store_result || result_valid);
     // Lane 0 occupies the lowest byte address and least-significant data bits.
     // MEM bit 8 optionally advances the address after the complete vector.
@@ -178,8 +184,8 @@ module data_ctrl (
                     end
                 end
 
-                // exec_unit captures the operand at this edge. A following
-                // SYNC cannot retire before that capture has completed.
+                // exec_unit captures the operand at this edge. Only SYNC may
+                // retire concurrently; a dependent instruction follows next cycle.
                 DELIVER: state <= IDLE;
                 default: state <= IDLE;
             endcase

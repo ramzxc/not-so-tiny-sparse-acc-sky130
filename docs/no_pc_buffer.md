@@ -102,3 +102,11 @@ The prior physical-fit result does not apply to this added logic. Next work,
 if retaining this branch, is to reduce compute service demand, validate continuous
 recurrent state carry and test real UART/QSPI timing; request synthesis separately
 before judging whether the added logic still fits 8×2 tiles.
+
+## Follow-up
+
+The initial comparison above is preserved as the pre-optimization baseline.
+[Subsequent control optimization and whole-recording queue analysis](no_pc_optimization.md)
+use no per-input deadline. New program images and the streaming runner now place
+instructions at 0x300000, outside the queue; the original short-run fixture used
+0x600000 and did not exercise enough slots to reach that overlap.

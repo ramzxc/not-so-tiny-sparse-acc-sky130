@@ -80,7 +80,9 @@ module micro_ctrl (
         core_inst = host_inst;
         if (busy) begin
             case (state)
-                I_DATA: core_inst = batched ? (16'h8100 | {4'b0,sparse,1'b0,cur,9'b0}) : 16'h8000; // input pair, vector mode
+                I_DATA: core_inst = compact_sram ?
+                    {3'b111,(batched ? (4'd2+{2'b0,sparse,cur}) : 4'd0),read_input_addr[9:1]} :
+                    batched ? (16'h8100 | {4'b0,sparse,1'b0,cur,9'b0}) : 16'h8000; // input pair, vector mode
                 I_LO: core_inst = {4'h2,read_input_addr[11:0]};
                 I_HI: core_inst = {4'h3,read_input_addr[23:12]};
                 I_MEM: core_inst = 16'h4000 | {5'b0,input_sram,10'b0};
@@ -179,7 +181,7 @@ module micro_ctrl (
             end
         end else begin
             case (state)
-                I_DATA: if (fire) state <= I_LO;
+                I_DATA: if (fire) state <= compact_sram ? I_SYNC : I_LO;
                 I_LO: if (fire) state <= I_HI;
                 I_HI: if (fire) state <= I_MEM;
                 I_MEM: if (fire) state <= I_SYNC;

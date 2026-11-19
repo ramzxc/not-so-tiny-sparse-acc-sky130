@@ -7,6 +7,8 @@ def expand_compact(w):
     if w>>13!=7 or ((w>>9)&15)>=12:return [w]
     kind=(w>>9)&15;a=(w&511)*2
     if kind==11:return [0x9000,0x2000|a,0x5600]
+    if kind==0:return [0x8000,0x2000|a,0x3000,0x4400]
+    if 2<=kind<=5:return [0x8100|((kind>=4)<<11)|((kind&1)<<9),0x2000|a,0x3000,0x4400]
     if kind==1:mode=0x8400
     elif 6<=kind<=9:mode=0x8500|((kind>=8)<<11)|((kind&1)<<9)
     else:raise AssertionError(f'unexpected MICRO compact op {w:04x}')

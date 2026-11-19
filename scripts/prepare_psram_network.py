@@ -17,7 +17,7 @@ for ds in range(4):
         tagged=compact_sram(tagged)
         words=[w&65535 for w in tagged]
         (case/'phases.hex').write_text(''.join(f'{w>>16:x}\n' for w in tagged))
-        base=0x600000
+        base=0x300000
         with (case/'psram.hex').open('w') as f:
             f.write((case/'flash.hex').read_text());f.write(f'@{base:x}\n')
             for w in words:f.write(f'{w&255:02x}\n{w>>8:02x}\n')

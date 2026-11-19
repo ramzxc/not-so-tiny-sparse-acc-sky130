@@ -26,7 +26,7 @@ def prepare(dataset, step):
     case.mkdir(parents=True, exist_ok=True)
     tagged = compact_sram([int(w, 16) for w in (original / 'commands.hex').read_text().split()
                            if int(w, 16) >> 16 != 65535])
-    base = 0x600000
+    base = 0x300000
     (case / 'psram.hex').write_text((original / 'flash.hex').read_text() + f'@{base:x}\n' +
                                   ''.join(f'{w & 255:02x}\n{(w >> 8) & 255:02x}\n' for w in tagged))
     (case / 'phases.hex').write_text(''.join(f'{w >> 16:x}\n' for w in tagged))
