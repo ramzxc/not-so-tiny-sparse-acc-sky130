@@ -10,11 +10,11 @@
     "macro/acc_hard_macro/acc_hard_macro.v": "eb0a2588327e78bccea4488730430f825a8472c801b896fd4a44690786c19d82",
     "memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.lvs.sp": "aecf2d431c88a9e6a144f23c69ec1eae3442e8054eb3da9a8ea30721d195bf3b",
     "macro/acc_hard_macro/acc_hard_macro.lvs.spice": "873fd4b771b223f904c3502cb205a37382da07b649a3c20be88b62ef814a0f5a",
-    "macro/acc_hard_macro/sram.lvs_micron.spice": "f6e25d29d38a08721eed0578a2933c8f27126d5644952567706ff15f3e66b163"
+    "macro/acc_hard_macro/sram.lvs_micron.spice": "02f4bea9e5339eee87b278366e3627d03dd5289b8a7094d2b7e5bf3d4e0b6f41"
   },
   "lvs_nfet_rule": {
-    "model": null,
-    "width_lt_um": null
+    "model": "sky130_fd_pr__special_nfet_01v8",
+    "width_lt_um": "0.42"
   },
   "packaging": "Added top PR boundary and exactly rescaled GDS database units without rounding; manufacturing geometry unchanged."
 }
