@@ -2,13 +2,13 @@
 `define ACC_DEFS_VH
 
 `ifndef DATA_WIDTH
-`define DATA_WIDTH 16
+`define DATA_WIDTH 8
 `endif
 `ifndef COMPUTE_WIDTH
 `define COMPUTE_WIDTH 2
 `endif
 
-// FP16 arithmetic uses the module-local defs/fp16_math.vh functions.
+// FP8 E4M3FN, RNE, finite saturation. Two lanes share one physical MAC.
 // The instruction encoding is the tiny rebuild 16-bit ISA.
 `define INST_WIDTH 16
 `define INST_OP_WIDTH 3

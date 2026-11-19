@@ -1,0 +1,25 @@
+{
+  "files": {
+    "tt_sram_1rw_64x128_buffered_sky130.gds": {
+      "source": "/docker/projects/tapeout/not-so-tiny-sparse-acc-sky130-ci-fp8-1k/memory/openram/runs/1kib_output_buffer_20261119/repaired/tt_sram_1rw_64x128_buffered_sky130.gds",
+      "sha256": "ef8c1afb303770916f4b8af3910b30c3967dbaa52e3233fafa987650e641b278"
+    },
+    "tt_sram_1rw_64x128_buffered_sky130.lef": {
+      "source": "/docker/projects/tapeout/not-so-tiny-sparse-acc-sky130-ci-fp8-1k/memory/openram/runs/1kib_output_buffer_20261119/repaired/tt_sram_1rw_64x128_buffered_sky130.lef",
+      "sha256": "1d2667716688362f9d95bd0c0ea97648e1d123adb9fadeef405e3d027bf1ab3e"
+    },
+    "tt_sram_1rw_64x128_buffered_sky130.lvs.sp": {
+      "source": "/docker/projects/tapeout/not-so-tiny-sparse-acc-sky130-ci-fp8-1k/memory/openram/runs/1kib_output_buffer_20261119/repaired/tt_sram_1rw_64x128_buffered_sky130.lvs.sp",
+      "sha256": "04866e7dfe3f311f4a44090a9f313b95ea7d60e09445f7edd4ab2962940c9074"
+    },
+    "tt_sram_1rw_64x128_buffered_sky130.v": {
+      "source": "/docker/projects/tapeout/not-so-tiny-sparse-acc-sky130-ci-fp8-1k/memory/openram/runs/1kib_output_buffer_20261119/full/tt_sram_1rw_64x128_buffered_sky130.v",
+      "sha256": "b29913e9458adbd6395dfb9ee5f2f69e5f3bad6f30b23e962d43f50adc88cb0a"
+    },
+    "tt_sram_1rw_64x128_buffered_sky130_TT_1p8V_25C.lib": {
+      "source": "/docker/projects/tapeout/not-so-tiny-sparse-acc-sky130-ci-fp8-1k/memory/openram/runs/1kib_output_buffer_20261119/full/tt_sram_1rw_64x128_buffered_sky130_TT_1p8V_25C.lib",
+      "sha256": "cc8ec70e232138d3ca8f8f39548397eb3aff248f0579afbfa75c7249a163b732"
+    }
+  },
+  "note": "Repaired physical views; behavioral model and analytical TT Liberty from the same buffered run. Not extracted timing signoff."
+}

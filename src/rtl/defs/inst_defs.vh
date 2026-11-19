@@ -11,13 +11,13 @@
 `define OPCODE_DMA    3'b110
 `define OPCODE_SYNC   3'b111
 
-// Blocking Flash -> SRAM copy. Address commands capture ordinary ADDR.
+// Blocking PSRAM -> SRAM copy. Address commands capture ordinary ADDR.
 `define DMA_SOURCE 3'd0
 `define DMA_DEST   3'd1
 `define DMA_RUN    3'd2
 `define INST_DMA_SOURCE {`OPCODE_DMA, `DMA_SOURCE, 10'b0}
 `define INST_DMA_DEST   {`OPCODE_DMA, `DMA_DEST, 10'b0}
-// Count is an 8-bit number of 4-byte vectors (0..128); zero is a no-op.
+// Count is an 8-bit number of 2-byte vectors (0..255); zero is a no-op.
 `define INST_DMA_RUN(count) {`OPCODE_DMA, `DMA_RUN, 2'b0, (count)}
 
 // Fixed column sequencer configuration. Address commands capture the current ADDR.
@@ -28,6 +28,11 @@
 `define MICRO_COLUMNS 3'd4
 `define MICRO_RUN     3'd5
 `define MICRO_BATCH   3'd6
+`define MICRO_TILE    3'd7
+// TILE bit 0 selects the captured ADDR: SRAM buffer (0), PSRAM column stride (1).
+// A zero stride uses the packed width (2 * GROUPS bytes).
+`define INST_MICRO_BUFFER {`OPCODE_MICRO, `MICRO_TILE, 10'b0}
+`define INST_MICRO_STRIDE {`OPCODE_MICRO, `MICRO_TILE, 9'b0, 1'b1}
 // 1..128; reset default is 1. Use an 8-bit count.
 `define INST_MICRO_BATCH(count) {`OPCODE_MICRO, `MICRO_BATCH, 2'b0, (count)}
 `define INST_MICRO_INPUT(sram) {`OPCODE_MICRO, `MICRO_INPUT, 9'b0, (sram)}
@@ -36,6 +41,8 @@
 `define INST_MICRO_GROUPS(count) {`OPCODE_MICRO, `MICRO_GROUPS, 2'b0, (count)}
 `define INST_MICRO_COLUMNS(count) {`OPCODE_MICRO, `MICRO_COLUMNS, 2'b0, (count)}
 `define INST_MICRO_RUN(sparse) {`OPCODE_MICRO, `MICRO_RUN, 9'b0, (sparse)}
+// RUN bit 1 enables automatic PSRAM -> SRAM weight tiles for the configured batch.
+`define INST_MICRO_RUN_DMA(sparse) {`OPCODE_MICRO, `MICRO_RUN, 8'b0, 1'b1, (sparse)}
 
 // opcode: nop
 `define NOP 16'b0000000000000000
@@ -73,6 +80,13 @@
 `define DATA_INPUT  1'b0
 `define DATA_WEIGHT 1'b1
 
+// Compact SRAM operations use opcode 111, subcode [12:9] 0..11.
+// [8:0] is the aligned two-byte SRAM vector address. FFFF remains SYNC.
+// 0 input vector, 1 weight vector; 2..5 input scalar (dense0/1,sparse0/1);
+// 6..9 weight scalar (dense0/1,sparse0/1); 10 STORE, 11 STORE+accumulate.
+// Noncanonical legacy SYNC aliases in E000..F7FF are now these operations.
+`define INST_SRAM_COMPACT(kind, vector_addr) {3'b111,(kind),(vector_addr)}
+
 // opcode: SYNC
 `define SYNC 16'b1111111111111111
 
@@ -89,7 +103,7 @@
 `define INST_ADDR_HIGH(addr) {`OPCODE_ADDR, `ADDR_HIGH, (addr)}
 
 // MEM: [15:13] opcode, [12] read/write, [11:10] device, [9] SRAM accumulate, [8] post-increment, [7:0] reserved.
-// Device: 00=Flash, 01=local SRAM; 10/11 unsupported on this design.
+// Device: 00=PSRAM, 01=local SRAM; 10/11 unsupported on this design.
 `define INST_MEM_READ_DEVICE(dev)  {`OPCODE_MEM, `MEM_READ,  (dev), 10'b0}
 `define INST_MEM_WRITE_DEVICE(dev) {`OPCODE_MEM, `MEM_WRITE, (dev), 10'b0}
 `define INST_MEM_READ  `INST_MEM_READ_DEVICE(2'b00)
@@ -99,7 +113,7 @@
 // SRAM-only memory accumulation uses formerly reserved MEM bit 9.
 `define INST_SRAM_ACCUMULATE {`OPCODE_MEM, `MEM_WRITE, 2'b01, 1'b1, 9'b0}
 
-// Optional post-increment (+4 bytes) for any MEM preset, including accumulation.
+// Optional post-increment (+2 bytes) for any MEM preset, including accumulation.
 `define INST_MEM_POSTINC(inst) ((inst) | 16'h0100)
 `define INST_SRAM_READ_INC `INST_MEM_POSTINC(`INST_SRAM_READ)
 `define INST_SRAM_WRITE_INC `INST_MEM_POSTINC(`INST_SRAM_WRITE)

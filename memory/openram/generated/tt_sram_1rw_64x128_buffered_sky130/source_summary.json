@@ -1,0 +1,50 @@
+{
+  "macro": "tt_sram_1rw_64x128_buffered_sky130",
+  "capacity_bytes": 1024,
+  "usable_word_bits": 64,
+  "words": 128,
+  "output_buffers_including_spare": 65,
+  "width_um": 842.335,
+  "height_um": 214.355,
+  "area_um2": 180558.718925,
+  "baseline_area_um2": 180155.731525,
+  "physical": {
+    "drc_errors": 0,
+    "lvs_errors": 0,
+    "lvs_property_errors": false,
+    "final_verification": true,
+    "checked_sha256": {
+      ".gds": "ef8c1afb303770916f4b8af3910b30c3967dbaa52e3233fafa987650e641b278",
+      ".lvs.sp": "04866e7dfe3f311f4a44090a9f313b95ea7d60e09445f7edd4ab2962940c9074"
+    }
+  },
+  "klayout_drc": 0,
+  "schematic_output_stage_load_fF": 150,
+  "schematic_results": {
+    "TT_1p8_25C": {
+      "old_rise": 8.896258e-10,
+      "new_rise": 1.161649e-10,
+      "old_read1": 5.252434e-08,
+      "new_read1": 1.064399e-07,
+      "old_read2": 1.799684,
+      "new_read2": 1.8
+    },
+    "SS_1p62_100C": {
+      "old_rise": 1.459894e-09,
+      "new_rise": 1.637767e-10,
+      "old_read1": 6.07773e-08,
+      "new_read1": 4.596808e-07,
+      "old_read2": 1.604831,
+      "new_read2": 1.62
+    },
+    "FF_1p98_minus40C": {
+      "old_rise": 6.249334e-10,
+      "new_rise": 7.920398e-11,
+      "old_read1": 3.632889e-08,
+      "new_read1": 2.021793e-08,
+      "old_read2": 1.979995,
+      "new_read2": 1.98
+    }
+  },
+  "integration_status": "NOT integrated; not pushed; timing Liberty remains analytical with old load grid; no extracted full-SRAM PVT characterization or new core PnR/STA yet"
+}

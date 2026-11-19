@@ -1,5 +1,5 @@
 `include "defs/defs.vh"
-// Wire-protocol bytes stay 8 bits independently of FP16 compute width.
+// Wire-protocol bytes stay 8 bits independently of the compute format.
 
 module uart_tx #(
     parameter integer CLKS_PER_BIT = 87 // for 115200 baud, 10MHz clk

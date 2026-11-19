@@ -1,5 +1,5 @@
 `include "defs/defs.vh"
-// Wire-protocol bytes stay 8 bits independently of FP16 compute width.
+// Wire-protocol bytes stay 8 bits independently of the compute format.
 
 // Collect `INST_WIDTH/8 UART bytes, low byte first, into one external job.
 module uart_rx # (
@@ -10,6 +10,7 @@ module uart_rx # (
 
     output reg [`INST_WIDTH-1:0] inst,
     output reg inst_val,
+    output reg error,
 
     input  wire rx
 );
@@ -38,6 +39,7 @@ module uart_rx # (
     always @(posedge clk) begin
         if (!rst_n) begin
             inst_val <= 0;
+            error <= 0;
             inst <= 0;
             rx_meta <= 0;
             rx_sync <= 0;
@@ -107,7 +109,8 @@ module uart_rx # (
                                     state <= IDLE;
                                 end
                                 else begin
-                                    // error for PC..?
+                                    // Framing failure invalidates the current host frame until reset.
+                                    error <= 1;
                                     state <= RESET;
                                 end
                             end

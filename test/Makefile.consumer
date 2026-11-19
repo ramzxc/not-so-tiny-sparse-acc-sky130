@@ -1,0 +1,18 @@
+# From repository root; requires converted FP8 data and full software traces.
+BUILD ?= /tmp/acc-fp8-consumer
+UART_BUILD ?= /tmp/acc-fp8-consumer-uart
+.PHONY: all build fixtures run uart summary
+all: build fixtures run uart summary
+build:
+	verilator --binary --timing -j 2 -Wno-fatal --top-module tb_fp8_consumer --Mdir $(BUILD) -f src/sources.f memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.v test/qspi_nor_model.sv test/tb_fp8_consumer.sv
+fixtures:
+	python3 scripts/prepare_fp8_network.py --consumer
+	python3 scripts/prepare_fp8_network.py --consumer --holdouts
+run:
+	python3 scripts/run_fp8_network.py --cases consumer_cases.json --jobs 3 --binary $(BUILD)/Vtb_fp8_consumer
+	python3 scripts/run_fp8_network.py --cases consumer_holdout_cases.json --jobs 3 --binary $(BUILD)/Vtb_fp8_consumer
+uart:
+	verilator --binary --timing -j 2 -Wno-fatal --top-module tb_fp8_consumer -GDIRECT_FEED=0 --Mdir $(UART_BUILD) -f src/sources.f memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.v test/qspi_nor_model.sv test/tb_fp8_consumer.sv
+	python3 scripts/run_fp8_network.py --cases consumer_cases.json --limit 3 --jobs 3 --binary $(UART_BUILD)/Vtb_fp8_consumer --report-name uart87_export
+summary:
+	python3 scripts/summarize_fp8_consumer.py

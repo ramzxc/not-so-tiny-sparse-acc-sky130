@@ -1,0 +1,10 @@
+# Run from repository root, after generating FP8 Bishop reference traces.
+BUILD ?= /tmp/acc-psram-network
+.PHONY: all build fixtures run
+all: build fixtures run
+build:
+	verilator --binary --timing -j 2 -Wno-fatal --top-module tb_psram_network --Mdir $(BUILD) -f src/sources.f memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.v test/qspi_psram_model.sv test/tb_psram_stream.sv test/tb_psram_network.sv
+fixtures:
+	python3 scripts/prepare_psram_network.py
+run:
+	python3 scripts/run_psram_network.py --binary $(BUILD)/Vtb_psram_network

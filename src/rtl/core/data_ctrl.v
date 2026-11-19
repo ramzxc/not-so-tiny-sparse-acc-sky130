@@ -51,11 +51,18 @@ module data_ctrl (
     reg load_weight;
     reg write_reg;
     reg auto_increment;
-    localparam integer VECTOR_BYTES = `DATA_WIDTH * `COMPUTE_WIDTH / 8;
+    localparam [23:0] VECTOR_BYTES = `DATA_WIDTH * `COMPUTE_WIDTH / 8;
     reg result_valid;
 
     wire [2:0] opcode = data_inst_in[15:13];
-    wire store_result = opcode == `OPCODE_DATA && data_inst_in[12] == `DATA_STORE;
+    wire [3:0] compact_kind=data_inst_in[12:9];
+    wire compact=opcode==`OPCODE_SYNC && compact_kind<12;
+    wire compact_store=compact_kind>=10;
+    wire compact_weight=compact_kind==1 || compact_kind>=6;
+    wire compact_scalar=compact_kind>=2;
+    wire compact_sparse=compact_kind==4 || compact_kind==5 || compact_kind==8 || compact_kind==9;
+    wire store_result = (opcode == `OPCODE_DATA && data_inst_in[12] == `DATA_STORE) ||
+                        (compact && compact_store);
     wire accept = data_inst_in_val && data_rdy;
 
     // STORE waits for at least one result, not for a coincident valid pulse.
@@ -129,7 +136,7 @@ module data_ctrl (
                             if (data_inst_in[12] == `MEM_READ &&
                                 load_weight && sparse_en && input_zero) begin
                                 // No bus request. Supply zero instead of an old
-                                // weight (which could even be NaN in FP16).
+                                // weight (which could even be NaN in FP8).
                                 exec_data_out       <= 0;
                                 exec_data_out_val   <= 1;
                                 exec_data_is_weight <= 1;
@@ -139,6 +146,20 @@ module data_ctrl (
                             end
                         end
 
+                        `OPCODE_SYNC: if(compact)begin
+                            base_addr<={14'b0,data_inst_in[8:0],1'b0};
+                            device<=`MEM_SRAM;auto_increment<=0;
+                            write_reg<=compact_store;write_accumulate<=compact_kind==11;
+                            if(compact_store)begin
+                                write_buffer<=exec_data_in;state<=SEND;
+                            end else begin
+                                load_weight<=compact_weight;sparse_en<=compact_sparse;
+                                input_scalar_mode<=compact_scalar;input_select<=compact_kind[0];
+                                if(compact_weight && compact_sparse && input_zero_mask[compact_kind[0]])begin
+                                    exec_data_out<=0;exec_data_out_val<=1;exec_data_is_weight<=1;state<=DELIVER;
+                                end else state<=SEND;
+                            end
+                        end
                         default: begin end
                     endcase
                 end
@@ -167,8 +188,8 @@ module data_ctrl (
 
 `ifndef SYNTHESIS
     initial begin
-        if (`DATA_WIDTH != 16 || `COMPUTE_WIDTH < 1)
-            $fatal(1, "data_ctrl requires FP16 elements and a valid positive lane count");
+        if (`DATA_WIDTH != 8 || `COMPUTE_WIDTH < 1)
+            $fatal(1, "data_ctrl requires FP8 elements and a valid positive lane count");
     end
     // Invalid regions are rejected by mem_itf and reported on its error output.
 `endif

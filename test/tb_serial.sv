@@ -1,5 +1,5 @@
 `timescale 1ns/1ps
-module tb_serial;
+module tb_serial #(parameter integer UART_CLKS_PER_BIT = 8);
     logic clk, rst_n, ena;
     logic [7:0] ui_in;
     wire [7:0] uo_out, uio_in, uio_out, uio_oe;
@@ -9,6 +9,7 @@ module tb_serial;
     wire [31:0] flash_observe_data = {flash_model.mem[flash_observe_addr+3],
         flash_model.mem[flash_observe_addr+2],flash_model.mem[flash_observe_addr+1],flash_model.mem[flash_observe_addr]};
     wire [31:0] flash_read_ops = flash_model.read_ops;
+    string perf_flash_file;
     initial begin
         #1;
         flash_model.mem[16'h0400] = 8'h00;
@@ -59,6 +60,20 @@ module tb_serial;
         flash_model.mem[16'h0515] = 8'h49;
         flash_model.mem[16'h0516] = 8'h00;
         flash_model.mem[16'h0517] = 8'h4a;
+        // Four packed samples, three columns: [[0,1,0],[0,0,2],[0,-2,0],[0,0,3]].
+        // Column 0 is all zero (including -0); columns 1/2 need one burst each.
+        for (integer i=0; i<32; i=i+1) flash_model.mem[16'h0600+i] = 0;
+        flash_model.mem[16'h0603] = 8'h3c;
+        flash_model.mem[16'h0605] = 8'h80;
+        flash_model.mem[16'h060b] = 8'hc0;
+        flash_model.mem[16'h0615] = 8'h40;
+        flash_model.mem[16'h061d] = 8'h42;
+        // Performance fixtures: nonzero packed pairs and a zero initialization tile.
+        for (integer i=0; i<32; i=i+1) begin
+            {flash_model.mem[16'h0a00+4*i+3],flash_model.mem[16'h0a00+4*i+2],
+             flash_model.mem[16'h0a00+4*i+1],flash_model.mem[16'h0a00+4*i]} = 32'h40003c00;
+        end
+        for (integer i=0; i<256; i=i+1) flash_model.mem[16'h0b00+i] = 0;
         // Arbitrary bits include signed zeros, subnormals, infinities and NaNs.
         for (integer i=0; i<512; i=i+1)
             flash_model.mem[16'h0800+i] = 8'((i*37+11) ^ (i>>1));
@@ -123,6 +138,9 @@ module tb_serial;
         flash_model.mem[16'h0325] = 8'h7e;
         flash_model.mem[16'h0326] = 8'h00;
         flash_model.mem[16'h0327] = 8'h7e;
+        // Optional external-memory stimulus for performance replay (not a core preload).
+        if ($value$plusargs("perf_flash_file=%s", perf_flash_file))
+            $readmemh(perf_flash_file, flash_model.mem);
     end
     wire [3:0] flash_dq;
 `ifdef GL_TEST
@@ -130,11 +148,11 @@ module tb_serial;
     // invalidates dout0 on the next rising edge, long before UART SYNC returns.
     // Do not sample that idle X window or initialize the SRAM contents.
     reg [64:0] mem_observe_row;
-    always @(negedge dut.core.itf.memory.size_512_macro.clk0) begin
-        if (!dut.core.itf.memory.size_512_macro.csb0_reg &&
-             dut.core.itf.memory.size_512_macro.web0_reg) begin
-            #(dut.core.itf.memory.size_512_macro.DELAY + 1);
-            mem_observe_row = dut.core.itf.memory.size_512_macro.dout0;
+    always @(negedge dut.\core.itf.memory.size_512.macro .clk0) begin
+        if (!dut.\core.itf.memory.size_512.macro .csb0_reg &&
+             dut.\core.itf.memory.size_512.macro .web0_reg) begin
+            #(dut.\core.itf.memory.size_512.macro .DELAY + 1);
+            mem_observe_row = dut.\core.itf.memory.size_512.macro .dout0;
         end
     end
     wire [31:0] mem_observe_data = observe_upper ? mem_observe_row[63:32] : mem_observe_row[31:0];
@@ -145,8 +163,20 @@ module tb_serial;
         .uio_in(uio_in), .uio_out(uio_out), .uio_oe(uio_oe), .VPWR(VPWR), .VGND(VGND)
     );
 `else
+    // Cumulative counters for the optional throughput benchmark (testbench only).
+    logic [63:0] perf_dma_cycles=0, perf_micro_cycles=0, perf_total_cycles=0;
+    always @(posedge clk) begin
+        perf_total_cycles <= perf_total_cycles + 1;
+        if (dut.dma_busy) perf_dma_cycles <= perf_dma_cycles + 1;
+        if (dut.micro_busy) perf_micro_cycles <= perf_micro_cycles + 1;
+    end
     wire [31:0] mem_observe_data = dut.itf.read_data;
-    acc_hard_macro #(.UART_CLKS_PER_BIT(8)) dut (
+    // Read-only output snapshot: checking completion must not add UART waits.
+    wire [4095:0] perf_sram_snapshot;
+    for (genvar row=0; row<64; row=row+1) begin : perf_observe_sram
+        assign perf_sram_snapshot[64*row+:64] = dut.itf.memory.size_512.macro.mem[row][63:0];
+    end
+    acc_hard_macro #(.UART_CLKS_PER_BIT(UART_CLKS_PER_BIT)) dut (
         .clk(clk), .rst_n(rst_n), .uart_rx_i(ui_in[3]),
         .qspi_dq_i({uio_in[5:4], uio_in[2:1]}),
         .uo_out(uo_out), .uio_out(uio_out), .uio_oe(uio_oe)

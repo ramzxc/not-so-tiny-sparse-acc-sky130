@@ -1,112 +1,94 @@
 ## How it works
 
-Not-So-Tiny Sparse Accelerator is an FP16 accelerator for Tiny Tapeout SKY130
-8×2 tiles. It uses the tiny-sparse-acc rebuild structure: UART, instruction FIFO,
-decoder, data control, execution unit, memory interface and QSPI controller.
-DATA can select either prefetched input element and broadcast it to both lanes
-for column-wise computation. Sparse mode tests that selected element.
-Instructions are 16 bits. Two FP16 lanes share one arithmetic multiplier and
-adder. ReLU, hard sigmoid, hard tanh, STEP, accumulation and sparse weight reads
-are supported. Hard sigmoid clamps `x/4 + 0.5` to `[0,1]`; hard tanh clamps
-`x` to `[-1,1]`. Arithmetic remains FP16.
+Current physical macro: buffered 1 KiB SRAM, configured on the right; see
+[sram_right_placement.md](sram_right_placement.md) for geometry and validation limits.
 
-A small micro sequencer can run a fixed column-wise loop. It loads input pairs,
-selects each element, reads weights and accumulates products into SRAM. Configure
-the input count, number of output groups and batch size, then issue RUN and SYNC.
-Batch size 1 keeps the original order. Larger batches reuse each weight vector
-across samples and keep separate SRAM partial sums.
+Not-So-Tiny Sparse Accelerator targets Tiny Tapeout SKY130 8×2 tiles. Its two
+FP8 E4M3FN architectural lanes share one multiplier and arithmetic adder. The
+existing 1 KiB OpenRAM macro stores inputs, states and working tiles. ReLU,
+hard sigmoid/tanh, STEP, FP8 accumulation and sparse weight reads are supported.
 
-The memory interface selects external Flash or internal 512 B SRAM. PSRAM is
-not used. A small blocking DMA copies Flash blocks to SRAM without arithmetic.
-Set source, destination and length, then wait for completion before RUN.
+The MCU loads program and weights from Flash into PSRAM A before enabling the
+chip. UART then supplies configuration and input payloads. The frontend fetches
+up to four existing 16-bit instructions per PSRAM transaction and replays the
+configured program for each input. It has no branch/loop engine or second cache.
+MICRO retains its generic column/batch loops and sparse automatic DMA behavior.
 
-This branch tests the ICC2 core GDS as a hard macro. GitHub Actions builds
-and routes the Tiny Tapeout wrapper around it. The core includes the 512 B
-SRAM. Full DRC and LVS remain enabled.
+Instruction fetch and data access share one bounded QPI controller through a
+transaction-owner arbiter. DMA transfers up to one SRAM row at a time using
+the existing row buffer; compact SRAM commands reduce setup traffic. PSRAM A is the only external memory visible to the
+chip; Flash and PSRAM B are deselected. SRAM accesses and FP8 execution keep their
+existing dependency/SYNC contract. See [PSRAM stream](psram_stream.md) for the
+complete UART, boot and ownership contract, and [rebuild](rebuild.md) for the ISA.
 
 ### Source files
 
 | Path | Contents |
-| --- | --- |
-| `src/rtl/project.v` | Logical top (`acc_hard_macro`) and module connections |
-| `src/rtl/core/` | Micro sequencer, FIFO, decoder, data control, FP16 execution and activation |
-| `src/rtl/uart/` | UART receiver and READY transmitter |
-| `src/rtl/defs/` | Instruction and width definitions |
-| `src/rtl/mem_itf.sv` | Flash/SRAM selection and vector transfers |
-| `src/rtl/shared_sram.sv` | OpenRAM macro connection |
-| `src/rtl/qspi_ctrl.v` | Byte transfers to Flash |
-| `src/sources.f` | RTL source list |
-| `memory/openram/` | SRAM models and physical views |
-| `macro/acc_hard_macro/` | Current ICC2 core GDS, LEF, netlist, and parasitics |
-
-The existing post-route netlist is
-[acc_hard_macro.v](../macro/acc_hard_macro/acc_hard_macro.v).
-New local synthesis writes `syn/runs/<run>/acc_hard_macro_gate.v`.
-See [the design notes](rebuild.md) for instruction and arithmetic details.
+|---|---|
+| `src/rtl/project.v` | Core wiring and reset synchronization |
+| `src/rtl/core/program_ctrl.v` | UART framing, input commit, sequential program fetch/replay |
+| `src/rtl/psram_arbiter.v` | Exclusive fetch/data transaction ownership |
+| `src/rtl/core/micro_ctrl.v` | Generic column/batch sequencer |
+| `src/rtl/core/dma_ctrl.v` | PSRAM-to-SRAM vector copies |
+| `src/rtl/core/data_ctrl.v` | Address, operand selection, sparse reads and store snapshots |
+| `src/rtl/core/exec_unit.sv` | FP8 arithmetic and activations |
+| `src/rtl/mem_itf.sv` | Ordinary vectors, row-bounded DMA and SRAM RMW |
+| `src/rtl/qspi_ctrl.v` | PSRAM A QPI 0B/02 transfers |
+| `src/rtl/shared_sram.sv` | Existing 64x128 OpenRAM macro |
+| `src/rtl/uart/` | UART word receiver and READY transmitter |
 
 ### Pins and clocks
 
-| Pin | Current RTL signal |
-| --- | --- |
-| `ui_in[3]` | UART RX, idle high |
-| `uo_out[0]` | Decoder ready |
-| `uo_out[1]` | Sticky memory/sequencer error; clear with reset |
+| Pin | Signal |
+|---|---|
+| `ui_in[3]` | UART RX |
+| `uo_out[0]` | Frontend idle/configuring; not a UART credit |
+| `uo_out[1]` | Sticky host/UART/memory/sequencer fault |
 | `uo_out[4]` | UART TX: READY credits |
-| `uio[0]` | Flash CS_N |
-| `uio[1]`, `uio[2]`, `uio[4]`, `uio[5]` | QSPI DQ0, DQ1, DQ2, DQ3 |
-| `uio[3]` | QSPI SCK |
-| `uio[6]`, `uio[7]` | Unused PSRAM selects, held high after reset |
+| `uio[0]` | Flash CS_N held high while active |
+| `uio[1]`, `uio[2]`, `uio[4]`, `uio[5]` | QPI DQ0..DQ3 |
+| `uio[3]` | QPI SCK, clk/2 |
+| `uio[6]` | PSRAM A CS_N |
+| `uio[7]` | PSRAM B CS_N held high while active |
 
-Other dedicated inputs are unused and other outputs are zero.
-Use a continuous 10 MHz clock. UART uses 87 clocks per bit (about 115200 baud),
-8 data bits, no parity and one stop bit. For each READY byte `0x01`, send one
-16-bit instruction, low byte first. Do not send more than one instruction per
-credit. The FIFO holds two instructions. QSPI SCK is half the system clock.
-
-`rst_n=0` resets control state. SRAM and Flash contents are retained. An already
-committed memory write cannot be undone. Restart the credit protocol after reset.
-As in tiny, `ena` is unused inside the core.
+UART uses 87 core clocks per bit by default (about 115200 baud at 10 MHz), 8N1,
+low byte first. Each READY byte permits exactly one 16-bit host protocol word,
+not an execution instruction. Reset tri-states shared outputs and clears control;
+it does not clear SRAM/PSRAM. Wrapper `ena=0` gates shared output enables and must
+only be used when execution is inactive. MCU pins must be released before the
+ASIC drives the bus. See PSRAM tCEM/clock requirements in the interface document.
 
 ### Memory
 
-| MEM selector | Memory | Byte address range |
-| --- | --- | --- |
-| `00` | External Flash | 24 bits; vector base at most `0xfffffc` |
-| `01` | Internal SRAM | `0..511`; vector bases `0,4,...,508` |
-| `10`, `11` | Unsupported | Requests rejected |
+| MEM selector | Memory | Legal two-byte vector bases |
+|---|---|---|
+| `00` | PSRAM A | `0..0x7ffffe` (unaligned supported) |
+| `01` | Internal 1 KiB SRAM | even addresses `0..1022` |
+| `10/11` | Reserved | rejected |
 
-Each vector contains two FP16 values (4 bytes), with lane 0 in the low 16 bits.
-SRAM is one continuous space with no fixed input, weight or accumulator regions.
-Two vectors share each physical 64-bit SRAM word. Writes preserve the other
-vector. Initialize SRAM before reading it; reset does not clear its contents.
-MEM bit 8 optionally advances the byte address by 4 after each vector; it does
-not automatically repeat the transfer. With bit 8 clear the address stays fixed.
-Invalid accesses set the memory error output; invalid reads return zero and
-invalid writes are discarded. Addresses do not wrap into valid SRAM.
+Lane 0 occupies the lowest byte. Four vectors share one 64-bit SRAM row; RMW
+preserves neighboring vectors. Initialize SRAM before use; reset retains its
+contents. MEM post-increment adds two bytes, saturating at the 24-bit address
+limit. Invalid spans fault without truncation/wrap or partial writes.
 
-## How to test
-
-Install Verilator 5.036 or later and `test/requirements.txt`, then run:
+### Test
 
 ```sh
 make -C test
 python3 -m cocotb_tools.check_results test/results.xml
+make -C test -f Makefile.arbiter
 make -C test -f Makefile.exec
-python3 -m cocotb_tools.check_results /tmp/acc-fp16-exec/results.xml
 make -C test -f Makefile.mem_itf
-python3 -m cocotb_tools.check_results /tmp/acc-mem-itf/results.xml
 ```
 
-Tests cover FP16 execution, UART instructions, QSPI Flash pins, SRAM bounds,
-neighbor preservation, accumulation, sparse reads and reset behavior.
-The pin test uses a shorter UART divider; hardware uses 87 clocks per bit.
-The previous physical macro cannot pass the new instruction protocol test.
+The default suite covers UART inputs, replay, batch 1/3/4, both arbitration wait
+directions, final/unaligned PSRAM addresses, invalid configurations, framing
+faults and reset. Full Bishop tests use `make -f test/Makefile.psram_network` after
+preparing the FP8 reference traces. UART result payload transmission is not part
+of this stage; programs can store numerical results in PSRAM.
 
-## External hardware
+Only the SRAM has validated physical macro views. Historical full-chip netlists,
+placement/PDN geometry and timing are not signoff evidence for this RTL revision.
+Local synthesis comparisons do not replace a complete physical implementation.
 
-Use a host that supplies UART instructions, reset and a continuous system clock,
-and a Flash connected in the TinyQV QSPI Pmod pin order shown above.
-The Flash must already be in SPI mode with QE enabled. Writes require erased,
-writable locations. The controller sends WREN, byte program and status polling;
-it does not erase Flash or initialize the board. There is no polling timeout.
-Intermediate data can stay in internal SRAM. Flash is not a random-write RAM.
+Current staged measurements: [area and performance](optimization_stages.md).

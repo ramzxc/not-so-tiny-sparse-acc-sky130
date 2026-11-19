@@ -1,0 +1,11 @@
+# Run from the repository root: make -f test/Makefile.network
+BUILD ?= /tmp/acc-fp8-full-native
+.PHONY: all build fixtures run
+all: build fixtures run
+build:
+	verilator --binary --timing -j 2 -Wno-fatal --top-module tb_fp8_network --Mdir $(BUILD) -f src/sources.f memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.v test/qspi_nor_model.sv test/tb_fp8_network.sv
+fixtures:
+	python3 scripts/prepare_fp8_egru_trace.py
+	python3 scripts/prepare_fp8_network.py
+run:
+	python3 scripts/run_fp8_network.py --jobs 3 --binary $(BUILD)/Vtb_fp8_network

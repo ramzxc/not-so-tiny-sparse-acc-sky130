@@ -1,0 +1,7 @@
+# FP8/1 KiB component timings. Previous FP16 estimates are historical only.
+PERF_UART_CLKS_PER_BIT ?= 87
+COCOTB_TEST_MODULES = test_fp8_throughput
+BUILD ?= /tmp/acc-fp8-throughput
+COCOTB_RESULTS_FILE = $(BUILD)/results.xml
+export PERF_OUTPUT ?= $(BUILD)/measurements.json
+include Makefile

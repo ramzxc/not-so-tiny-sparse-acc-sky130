@@ -32,11 +32,13 @@ class Host:
         self.credits=0;self.state=-1
         self.d.rst_n.value=1
         await self.cycles(8)
-    async def instruction(self,word):
+    async def wait_credit(self):
         for _ in range(200000): # full 512 B DMA can hold dispatch for >64k cycles
             if self.credits:break
             await self.cycles()
         else:raise AssertionError('UART credit timeout')
+    async def instruction(self,word):
+        await self.wait_credit()
         self.credits-=1
         for byte in [word&255,word>>8]:
             for bit in [0]+[(byte>>i)&1 for i in range(8)]+[1]:
@@ -46,6 +48,12 @@ class Host:
         # With depth two, credit for the second NOP proves preceding SYNC retired.
         for word in [0xffff,0,0]:await self.instruction(word)
         await self.cycles(8)
+    async def fence(self):
+        # The READY following the first NOP proves preceding SYNC retired.
+        # Keep that credit for the next real command instead of sending a NOP.
+        await self.instruction(0xffff)
+        await self.instruction(0)
+        await self.wait_credit()
     async def address(self,address):
         await self.instruction(0x2000|(address&4095));await self.instruction(0x3000|(address>>12))
     async def load(self,address,device=0,weight=False,sparse=False):
@@ -328,3 +336,170 @@ async def dma_burst_reset(d):
     d.observe_upper.value=1
     await h.load(508,1);await h.sync()
     assert int(d.mem_observe_data.value)==0x7d017c00
+
+
+@cocotb.test()
+async def micro_auto_dma_tiles(d):
+    """Generic GEMV: stride, output tiles, column tiles, sparse and dense modes."""
+    import struct
+    h=Host(d);await h.reset()
+    await h.dma_copy(0x200,0,3) # [1,2,0,3,-0,padding]
+    async def configure(inp,weight,acc,groups,columns,stride=0,inpdev=1):
+        await h.address(inp);await h.instruction(0xa000|inpdev)
+        await h.address(weight);await h.instruction(0xa400)
+        await h.address(acc);await h.instruction(0xa800)
+        await h.address(64);await h.instruction(0xbc00)
+        await h.address(stride);await h.instruction(0xbc01)
+        await h.instruction(0xac00|groups);await h.instruction(0xb000|columns)
+    async def raw(addr,values):
+        await h.load(addr,1);await h.sync()
+        assert int(d.mem_observe_data.value)==int.from_bytes(struct.pack('<ee',*values),'little')
+    # Four outputs with initial bias 1; three nonzero columns -> three bursts.
+    for a in (128,132):await h.dma_copy(20,a,1)
+    await configure(0,0x300,128,2,5)
+    before=int(d.flash_read_ops.value)
+    await h.instruction(0xb403);await h.sync()
+    assert int(d.flash_read_ops.value)==before+3 and not int(d.uo_out.value)&2
+    await raw(128,[39,45]);await raw(132,[51,57])
+    # Independent two-output tiles from the same full matrix, column stride 8.
+    # No repacking of Flash weights is needed to select the second output pair.
+    for offset,expected in [(0,[38,44]),(4,[50,56])]:
+        await h.dma_copy(12,128,1)
+        await configure(0,0x300+offset,128,1,5,stride=8)
+        before=int(d.flash_read_ops.value);await h.instruction(0xb403);await h.sync()
+        assert int(d.flash_read_ops.value)==before+3 and not int(d.uo_out.value)&2
+        await raw(128,expected)
+    # Split the input dimension into two column tiles and retain partial sums.
+    for a in (128,132):await h.dma_copy(12,a,1)
+    for inp,weight,columns in [(0,0x300,2),(4,0x310,3)]:
+        await configure(inp,weight,128,2,columns)
+        await h.instruction(0xb403);await h.sync()
+    await raw(128,[38,44]);await raw(132,[50,56])
+    # Flash inputs are legal too; the weight DMA must not disturb input operands.
+    for a in (128,132):await h.dma_copy(12,a,1)
+    await configure(0x200,0x300,128,2,5,inpdev=0)
+    before=int(d.flash_read_ops.value);await h.instruction(0xb403);await h.sync()
+    assert int(d.flash_read_ops.value)==before+12+3
+    await raw(128,[38,44]);await raw(132,[50,56])
+    # Reuse the retained configuration after restoring consumed input/weight/count.
+    await h.address(0);await h.instruction(0xa001)
+    await h.address(0x300);await h.instruction(0xa400)
+    await h.instruction(0xb005);await h.instruction(0xb403);await h.sync()
+    await raw(128,[76,88]);await raw(132,[100,112])
+    # Ordinary SRAM MICRO still works after the DMA mode; RUN bit 1 is not sticky.
+    await h.dma_copy(0x300,64,2)
+    await h.address(0);await h.instruction(0xa001)
+    await h.address(64);await h.instruction(0xa401)
+    await h.instruction(0xb001)
+    before=int(d.flash_read_ops.value);await h.instruction(0xb401);await h.sync()
+    assert int(d.flash_read_ops.value)==before and not int(d.uo_out.value)&2
+    await raw(128,[77,90]);await raw(132,[103,116])
+    # Dense mode intentionally loads NaN weights for a zero input.
+    await h.dma_copy(12,0,1)
+    await configure(0,0x310,128,1,1)
+    before=int(d.flash_read_ops.value);await h.instruction(0xb402);await h.sync()
+    assert int(d.flash_read_ops.value)==before+1
+    await h.load(128,1);await h.sync()
+    assert int(d.mem_observe_data.value)==0x7e007e00
+
+
+@cocotb.test()
+async def micro_auto_dma_faults_reset(d):
+    h=Host(d);await h.reset()
+    async def config(weight=0x800,groups=32,columns=2,buffer=64,acc=256,stride=0):
+        await h.address(0);await h.instruction(0xa001)
+        await h.address(weight);await h.instruction(0xa400)
+        await h.address(buffer);await h.instruction(0xbc00)
+        await h.address(acc);await h.instruction(0xa800)
+        await h.address(stride);await h.instruction(0xbc01)
+        await h.instruction(0xac00|groups);await h.instruction(0xb000|columns)
+    # Overlap is rejected before any input read/DMA write. Existing SRAM survives.
+    await h.dma_copy(0,0,1)
+    await config(buffer=0)
+    before=int(d.flash_read_ops.value);await h.instruction(0xb403);await h.sync()
+    assert int(d.uo_out.value)&2 and int(d.flash_read_ops.value)==before
+    await h.reset();await h.load(0,1);await h.sync()
+    assert int(d.mem_observe_data.value)==0x40003c00
+    # DMA's complete span check rejects an invalid Flash range without bus work.
+    await config(weight=0xfffffd,groups=1,columns=1)
+    before=int(d.flash_read_ops.value);await h.instruction(0xb403);await h.sync()
+    assert int(d.uo_out.value)&2 and int(d.flash_read_ops.value)==before
+    # Saturation on a large stride cannot wrap to valid Flash address zero.
+    await h.reset();await h.dma_copy(12,256,1)
+    await config(weight=0x300,groups=1,columns=2,stride=0xffff00)
+    before=int(d.flash_read_ops.value);await h.instruction(0xb403);await h.sync()
+    assert int(d.uo_out.value)&2 and int(d.flash_read_ops.value)==before+1
+    await h.reset();await h.load(256,1);await h.sync()
+    assert int(d.mem_observe_data.value)==0x40003c00 # first column committed
+    # An all-zero column does not DMA even with an unusable Flash address.
+    await h.dma_copy(12,0,1);await config(weight=0xffffff,groups=1,columns=2)
+    before=int(d.flash_read_ops.value);await h.instruction(0xb403);await h.sync()
+    assert not int(d.uo_out.value)&2 and int(d.flash_read_ops.value)==before
+    # Reset while auto DMA holds CS; no stale run or byte stream may resume.
+    await h.dma_copy(0,0,1);await config()
+    before=int(d.flash_read_ops.value);await h.instruction(0xb403)
+    for _ in range(2000):
+        if int(d.flash_read_ops.value)>before:break
+        await h.cycles()
+    else:raise AssertionError('automatic DMA did not start')
+    assert not int(d.uio_out.value)&1
+    await h.reset();assert int(d.uio_out.value)&1 and not int(d.uo_out.value)&2
+    await h.dma_copy(12,256,1);await config(weight=0x300,groups=1,columns=1)
+    await h.instruction(0xb403);await h.sync()
+    assert not int(d.uo_out.value)&2
+    await h.load(256,1);await h.sync()
+    assert int(d.mem_observe_data.value)==0x40003c00
+
+
+@cocotb.test()
+async def micro_auto_dma_batches(d):
+    import struct
+    h=Host(d);await h.reset()
+    async def configure(inp,device,batches,columns=3,groups=2):
+        await h.address(inp);await h.instruction(0xa000|device)
+        await h.address(0x500);await h.instruction(0xa400)
+        await h.address(64);await h.instruction(0xbc00)
+        await h.address(128);await h.instruction(0xa800)
+        await h.address(0);await h.instruction(0xbc01)
+        await h.instruction(0xac00|groups);await h.instruction(0xb000|columns)
+        await h.instruction(0xb800|batches)
+    cases=[(3,0x400,[[1,0,3],[2,4,0],[0,-2,1]],3),
+           (4,0x600,[[0,1,0],[0,0,2],[0,-2,0],[0,0,3]],2)]
+    for batches,source,samples,bursts in cases:
+        await h.dma_copy(source,0,2*batches)
+        for g in range(2):
+            for b in range(batches):await h.dma_copy(20,128+4*(g*batches+b),1)
+        for iteration in (1,2):
+            await configure(0,1,batches)
+            before=int(d.flash_read_ops.value)
+            await h.instruction(0xb403);await h.sync()
+            assert int(d.flash_read_ops.value)==before+bursts and not int(d.uo_out.value)&2
+            for g in range(2):
+                for b,x in enumerate(samples):
+                    expected=[1+iteration*sum(x[c]*(c*4+g*2+lane+1) for c in range(3)) for lane in range(2)]
+                    await h.load(128+4*(g*batches+b),1);await h.sync()
+                    assert int(d.mem_observe_data.value)==int.from_bytes(struct.pack('<ee',*expected),'little')
+    # Flash-resident batch: zero-column prescan and later compute reread packed pairs.
+    for addr in range(128,160,4):await h.dma_copy(12,addr,1)
+    await configure(0x600,0,4)
+    before=int(d.flash_read_ops.value);await h.instruction(0xb403);await h.sync()
+    assert int(d.flash_read_ops.value)==before+94 and not int(d.uo_out.value)&2
+    for g in range(2):
+        for b,x in enumerate(cases[1][2]):
+            expected=[sum(x[c]*(c*4+g*2+lane+1) for c in range(3)) for lane in range(2)]
+            await h.load(128+4*(g*4+b),1);await h.sync()
+            assert int(d.mem_observe_data.value)==int.from_bytes(struct.pack('<ee',*expected),'little')
+    # Dense batch copies even the all-zero column; no stale sparse scan flag.
+    await configure(0,1,4)
+    before=int(d.flash_read_ops.value);await h.instruction(0xb402);await h.sync()
+    assert int(d.flash_read_ops.value)==before+3 and not int(d.uo_out.value)&2
+    for g in range(2):
+        for b,x in enumerate(cases[1][2]):
+            expected=[2*sum(x[c]*(c*4+g*2+lane+1) for c in range(3)) for lane in range(2)]
+            await h.load(128+4*(g*4+b),1);await h.sync()
+            assert int(d.mem_observe_data.value)==int.from_bytes(struct.pack('<ee',*expected),'little')
+    # Switching to batch=1 after a batch reuses the same mode safely.
+    await h.dma_copy(0,0,1);await h.dma_copy(12,128,1)
+    await configure(0,1,1,columns=1,groups=1)
+    await h.instruction(0xb403);await h.sync();await h.load(128,1);await h.sync()
+    assert int(d.mem_observe_data.value)==0x40003c00

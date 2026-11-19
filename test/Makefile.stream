@@ -1,0 +1,20 @@
+.DEFAULT_GOAL := sim
+SIM = verilator
+TOPLEVEL_LANG = verilog
+TOPLEVEL = tb_psram_stream
+COCOTB_TEST_MODULES = test_psram_stream
+ROOT := $(abspath $(CURDIR)/..)
+BUILD ?= /tmp/acc-psram-stream
+SIM_BUILD = $(BUILD)/sim
+COCOTB_RESULTS_FILE ?= $(BUILD)/results.xml
+export STREAM_FIXTURE=$(BUILD)/psram.hex
+export PERF_UART_CLKS_PER_BIT ?= 8
+COMPILE_ARGS += -I$(ROOT)/src/rtl -I$(ROOT)/src/rtl/core -Wno-fatal --timing --timescale-override 1ns/1ps -GUART_CLKS_PER_BIT=$(PERF_UART_CLKS_PER_BIT)
+VERILOG_SOURCES = $(addprefix $(ROOT)/,$(shell sed '/^+/d' $(ROOT)/src/sources.f))
+VERILOG_SOURCES += $(ROOT)/memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.v $(CURDIR)/tb_psram_stream.sv $(CURDIR)/qspi_psram_model.sv
+CUSTOM_SIM_DEPS += $(BUILD)/psram.hex
+SIM_ARGS += +FIXTURE=$(BUILD)/psram.hex
+$(BUILD)/psram.hex: $(CURDIR)/prepare_psram_fixture.py $(CURDIR)/fp8_reference.py
+	mkdir -p $(BUILD)
+	python3 $(CURDIR)/prepare_psram_fixture.py $@
+include $(shell cocotb-config --makefiles)/Makefile.sim

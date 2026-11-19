@@ -4,7 +4,8 @@ src/rtl/shared_sram.sv
 src/rtl/project.v
 src/rtl/uart/uart_rx.v
 src/rtl/uart/uart_tx.v
-src/rtl/core/inst_fifo.v
+src/rtl/core/program_ctrl.v
+src/rtl/psram_arbiter.v
 src/rtl/core/micro_ctrl.v
 src/rtl/core/dma_ctrl.v
 src/rtl/core/inst_decoder.v

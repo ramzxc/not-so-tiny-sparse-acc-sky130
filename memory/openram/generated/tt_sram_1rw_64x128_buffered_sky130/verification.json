@@ -1,0 +1,10 @@
+{
+  "drc_errors": 0,
+  "lvs_errors": 0,
+  "lvs_property_errors": false,
+  "final_verification": true,
+  "checked_sha256": {
+    ".gds": "ef8c1afb303770916f4b8af3910b30c3967dbaa52e3233fafa987650e641b278",
+    ".lvs.sp": "04866e7dfe3f311f4a44090a9f313b95ea7d60e09445f7edd4ab2962940c9074"
+  }
+}

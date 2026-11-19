@@ -20,12 +20,26 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87) (
     end
 
     wire tx, fifo_rdy, rx_inst_val, inst_val, decoder_rdy;
+    wire host_error,host_busy,input_write,uart_error;
+    wire [9:0] input_addr;
+    wire [15:0] input_data;
+    wire fetch_valid,fetch_ready,fetch_done,fetch_byte_valid;
+    wire [22:0] fetch_addr;
+    wire [3:0] fetch_bytes;
+    wire bus_busy, bus_valid,bus_ready,bus_write,bus_done,bus_byte_valid;
+    wire [22:0] bus_addr;
+    wire [3:0] bus_bytes;
+    wire [15:0] bus_data;
     wire [`INST_WIDTH-1:0] rx_inst, inst, sequenced_inst;
     wire sequenced_valid, sequenced_ready, micro_error, micro_busy;
     wire [15:0] dispatched_inst;
     wire dispatched_valid, dispatched_ready;
     wire dma_busy, dma_error, dma_read, dma_write, dma_read_continue;
     wire [23:0] dma_addr;
+    wire [9:0] dma_destination;
+    wire [2:0] dma_vectors;
+    wire copy_done;
+    wire [3:0] qspi_bytes;
     wire [1:0] loaded_input_zero_mask;
     wire [`EXEC_INST_WIDTH-1:0] exec_inst;
     wire [`DATA_INST_WIDTH-1:0] data_inst;
@@ -37,24 +51,31 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87) (
     wire [`MEM_ADDR_WIDTH-1:0] addr;
     wire [`MEM_DEVICE_WIDTH-1:0] device;
     wire [`DATA_WIDTH*`COMPUTE_WIDTH-1:0] write_data, read_data;
-    wire qspi_req_val, qspi_req_rdy, qspi_req_write, qspi_read_data_val, qspi_req_continue;
-    wire [`MEM_ADDR_WIDTH-1:0] qspi_addr;
+    wire qspi_req_val, qspi_req_rdy, qspi_req_write, qspi_byte_valid,qspi_done;
+    wire [22:0] qspi_addr;
     wire [`MEM_DEVICE_WIDTH-1:0] qspi_device;
-    wire [7:0] qspi_write_data, qspi_read_data;
-    wire sck, flash_cs, ram_a_cs, ram_b_cs;
+    wire [15:0] qspi_write_data;
+    wire [7:0] qspi_read_data;
+    wire sck,ram_a_cs;
     wire [3:0] dq_out, dq_oe;
 
     uart_rx #(.CLKS_PER_BIT(UART_CLKS_PER_BIT)) receiver (
         .clk(clk), .rst_n(core_rst_n), .rx(uart_rx_i),
-        .inst(rx_inst), .inst_val(rx_inst_val)
+        .inst(rx_inst), .inst_val(rx_inst_val),.error(uart_error)
     );
     uart_tx #(.CLKS_PER_BIT(UART_CLKS_PER_BIT)) transmitter (
         .clk(clk), .rst_n(core_rst_n), .inst_fifo_rdy(fifo_rdy), .tx(tx)
     );
-    inst_fifo #(.FIFO_DEPTH(2)) fifo (
-        .clk(clk), .rst_n(core_rst_n),
-        .inst_in(rx_inst), .inst_in_val(rx_inst_val), .fifo_rdy(fifo_rdy),
-        .decoder_rdy(decoder_rdy), .inst_out(inst), .inst_out_val(inst_val)
+    program_ctrl frontend (
+        .clk(clk),.rst_n(core_rst_n),.rx_word(rx_inst),.rx_valid(rx_inst_val),
+        .rx_ready(fifo_rdy),.error(host_error),.busy(host_busy),
+        .units_idle(exec_rdy && data_rdy && !dma_busy && !micro_busy && !bus_busy),
+        .memory_error(memory_error | dma_error | micro_error | uart_error),
+        .inst(inst),.inst_valid(inst_val),.inst_ready(decoder_rdy),
+        .fetch_valid(fetch_valid),.fetch_addr(fetch_addr),.fetch_bytes(fetch_bytes),
+        .fetch_ready(fetch_ready),.fetch_done(fetch_done),.fetch_data(qspi_read_data),
+        .fetch_byte_valid(fetch_byte_valid),
+        .input_write(input_write),.input_addr(input_addr),.input_data(input_data),.mem_ready(mem_rdy)
     );
     micro_ctrl sequencer (
         .clk(clk), .rst_n(core_rst_n), .host_inst(inst), .host_valid(inst_val),
@@ -68,9 +89,9 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87) (
         .host_inst(sequenced_inst), .host_valid(sequenced_valid), .host_ready(sequenced_ready),
         .core_inst(dispatched_inst), .core_valid(dispatched_valid), .core_ready(dispatched_ready),
         .units_idle(exec_rdy && data_rdy), .staging_addr(addr),
-        .mem_ready(mem_rdy), .mem_read_valid(read_data_val), .memory_error(memory_error),
+        .mem_ready(mem_rdy), .mem_read_valid(copy_done), .memory_error(memory_error),
         .mem_read(dma_read), .mem_write(dma_write), .mem_addr(dma_addr),
-        .mem_read_continue(dma_read_continue),
+        .mem_read_continue(dma_read_continue),.mem_destination(dma_destination),.mem_vectors(dma_vectors),
         .busy(dma_busy), .error(dma_error)
     );
     inst_decoder decode (
@@ -87,7 +108,7 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87) (
         .exec_data_is_weight(operand_is_weight),
         .loaded_input_zero_mask(loaded_input_zero_mask),
         .input_scalar_mode(input_scalar_mode), .input_select(input_select), .input_sparse(input_sparse),
-        .mem_itf_rdy(mem_rdy && !dma_busy), .read_en(read_en), .write_en(write_en),
+        .mem_itf_rdy(mem_rdy && !dma_busy && !input_write), .read_en(read_en), .write_en(write_en),
         .addr(addr), .device(device), .write_accumulate(write_accumulate), .write_data(write_data),
         .read_data(read_data), .read_data_val(read_data_val && !dma_busy)
     );
@@ -100,33 +121,41 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87) (
     );
     mem_itf itf (
         .clk(clk), .rst_n(core_rst_n), .rdy(mem_rdy),
-        .read_en(dma_busy ? dma_read : read_en), .write_en(dma_busy ? dma_write : write_en),
-        .write_accumulate(!dma_busy && write_accumulate),
+        .read_en(!dma_busy && read_en), .write_en(input_write || (!dma_busy && write_en)),
+        .copy_en(dma_read),.copy_source(dma_addr),.copy_destination(dma_destination),
+        .copy_vectors(dma_vectors),.copy_done(copy_done),
+        .write_accumulate(!input_write && !dma_busy && write_accumulate),
         .read_burst(dma_busy), .read_continue(dma_read_continue),
-        .error(memory_error), .addr(dma_busy ? dma_addr : addr),
-        .device(dma_busy ? (dma_write ? `MEM_SRAM : `MEM_FLASH) : device),
-        // read_data is held across writes by mem_itf; copy all 32 bits verbatim.
-        .write_data(dma_busy ? read_data : write_data), .read_data(read_data), .read_data_val(read_data_val),
+        .error(memory_error), .addr(input_write ? {14'b0,input_addr} : addr),
+        .device(input_write ? `MEM_SRAM : device),
+        // Ordinary writes use DATA or UART; DMA copies through the row buffer.
+        .write_data(input_write ? input_data : write_data), .read_data(read_data), .read_data_val(read_data_val),
         .qspi_req_val(qspi_req_val), .qspi_req_rdy(qspi_req_rdy),
-        .qspi_req_write(qspi_req_write), .qspi_req_addr(qspi_addr),
-        .qspi_req_continue(qspi_req_continue),
-        .qspi_req_device(qspi_device), .qspi_req_data(qspi_write_data),
-        .qspi_read_data(qspi_read_data), .qspi_read_data_val(qspi_read_data_val)
+        .qspi_req_write(qspi_req_write), .qspi_req_addr(qspi_addr),.qspi_req_bytes(qspi_bytes),
+        .qspi_req_data(qspi_write_data),.qspi_read_data(qspi_read_data),
+        .qspi_byte_valid(qspi_byte_valid),.qspi_done(qspi_done)
+    );
+    psram_arbiter memory_owner (
+        .clk(clk),.rst_n(core_rst_n),
+        .data_valid(qspi_req_val),.data_write(qspi_req_write),.data_addr(qspi_addr),
+        .data_bytes(qspi_bytes),.data_wdata(qspi_write_data),.data_ready(qspi_req_rdy),
+        .data_done(qspi_done),.data_byte_valid(qspi_byte_valid),
+        .fetch_valid(fetch_valid),.fetch_addr(fetch_addr),.fetch_bytes(fetch_bytes),
+        .fetch_ready(fetch_ready),.fetch_done(fetch_done),.fetch_byte_valid(fetch_byte_valid),
+        .req_valid(bus_valid),.req_write(bus_write),.req_addr(bus_addr),.req_bytes(bus_bytes),
+        .req_data(bus_data),.req_ready(bus_ready),.done(bus_done),.byte_valid(bus_byte_valid),.busy(bus_busy)
     );
     qspi_ctrl serial_memory (
-        .clk(clk), .rst_n(core_rst_n),
-        .req_val(qspi_req_val), .req_rdy(qspi_req_rdy), .req_write(qspi_req_write),
-        .req_addr(qspi_addr), .req_device(qspi_device), .req_data(qspi_write_data),
-        .req_continue(qspi_req_continue), .abort_read(memory_error | dma_error),
-        .read_data(qspi_read_data), .read_data_val(qspi_read_data_val),
-        .sck(sck), .flash_sc_n(flash_cs), .psram_a_sc_n(ram_a_cs), .psram_b_sc_n(ram_b_cs),
-        .dq_in(qspi_dq_i), .dq_out(dq_out), .dq_oe(dq_oe)
+        .clk(clk),.rst_n(core_rst_n),.req_valid(bus_valid),.req_ready(bus_ready),
+        .req_write(bus_write),.req_addr(bus_addr),.req_bytes(bus_bytes),.req_data(bus_data),
+        .read_data(qspi_read_data),.byte_valid(bus_byte_valid),.done(bus_done),
+        .sck(sck),.cs_n(ram_a_cs),.dq_in(qspi_dq_i),.dq_out(dq_out),.dq_oe(dq_oe)
     );
 
     // TinyQV Pmod order, preserved from the original wrapper.
-    assign uio_out = {ram_b_cs, ram_a_cs, dq_out[3:2], sck, dq_out[1:0], flash_cs};
-    assign uio_oe  = {2'b11, dq_oe[3:2], 1'b1, dq_oe[1:0], 1'b1};
-    assign uo_out  = {3'b0, tx, 2'b0, (memory_error | micro_error | dma_error), decoder_rdy};
-    wire _unused = &{micro_busy, 1'b0};
+    assign uio_out = {1'b1,ram_a_cs,dq_out[3:2],sck,dq_out[1:0],1'b1};
+    assign uio_oe = core_rst_n && rst_n ? {2'b11,dq_oe[3:2],1'b1,dq_oe[1:0],1'b1} : 8'b0;
+    assign uo_out  = {3'b0, tx, 2'b0, (memory_error | micro_error | dma_error | host_error | uart_error), !host_busy};
+    wire _unused = &{micro_busy,dma_write,1'b0};
 endmodule
 `default_nettype wire

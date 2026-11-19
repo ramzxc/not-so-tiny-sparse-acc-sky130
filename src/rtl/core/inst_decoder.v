@@ -1,7 +1,7 @@
 `include "../defs/defs.vh"
 `include "../defs/inst_defs.vh"
 
-// Dispatch the FIFO head directly. No local instruction or pending register.
+// Dispatch the current instruction directly. No local instruction or pending register.
 module inst_decoder (
     input  wire rst_n,
     input  wire [`INST_WIDTH-1:0] inst_in,
@@ -39,7 +39,12 @@ module inst_decoder (
 
                 // Independent units may overlap. Insert SYNC before consuming
                 // a pending memory operand or before reusing a result.
-                `OPCODE_SYNC: decoder_rdy = exec_rdy && data_rdy;
+                `OPCODE_SYNC: begin
+                    if(inst_in[12:9]<12)begin
+                        decoder_rdy=data_rdy;
+                        data_inst_out_val=inst_in_val && data_rdy;
+                    end else decoder_rdy=exec_rdy && data_rdy;
+                end
 
                 default: decoder_rdy = 1; // NOP and reserved opcodes
             endcase

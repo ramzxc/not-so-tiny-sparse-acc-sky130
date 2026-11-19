@@ -1,0 +1,5 @@
+# Run from repository root. Fixed-delay sensitivity tests, not IO signoff.
+BUILD ?= /tmp/acc-qspi-timing
+.PHONY: all
+all:
+	python3 scripts/check_qspi_board_timing.py --build $(BUILD)

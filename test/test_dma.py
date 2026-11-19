@@ -19,32 +19,33 @@ async def copy_control(d):
         d.host_inst.value=word;d.staging_addr.value=addr;d.host_valid.value=1
         await settle();assert int(d.host_ready.value) and not int(d.core_valid.value)
         await tick();d.host_valid.value=0;await settle()
-    for src,dst,count in [(3,4,1),(0xffc,0,128),(0xfffffc,508,1),(20,128,17),(0xffffff,508,0)]:
+    for src,dst,count in [(3,4,1),(0xffc,0,128),(0x7ffffe,1022,1),(20,512,255),(0xffffff,508,0)]:
         await reset();await cfg(0xc000,src);await cfg(0xc400,dst);await cfg(0xc800|count)
         # A queued host operation cannot retire before the last write completes.
         d.host_inst.value=0xffff;d.host_valid.value=1
-        for i in range(count):
-            for writing in (False,True):
-                d.mem_ready.value=0
-                for _ in range(rng.randrange(1,7)):
-                    await settle()
-                    assert int(d.busy.value) and not int(d.host_ready.value) and not int(d.core_valid.value)
-                    assert int(d.mem_write.value)==writing and int(d.mem_read.value)==(not writing)
-                    assert int(d.mem_addr.value)==(dst+4*i if writing else src+4*i)
-                    assert int(d.mem_read_continue.value)==(i<count-1)
-                    await tick()
-                d.mem_ready.value=1;await tick();d.mem_ready.value=0
-                for _ in range(rng.randrange(1,10)):
-                    await settle()
-                    assert int(d.busy.value) and not int(d.mem_write.value) and not int(d.mem_read.value)
-                    await tick()
-                if writing:d.mem_ready.value=1
-                else:d.mem_read_valid.value=1
-                await tick();d.mem_read_valid.value=0
+        i=0
+        while i<count:
+            chunk=min(count-i,4-((dst+2*i)//2)%4)
+            d.mem_ready.value=0
+            for _ in range(rng.randrange(1,7)):
+                await settle()
+                assert int(d.busy.value) and not int(d.host_ready.value) and not int(d.core_valid.value)
+                assert not int(d.mem_write.value) and int(d.mem_read.value)
+                assert int(d.mem_addr.value)==src+2*i
+                assert int(d.mem_destination.value)==dst+2*i
+                assert int(d.mem_vectors.value)==chunk
+                await tick()
+            d.mem_ready.value=1;await tick();d.mem_ready.value=0
+            for _ in range(rng.randrange(1,10)):
+                await settle()
+                assert int(d.busy.value) and not int(d.mem_read.value)
+                assert int(d.mem_addr.value)==src+2*i and int(d.mem_vectors.value)==chunk
+                await tick()
+            d.mem_read_valid.value=1;await tick();d.mem_read_valid.value=0;i+=chunk
         await settle()
         assert not int(d.busy.value) and not int(d.error.value)
         assert int(d.host_ready.value) and int(d.core_valid.value) and int(d.core_inst.value)==0xffff
-    for src,dst,count in [(0xfffffd,0,1),(0xfffffc,0,2),(0,508,2),(0,0,129),(0,0,255),(0,2,1),(0,512,1)]:
+    for src,dst,count in [(0x7fffff,0,1),(0x7ffffe,0,2),(0xffffff,0,1),(0xfffffe,0,2),(0,1022,2),(0,1024,0),(0,1,1),(0,1024,1)]:
         await reset();await cfg(0xc000,src);await cfg(0xc400,dst);await cfg(0xc800|count)
         assert int(d.error.value) and not int(d.busy.value) and not int(d.mem_read.value)
     for bad in (0xc001,0xc401,0xc900,0xcc00):
