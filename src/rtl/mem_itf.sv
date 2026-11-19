@@ -39,15 +39,35 @@ module mem_itf (
     wire [1:0] vector_slot=saved_addr[2:1];
     wire high_lane=state==ADD_HIGH;
     wire [7:0] sum=fp8_add(old_vector[high_lane*8 +: 8],saved_data[high_lane*8 +: 8]);
-    assign rdy=rst_n && state==IDLE;
+    wire copy_invalid=read_en || write_en || copy_vectors==0 || copy_vectors>4 ||
+        copy_destination[0] || {1'b0,copy_destination[2:1]}+copy_vectors>4 || copy_end>25'h0800000;
+    wire vector_invalid=(read_en && write_en) || device[1] ||
+        (device==`MEM_SRAM && (addr>=1024 || addr[0])) ||
+        (device==`MEM_PSRAM && (addr>24'h7ffffe || write_accumulate)) ||
+        (write_accumulate && !write_en);
+    // Launch a validated SRAM read on request acceptance. The macro's output
+    // still has the same falling-edge-to-next-rising-edge capture interval.
+    wire accepting=state==IDLE || state==SRAM_COMMIT;
+    wire start_read=accepting && (copy_en ? (!copy_invalid && copy_vectors!=4) :
+        ((read_en || write_en) && !vector_invalid && device==`MEM_SRAM));
+    wire [6:0] request_row=copy_en ? copy_destination[9:3] : addr[9:3];
+    wire write_now=state==SRAM_WRITE || state==ADD_HIGH;
+    reg [63:0] macro_write_word;
+    always @(*)begin
+        macro_write_word=write_word;
+        // ADD_HIGH operands have a full core cycle to reach the macro input.
+        // Commit the last lane directly instead of adding a register-only stage.
+        if(state==ADD_HIGH)macro_write_word[vector_slot*16+8 +: 8]=sum;
+    end
+    assign rdy=rst_n && accepting;
     assign qspi_req_val=rst_n && state==EXTERNAL_SEND;
     assign qspi_req_write=saved_write && !copy_active;
     assign qspi_req_addr=copy_active ? copy_source[22:0] : saved_addr[22:0];
     assign qspi_req_bytes=copy_active ? {copy_vectors,1'b0} : 4'd2;
     assign qspi_req_data=saved_data;
     shared_sram #(.SRAM_BYTES(1024)) memory (
-        .clk(clk),.enable(rst_n && (state==SRAM_READ || state==SRAM_WRITE)),
-        .write(state==SRAM_WRITE),.addr(saved_addr[9:3]),.wdata(write_word),.rdata(macro_data)
+        .clk(clk),.enable(rst_n && (start_read || write_now)),
+        .write(write_now),.addr(accepting ? request_row : saved_addr[9:3]),.wdata(macro_write_word),.rdata(macro_data)
     );
     always @(posedge clk)begin
         if(!rst_n)begin
@@ -56,25 +76,28 @@ module mem_itf (
         end else begin
             read_data_val<=0;copy_done<=0;
             case(state)
-                IDLE:if(copy_en)begin
-                    if(read_en || write_en || copy_vectors==0 || copy_vectors>4 ||
-                       copy_destination[0] || {1'b0,copy_destination[2:1]}+copy_vectors>4 ||
-                       copy_end>25'h0800000)begin error<=1;copy_done<=1;end
-                    else begin
-                        saved_addr<={14'b0,copy_destination};saved_write<=1;saved_accumulate<=0;
-                        copy_active<=1;copy_byte<=copy_destination[2:0];
-                        state<=copy_vectors==4 ? EXTERNAL_SEND : SRAM_READ;
+                IDLE,SRAM_COMMIT:begin
+                    // The preceding SRAM write committed on the falling edge.
+                    // Retire it while permitting a new, independently validated request.
+                    if(state==SRAM_COMMIT)begin
+                        state<=IDLE;
+                        if(copy_active)begin copy_done<=1;copy_active<=0;end
                     end
-                end else if(read_en || write_en)begin
-                    if((read_en && write_en) || device[1] ||
-                        (device==`MEM_SRAM && (addr>=1024 || addr[0])) ||
-                        (device==`MEM_PSRAM && (addr>24'h7ffffe || write_accumulate)) ||
-                        (write_accumulate && !write_en))begin
-                        error<=1;read_data<=0;read_data_val<=read_en;
-                    end else begin
-                        saved_addr<=addr;saved_data<=write_data;saved_write<=write_en;
-                        saved_accumulate<=write_accumulate;
-                        state<=device==`MEM_SRAM ? SRAM_READ : EXTERNAL_SEND;
+                    if(copy_en)begin
+                        if(copy_invalid)begin error<=1;copy_done<=1;end
+                        else begin
+                            saved_addr<={14'b0,copy_destination};saved_write<=1;saved_accumulate<=0;
+                            copy_active<=1;copy_byte<=copy_destination[2:0];
+                            state<=copy_vectors==4 ? EXTERNAL_SEND : SRAM_WAIT;
+                        end
+                    end else if(read_en || write_en)begin
+                        if(vector_invalid)begin
+                            error<=1;read_data<=0;read_data_val<=read_en;
+                        end else begin
+                            saved_addr<=addr;saved_data<=write_data;saved_write<=write_en;
+                            saved_accumulate<=write_accumulate;
+                            state<=device==`MEM_SRAM ? SRAM_WAIT : EXTERNAL_SEND;
+                        end
                     end
                 end
                 EXTERNAL_SEND:if(qspi_req_rdy)state<=EXTERNAL_WAIT;
@@ -101,12 +124,8 @@ module mem_itf (
                     end
                 end
                 ADD_LOW:begin write_word[vector_slot*16 +: 8]<=sum;state<=ADD_HIGH;end
-                ADD_HIGH:begin write_word[vector_slot*16+8 +: 8]<=sum;state<=SRAM_WRITE;end
+                ADD_HIGH:begin write_word[vector_slot*16+8 +: 8]<=sum;state<=SRAM_COMMIT;end
                 SRAM_WRITE:state<=SRAM_COMMIT;
-                SRAM_COMMIT:begin
-                    state<=IDLE;
-                    if(copy_active)begin copy_done<=1;copy_active<=0;end
-                end
                 default:state<=IDLE;
             endcase
         end

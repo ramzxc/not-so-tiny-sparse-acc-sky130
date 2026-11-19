@@ -74,6 +74,24 @@ module tb_data_postinc;
         // Reset during a pending read cancels the increment and clears address.
         issue(16'h8000);address(24'd100);issue(16'h4500);mem_ready=0;tick();
         @(negedge clk);rst_n=0;tick();expect_addr(0);
+        // Compact requests issue on acceptance, not while the backend stalls.
+        @(negedge clk);rst_n=1;mem_ready=1;tick();
+        @(negedge clk);instruction=16'hf620;valid=1;#1;
+        if(!ready || !wen || !accumulate || addr!=64 || device!=1 || write_data!=16'h4038)
+            $fatal(1,"compact accumulate request not forwarded on acceptance");
+        tick();@(negedge clk);valid=0;mem_ready=0;
+        repeat(3)begin tick();if(ren || wen) $fatal(1,"duplicate compact write");end
+        @(negedge clk);instruction=16'hffff;mem_ready=1;tick();
+        @(negedge clk);instruction=16'he020;valid=1;mem_ready=0;
+        repeat(3)begin tick();if(ready || ren || wen) $fatal(1,"compact read ignored stall");end
+        @(negedge clk);mem_ready=1;#1;
+        if(!ready || !ren || wen || accumulate || addr!=64 || device!=1)
+            $fatal(1,"compact read inherited stale write mode");
+        tick();@(negedge clk);valid=0;mem_ready=0;
+        repeat(3)begin tick();if(ren || wen) $fatal(1,"duplicate compact read");end
+        @(negedge clk);read_data=16'h3840;read_valid=1;tick();
+        if(!operand_valid || operand!=16'h3840) $fatal(1,"compact read lost response");
+        @(negedge clk);read_valid=0;mem_ready=1;tick();
         $display("PASS post-increment stalls, sparse skip, carry, overflow and reset");
         $finish;
     end

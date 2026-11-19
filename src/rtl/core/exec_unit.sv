@@ -22,6 +22,7 @@ module exec_unit (
     logic [5:0] instruction;
     logic lane;
     fp8_type product_reg, add_a, add_b, lane_result;
+    wire [7:0] product = fp8_mul(saved_inputs[lane*8 +: 8], saved_weights[lane*8 +: 8]);
     wire [7:0] selected_input = inputs[input_select*8 +: 8];
     wire skip_scalar = input_scalar_mode && input_sparse && selected_input[6:0] == 0;
     wire multiply = instruction[4:3] == `VPU_MUL;
@@ -79,18 +80,34 @@ module exec_unit (
                         raw_result <= exec_inst_in[5] ? accumulator : 16'b0;
                         if (!exec_inst_in[5]) accumulator <= 0;
                         state <= ACTIVATE;
-                    end else state <= PRODUCT;
+                    end else state <= exec_inst_in[4:3]==`VPU_MUL ? PRODUCT : ARITHMETIC;
                 end
                 PRODUCT: begin
-                    product_reg <= fp8_mul(saved_inputs[lane*8 +: 8],
-                                            saved_weights[lane*8 +: 8]);
-                    state <= ARITHMETIC;
+                    if (!instruction[5]) begin
+                        // Overwrite MUL has no add. Preserve rounded FP8 product
+                        // as the raw accumulator; do not run an empty add stage.
+                        accumulator[lane*8 +: 8] <= product;
+                        raw_result[lane*8 +: 8] <= product;
+                        if (!lane) lane <= 1;
+                        else begin
+                            lane <= 0;
+                            if (instruction[2:0]==`ACT_NOP) begin
+                                data_out <= {product,raw_result[7:0]};
+                                data_out_val <= 1;state <= IDLE;
+                            end else state <= ACTIVATE;
+                        end
+                    end else begin product_reg <= product;state <= ARITHMETIC;end
                 end
                 ARITHMETIC: begin
                     accumulator[lane*8 +: 8] <= lane_result;
                     raw_result[lane*8 +: 8] <= lane_result;
-                    if (lane) begin lane <= 0; state <= ACTIVATE; end
-                    else begin lane <= 1; state <= PRODUCT; end
+                    if (lane) begin
+                        lane <= 0;
+                        if (instruction[2:0]==`ACT_NOP) begin
+                            data_out <= {lane_result,raw_result[7:0]};
+                            data_out_val <= 1;state <= IDLE;
+                        end else state <= ACTIVATE;
+                    end else begin lane <= 1;state <= multiply ? PRODUCT : ARITHMETIC;end
                 end
                 ACTIVATE: begin
                     if (!lane) begin

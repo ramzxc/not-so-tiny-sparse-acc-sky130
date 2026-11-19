@@ -79,3 +79,9 @@ The old test images placed instructions at `0x600000`, inside the newly reserved
 Build separate baseline/modified `test/Makefile.psram_network` binaries, then run `python3 scripts/evaluate_no_pc_optimization.py --before BASELINE_BINARY --after MODIFIED_BINARY`. The script reads existing fixtures without overwriting their reference results. `--reuse` recalculates projections from saved measurements.
 
 Run `scripts/run_no_pc_network.py --binary STREAM_BINARY --out reports/no_pc_optimization/stream_after` for the updated concurrent-input comparison. Reports, source hashes, binary hashes and logs are under `reports/no_pc_optimization/`.
+
+
+The validated state above is checkpointed at `0350439` on
+`checkpoint/no-pc-buffer-optimized`. The separate
+[sustainable-stream experiment](sustainable_stream.md) evaluates further changes;
+it does not move this checkpoint.

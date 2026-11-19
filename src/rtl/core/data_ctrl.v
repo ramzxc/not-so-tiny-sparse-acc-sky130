@@ -23,9 +23,9 @@ module data_ctrl (
     input  wire mem_itf_rdy,
     output wire read_en,
     output wire write_en,
-    output reg write_accumulate,
+    output wire write_accumulate,
     output wire [`MEM_ADDR_WIDTH-1:0] addr,
-    output reg [`MEM_DEVICE_WIDTH-1:0] device,
+    output wire [`MEM_DEVICE_WIDTH-1:0] device,
     output wire [`DATA_WIDTH*`COMPUTE_WIDTH-1:0] write_data,
     input  wire [`DATA_WIDTH*`COMPUTE_WIDTH-1:0] read_data,
     input  wire read_data_val,
@@ -64,6 +64,13 @@ module data_ctrl (
     wire store_result = (opcode == `OPCODE_DATA && data_inst_in[12] == `DATA_STORE) ||
                         (compact && compact_store);
     wire accept = data_inst_in_val && data_rdy;
+    reg [`MEM_DEVICE_WIDTH-1:0] saved_device;
+    reg saved_accumulate;
+    wire compact_skip=compact && !compact_store && compact_weight && compact_sparse &&
+        input_zero_mask[compact_kind[0]];
+    // Compact commands already carry address, mode and (held) result together.
+    // Accept the memory request on this edge instead of staging it through SEND.
+    wire compact_request=accept && compact && !compact_skip;
 
     // STORE waits for at least one result, not for a coincident valid pulse.
     // Software uses SYNC if it needs a newer EXEC result instead of the held one.
@@ -77,10 +84,12 @@ module data_ctrl (
         (!store_result || result_valid);
     // Lane 0 occupies the lowest byte address and least-significant data bits.
     // MEM bit 8 optionally advances the address after the complete vector.
-    assign addr = base_addr;
-    assign write_data = write_buffer;
-    assign read_en  = rst_n && state == SEND && !write_reg;
-    assign write_en = rst_n && state == SEND &&  write_reg;
+    assign addr = compact_request ? {14'b0,data_inst_in[8:0],1'b0} : base_addr;
+    assign write_data = compact_request && compact_store ? exec_data_in : write_buffer;
+    assign device = compact_request ? `MEM_SRAM : saved_device;
+    assign write_accumulate = compact_request ? compact_kind==11 : saved_accumulate;
+    assign read_en  = rst_n && ((state == SEND && !write_reg) || (compact_request && !compact_store));
+    assign write_en = rst_n && ((state == SEND && write_reg) || (compact_request && compact_store));
 
     always @(posedge clk) begin
         if (!rst_n) begin
@@ -92,10 +101,10 @@ module data_ctrl (
             input_select        <= 0;
             write_reg           <= 0;
             auto_increment      <= 0;
-            write_accumulate    <= 0;
+            saved_accumulate    <= 0;
             result_valid        <= 0;
             base_addr           <= 0;
-            device              <= `MEM_FLASH;
+            saved_device        <= `MEM_FLASH;
             write_buffer        <= 0;
             exec_data_out       <= 0;
             exec_data_out_val   <= 0;
@@ -135,9 +144,9 @@ module data_ctrl (
                         end
 
                         `OPCODE_MEM: begin
-                            device        <= data_inst_in[11:10];
+                            saved_device <= data_inst_in[11:10];
                             write_reg <= data_inst_in[12];
-                            write_accumulate <= data_inst_in[9];
+                            saved_accumulate <= data_inst_in[9];
                             auto_increment <= data_inst_in[8];
                             if (data_inst_in[12] == `MEM_READ &&
                                 load_weight && sparse_en && input_zero) begin
@@ -154,16 +163,16 @@ module data_ctrl (
 
                         `OPCODE_SYNC: if(compact)begin
                             base_addr<={14'b0,data_inst_in[8:0],1'b0};
-                            device<=`MEM_SRAM;auto_increment<=0;
-                            write_reg<=compact_store;write_accumulate<=compact_kind==11;
+                            saved_device <=`MEM_SRAM;auto_increment<=0;
+                            write_reg<=compact_store;saved_accumulate <=compact_kind==11;
                             if(compact_store)begin
-                                write_buffer<=exec_data_in;state<=SEND;
+                                write_buffer<=exec_data_in;state<=WAIT;
                             end else begin
                                 load_weight<=compact_weight;sparse_en<=compact_sparse;
                                 input_scalar_mode<=compact_scalar;input_select<=compact_kind[0];
                                 if(compact_weight && compact_sparse && input_zero_mask[compact_kind[0]])begin
                                     exec_data_out<=0;exec_data_out_val<=1;exec_data_is_weight<=1;state<=DELIVER;
-                                end else state<=SEND;
+                                end else state<=WAIT;
                             end
                         end
                         default: begin end

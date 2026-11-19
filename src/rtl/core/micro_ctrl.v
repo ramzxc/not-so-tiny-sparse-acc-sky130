@@ -74,7 +74,7 @@ module micro_ctrl (
                        {1'b0,input_addr[9:0]} < checked_next));
     assign busy = state != IDLE;
     assign host_ready = rst_n && !busy && (is_micro ? units_idle : core_ready);
-    assign core_valid = rst_n && (busy ? (command_state && !memory_error) :
+    assign core_valid = rst_n && (busy ? (command_state && !memory_error && (state!=STORE || units_idle)) :
                                                 (host_valid && !is_micro));
     always @(*) begin
         core_inst = host_inst;
@@ -256,7 +256,8 @@ module micro_ctrl (
                 W_HI: if (fire) state <= W_MEM;
                 W_MEM: if (fire) state <= W_SYNC;
                 W_SYNC: if (fire) state <= batched ? I_DATA : EXEC;
-                EXEC: if (fire) state <= EXEC_SYNC;
+                // STORE waits for idle units itself, including the newest EXEC result.
+                EXEC: if (fire) state <= STORE;
                 EXEC_SYNC: if (fire) state <= STORE;
                 STORE: if (fire) state <= compact_sram ? A_SYNC : A_LO;
                 A_LO: if (fire) state <= dma_mode && input_sram ? A_MEM : A_HI;

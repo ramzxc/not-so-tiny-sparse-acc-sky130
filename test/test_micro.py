@@ -50,7 +50,9 @@ async def sequencer(d):
         await reset()
         await cfg(0xa000,0x200);await cfg(0xa400,0xffc);await cfg(0xa800,0)
         await cfg(0xac00|groups);await cfg(0xb000|columns);await cfg(0xb401)
-        want=expected(groups,columns,masks) if groups and columns else [];index=0;held=None
+        want=expected(groups,columns,masks) if groups and columns else []
+        want=[item for i,item in enumerate(want) if not (i and item[0]==0xffff and want[i-1][0]==0x6800)]
+        index=0;held=None
         d.host_inst.value=0x6800;d.host_valid.value=1 # queued host operation
         for _ in range(20000):
             if not int(d.busy.value):break
@@ -126,6 +128,7 @@ async def batch_schedule(d):
                     if not (mask>>(c%2))&1:
                         emit(0x6800,0xffff,0x9000,0x2000|2*(g*batches+b),0x3000,0x5600)
                     emit(0xffff)
+        want=[item for i,item in enumerate(want) if not (i and item[0]==0xffff and want[i-1][0]==0x6800)]
         index=0;held=None
         for _ in range(100000):
             if not int(d.busy.value):break
@@ -202,6 +205,7 @@ async def dma_tile_sequence(d):
             source=min(0xffffff,source+(stride or groups*2))
         # A queued host command must stay blocked for the entire tile.
         d.host_inst.value=0x6800;d.host_valid.value=1
+        want=[item for i,item in enumerate(want) if not (i and item[0]==0xffff and want[i-1][0]==0x6800)]
         index=0;held=None;dma_stall=0
         for _ in range(30000):
             if not int(d.busy.value):break
@@ -316,6 +320,7 @@ async def dma_batch_sequence(d):
                     if not sparse or not (masks[c//2][b]>>(c%2))&1:
                         emit(0x6800,0xffff,0x9000);addr(acc+2*(g*batches+b),not inpdev);emit(0x5600)
                     emit(0xffff)
+        want=[item for i,item in enumerate(want) if not (i and item[0]==0xffff and want[i-1][0]==0x6800)]
         index=0;held=None;stall=0
         for _ in range(100000):
             if not int(d.busy.value):break
@@ -345,3 +350,29 @@ async def dma_batch_sequence(d):
             if not int(d.busy.value):break
             await tick()
         assert not int(d.busy.value) and int(d.error.value)
+
+@cocotb.test()
+async def store_waits_for_latest_exec(d):
+    """Folded STORE must not consume a held old result while EXEC is busy."""
+    async def tick():
+        d.clk.value=0;await Timer(5,unit='ns');d.clk.value=1;await Timer(5,unit='ns')
+    d.rst_n.value=0;d.host_valid.value=0;d.host_inst.value=0
+    d.core_ready.value=1;d.units_idle.value=1;d.staging_addr.value=0
+    d.input_zero_mask.value=0;d.memory_error.value=0
+    await tick();d.rst_n.value=1
+    for w in (0xac01,0xb001,0xb400):
+        d.host_inst.value=w;d.host_valid.value=1;await tick();d.host_valid.value=0
+    for _ in range(100):
+        if int(d.core_valid.value) and int(d.core_inst.value)==0x6800:
+            await tick();break
+        await tick()
+    else:raise AssertionError('no EXEC issued')
+    d.units_idle.value=0
+    for _ in range(5):
+        await Timer(1,unit='ns')
+        assert not int(d.core_valid.value),'STORE consumed the preceding held result'
+        assert int(d.busy.value)
+        await tick()
+    d.units_idle.value=1;await Timer(1,unit='ns')
+    assert int(d.core_valid.value) and int(d.core_inst.value)==0x9000
+    await tick()
