@@ -14,7 +14,7 @@ VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_f
 VERILOG_SOURCES += $(ROOT)/macro/acc_hard_macro/acc_hard_macro.v
 VERILOG_SOURCES += $(CURDIR)/gate_level_netlist.v
 else
-SIM = verilator
+SIM ?= verilator
 VERILOG_SOURCES = $(addprefix $(ROOT)/,$(shell sed '/^+/d' $(ROOT)/src/sources.f))
 COMPILE_ARGS += -I$(ROOT)/src/rtl -I$(ROOT)/src/rtl/core -Wno-fatal --timing --timescale-override 1ns/1ps
 endif

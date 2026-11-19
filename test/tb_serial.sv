@@ -126,8 +126,17 @@ module tb_serial;
     end
     wire [3:0] flash_dq;
 `ifdef GL_TEST
-    // Observe the SRAM model response, not a synthesis-dependent core net.
-    wire [64:0] mem_observe_row = dut.core.itf.memory.size_512_macro.dout0;
+    // Hold each valid SRAM response for the bit-exact DMA check. OpenRAM
+    // invalidates dout0 on the next rising edge, long before UART SYNC returns.
+    // Do not sample that idle X window or initialize the SRAM contents.
+    reg [64:0] mem_observe_row;
+    always @(negedge dut.core.itf.memory.size_512_macro.clk0) begin
+        if (!dut.core.itf.memory.size_512_macro.csb0_reg &&
+             dut.core.itf.memory.size_512_macro.web0_reg) begin
+            #(dut.core.itf.memory.size_512_macro.DELAY + 1);
+            mem_observe_row = dut.core.itf.memory.size_512_macro.dout0;
+        end
+    end
     wire [31:0] mem_observe_data = observe_upper ? mem_observe_row[63:32] : mem_observe_row[31:0];
     wire VPWR = 1'b1;
     wire VGND = 1'b0;

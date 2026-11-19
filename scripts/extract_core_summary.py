@@ -45,7 +45,7 @@ def main():
 
     folder = ROOT / 'macro/acc_hard_macro'
     manifest = json.loads((folder / 'manifest.json').read_text())
-    source = Path(os.environ.get('CORE_DEF', ROOT / manifest['source_run'] / 'acc_hard_macro.def'))
+    source = Path(os.environ['CORE_DEF']) if 'CORE_DEF' in os.environ else ROOT / manifest['source_run'] / 'acc_hard_macro.def'
     pdk = Path(os.environ['PDK_ROOT']) / 'sky130A/libs.ref/sky130_fd_sc_hd'
     lefs = [pdk / 'techlef/sky130_fd_sc_hd__nom.tlef', pdk / 'lef/sky130_fd_sc_hd.lef',
             ROOT / 'memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.lef']
@@ -101,7 +101,7 @@ def main():
     assets = ['acc_hard_macro.gds', 'acc_hard_macro.lef', 'acc_hard_macro.v', 'acc_hard_macro.lvs.spice']
     result = {
         'schema': 1,
-        'source_def': str(source.relative_to(ROOT)),
+        'source_def': f'{source.parent.name}/{source.name}',
         'source_def_sha256': digest(source),
         'source_lefs_sha256': {p.name: digest(p) for p in lefs},
         'submitted_assets_sha256': {name: digest(folder / name) for name in assets},

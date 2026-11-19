@@ -1,20 +1,21 @@
 {
-  "source_export": "final_1795020983",
+  "source_export": "final_1795071989",
   "sha256": {
-    "acc_hard_macro.gds": "fa174c22422ba1ef93717f137cf5532610328d95ff55c12e972f06b1a9855976",
-    "acc_hard_macro.lef": "a9b4d440e3330e00a581a3dca4e4d4031837dddd266099a9d09b1bb48e313215"
+    "acc_hard_macro.gds": "a4f82216c7f431b8497548254c1f8e1c26fa9109cbdc5452163f39c0715c0e09",
+    "acc_hard_macro.lef": "865ece4a1d124528d0d02083b08f594d682533985eacb2fc82dc18e1fa836344"
   },
   "lef_obstructions": "Removed only empty M1 margins after checking all GDS M1 geometry; pins and GDS unchanged. Regenerate with scripts/fix_core_lef_obstructions.py.",
   "lef_power_pins": "43 continuous M4 supply columns verified against actual GDS; full-height pins and matching M4 OBS subtraction. Reproduce with scripts/expose_core_power_pins.py.",
   "lvs_inputs": {
-    "macro/acc_hard_macro/acc_hard_macro.v": "eb0a2588327e78bccea4488730430f825a8472c801b896fd4a44690786c19d82",
+    "macro/acc_hard_macro/acc_hard_macro.v": "16a62920f6b8bdaa4ba1038b0e16cdcaf3e7acf1d86238ca1ea2986b32f67f7d",
     "memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.lvs.sp": "aecf2d431c88a9e6a144f23c69ec1eae3442e8054eb3da9a8ea30721d195bf3b",
-    "macro/acc_hard_macro/acc_hard_macro.lvs.spice": "873fd4b771b223f904c3502cb205a37382da07b649a3c20be88b62ef814a0f5a",
-    "macro/acc_hard_macro/sram.lvs_micron.spice": "02f4bea9e5339eee87b278366e3627d03dd5289b8a7094d2b7e5bf3d4e0b6f41"
+    "macro/acc_hard_macro/acc_hard_macro.lvs.spice": "0b54d7f93d6607f390b79f53d339fbff45980b67706bc20e1f67a09d81cdd993",
+    "macro/acc_hard_macro/sram.lvs_micron.spice": "f6e25d29d38a08721eed0578a2933c8f27126d5644952567706ff15f3e66b163"
   },
   "lvs_nfet_rule": {
-    "model": "sky130_fd_pr__special_nfet_01v8",
-    "width_lt_um": "0.42"
+    "model": null,
+    "width_lt_um": null
   },
-  "packaging": "Added top PR boundary and exactly rescaled GDS database units without rounding; manufacturing geometry unchanged."
+  "packaging": "Added top PR boundary and exactly rescaled GDS database units without rounding; manufacturing geometry unchanged.",
+  "functional_eco": "One and2b_1 gate on dma.remaining_reg_7_ D explicitly enforces synchronous reset; preserves binary behavior and prevents reset feedback X-pessimism. Physically placed, powered, and routed in ICC2."
 }
