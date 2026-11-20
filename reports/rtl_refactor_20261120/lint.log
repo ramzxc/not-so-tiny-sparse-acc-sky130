@@ -1,0 +1,81 @@
+- V e r i l a t i o n   R e p o r t: Verilator 5.052 2026-09-05 rev v5.052-61-g983a06a16
+- Verilator: Built from 0.903 MB sources in 19 modules, into 0.524 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.146 s (elab=0.019, cvt=0.089, bld=0.000); cpu 0.146 s on 1 threads; allocated 27.648 MB
+%Warning-DECLFILENAME: src/rtl/project.v:6:8: Filename 'project' does not match MODULE name: 'acc_hard_macro'
+    6 | module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87, parameter integer QUEUE_SLOT_BITS=14) (
+      |        ^~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/DECLFILENAME?v=5.052
+                       ... Use "/* verilator lint_off DECLFILENAME */" and lint_on around source to disable this message.
+%Warning-DECLFILENAME: src/rtl/core/command_ctrl.v:57:8: Filename 'command_ctrl' does not match MODULE name: 'program_fetch'
+   57 | module program_fetch (
+      |        ^~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: src/rtl/qspi_ctrl.v:54:99: Instance pin connected by name with empty reference: 'busy'
+   54 |         .req_data(serial_data),.req_ready(bus_ready),.done(bus_done),.byte_valid(bus_byte_valid),.busy()
+      |                                                                                                   ^~~~
+                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.052
+                          ... Use "/* verilator lint_off PINCONNECTEMPTY */" and lint_on around source to disable this message.
+%Warning-DECLFILENAME: src/rtl/qspi_ctrl.v:68:8: Filename 'qspi_ctrl' does not match MODULE name: 'psram_arbiter'
+   68 | module psram_arbiter #(parameter integer FETCH_WRITES=0) (
+      |        ^~~~~~~~~~~~~
+%Warning-WIDTHEXPAND: memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.v:51:21: Operator ASSIGN expects 65 bits on the Assign RHS, but Assign RHS's CONST '64'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' generates 64 bits.
+                                                                                                                            : ... note: In instance 'acc_hard_macro.itf.memory.size_1k.macro'
+   51 |     #(T_HOLD) dout0 = 64'bx;
+      |                     ^
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.052
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Warning-BLKSEQ: memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.v:46:14: Blocking assignment '=' in sequential logic process
+                                                                                                                       : ... note: In instance 'acc_hard_macro.itf.memory.size_1k.macro'
+                                                                                                                       : ... Suggest using delayed assignment '<='
+   46 |     csb0_reg = csb0;
+      |              ^
+                 ... For warning description see https://verilator.org/warn/BLKSEQ?v=5.052
+                 ... Use "/* verilator lint_off BLKSEQ */" and lint_on around source to disable this message.
+%Warning-BLKSEQ: memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.v:47:14: Blocking assignment '=' in sequential logic process
+                                                                                                                       : ... note: In instance 'acc_hard_macro.itf.memory.size_1k.macro'
+                                                                                                                       : ... Suggest using delayed assignment '<='
+   47 |     web0_reg = web0;
+      |              ^
+%Warning-BLKSEQ: memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.v:48:20: Blocking assignment '=' in sequential logic process
+                                                                                                                       : ... note: In instance 'acc_hard_macro.itf.memory.size_1k.macro'
+                                                                                                                       : ... Suggest using delayed assignment '<='
+   48 |     spare_wen0_reg = spare_wen0;
+      |                    ^
+%Warning-BLKSEQ: memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.v:49:15: Blocking assignment '=' in sequential logic process
+                                                                                                                       : ... note: In instance 'acc_hard_macro.itf.memory.size_1k.macro'
+                                                                                                                       : ... Suggest using delayed assignment '<='
+   49 |     addr0_reg = addr0;
+      |               ^
+%Warning-BLKSEQ: memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.v:50:14: Blocking assignment '=' in sequential logic process
+                                                                                                                       : ... note: In instance 'acc_hard_macro.itf.memory.size_1k.macro'
+                                                                                                                       : ... Suggest using delayed assignment '<='
+   50 |     din0_reg = din0;
+      |              ^
+%Warning-BLKSEQ: memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.v:51:21: Blocking assignment '=' in sequential logic process
+                                                                                                                       : ... note: In instance 'acc_hard_macro.itf.memory.size_1k.macro'
+                                                                                                                       : ... Suggest using delayed assignment '<='
+   51 |     #(T_HOLD) dout0 = 64'bx;
+      |                     ^
+%Warning-BLKSEQ: memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.v:64:30: Blocking assignment '=' in sequential logic process
+                                                                                                                       : ... note: In instance 'acc_hard_macro.itf.memory.size_1k.macro'
+                                                                                                                       : ... Suggest using delayed assignment '<='
+   64 |         mem[addr0_reg][63:0] = din0_reg[63:0];
+      |                              ^
+%Warning-BLKSEQ: memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.v:66:36: Blocking assignment '=' in sequential logic process
+                                                                                                                       : ... note: In instance 'acc_hard_macro.itf.memory.size_1k.macro'
+                                                                                                                       : ... Suggest using delayed assignment '<='
+   66 |                 mem[addr0_reg][64] = din0_reg[64];
+      |                                    ^
+%Warning-UNUSEDSIGNAL: src/rtl/project.v:38:57: Signal is not used: 'micro_busy'
+                                              : ... note: In instance 'acc_hard_macro'
+   38 |     wire sequenced_valid, sequenced_ready, micro_error, micro_busy;
+      |                                                         ^~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.052
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: src/rtl/mem_itf.sv:32:16: Bits of signal are not used: 'saved_addr'[23]
+                                               : ... note: In instance 'acc_hard_macro.itf'
+   32 |     reg [23:0] saved_addr;
+      |                ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: src/rtl/shared_sram.sv:11:17: Bits of signal are not used: 'raw_data'[64]
+                                                   : ... note: In instance 'acc_hard_macro.itf.memory'
+   11 |     wire [64:0] raw_data;
+      |                 ^~~~~~~~

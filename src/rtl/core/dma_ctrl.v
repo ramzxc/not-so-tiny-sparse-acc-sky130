@@ -13,7 +13,7 @@ module dma_ctrl (
     input wire core_ready, units_idle,
     input wire [23:0] staging_addr,
     input wire mem_ready, mem_read_valid, memory_error,
-    output wire mem_read, mem_write, mem_read_continue,
+    output wire mem_read,
     output wire [23:0] mem_addr,
     output wire [9:0] mem_destination,
     output wire [2:0] mem_vectors,
@@ -37,8 +37,6 @@ module dma_ctrl (
     wire [2:0] row_room=3'd4-{1'b0,destination[2:1]};
     assign mem_vectors=remaining < {5'b0,row_room} ? remaining[2:0] : row_room;
     assign mem_destination=destination;
-    assign mem_read_continue=remaining>{5'b0,mem_vectors};
-    assign mem_write=1'b0; // mem_itf commits the entire row before completion.
     assign mem_addr=source;
     always @(posedge clk) begin
         if (!rst_n) begin

@@ -20,7 +20,7 @@ module qspi_ctrl (
     output wire sck,ram_a_cs,
     output wire [3:0] dq_out,dq_oe
 );
-    wire core_bus_ready,core_bus_done,core_bus_byte_valid,queue_bus_busy;
+    wire core_bus_ready,core_bus_done,core_bus_byte_valid;
     wire serial_valid,serial_write;
     wire [22:0] serial_addr;
     wire [3:0] serial_bytes;
@@ -51,7 +51,7 @@ module qspi_ctrl (
         .fetch_write(bus_write),.fetch_wdata(bus_data),
         .fetch_ready(core_bus_ready),.fetch_done(core_bus_done),.fetch_byte_valid(core_bus_byte_valid),
         .req_valid(serial_valid),.req_write(serial_write),.req_addr(serial_addr),.req_bytes(serial_bytes),
-        .req_data(serial_data),.req_ready(bus_ready),.done(bus_done),.byte_valid(bus_byte_valid),.busy(queue_bus_busy)
+        .req_data(serial_data),.req_ready(bus_ready),.done(bus_done),.byte_valid(bus_byte_valid),.busy()
     );
     qpi_engine serial_memory (
         .clk(clk),.rst_n(rst_n),.req_valid(serial_valid),.req_ready(bus_ready),

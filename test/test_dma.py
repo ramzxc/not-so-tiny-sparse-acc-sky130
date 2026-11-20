@@ -30,7 +30,7 @@ async def copy_control(d):
             for _ in range(rng.randrange(1,7)):
                 await settle()
                 assert int(d.busy.value) and not int(d.host_ready.value) and not int(d.core_valid.value)
-                assert not int(d.mem_write.value) and int(d.mem_read.value)
+                assert int(d.mem_read.value)
                 assert int(d.mem_addr.value)==src+2*i
                 assert int(d.mem_destination.value)==dst+2*i
                 assert int(d.mem_vectors.value)==chunk
@@ -60,7 +60,7 @@ async def copy_control(d):
     # Accepted memory request must drain on a fault; no later request is issued.
     await tick();d.mem_ready.value=0;d.memory_error.value=1
     for _ in range(3):
-        await tick();assert int(d.busy.value) and not int(d.mem_read.value) and not int(d.mem_write.value)
+        await tick();assert int(d.busy.value) and not int(d.mem_read.value)
     d.mem_ready.value=1;await tick();assert not int(d.busy.value) and int(d.error.value)
     # Reset cancels a stalled copy and clears the sticky error.
     await reset();await cfg(0xc801);d.mem_ready.value=0;await tick()

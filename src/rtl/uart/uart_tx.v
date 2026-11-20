@@ -2,12 +2,12 @@
 // Wire-protocol bytes stay 8 bits independently of the compute format.
 
 module uart_tx #(
-    parameter integer CLKS_PER_BIT = 87 // for 115200 baud, 10MHz clk
+    parameter integer CLKS_PER_BIT = 87 // baud = clock frequency / CLKS_PER_BIT
 ) (
     input  wire clk,
     input  wire rst_n,
 
-    input  wire inst_fifo_rdy,
+    input  wire credit_ready,
 
     output wire tx
 );
@@ -37,12 +37,12 @@ module uart_tx #(
             ready_sent <= 0;
         end
         else begin
-            if (!inst_fifo_rdy)
+            if (!credit_ready)
                 ready_sent <= 0;
 
             case(state)
                 IDLE: begin
-                    if (inst_fifo_rdy && !ready_sent) begin
+                    if (credit_ready && !ready_sent) begin
                         ready_sent <= 1'b1;
                         bit_idx <= 0;
                         state <= DATA;

@@ -13,6 +13,21 @@ See [measured bottlenecks](../docs/bottleneck.md). Functional RTL is unchanged.
 
 # Current default: UART input / PSRAM programs and weights
 
+The default suite also runs `test_stream_control_payload`: F100/F200/F300/F400
+inside framed payloads, framed-to-raw transition, invalid raw frame sizes,
+reconfiguration, and a complete 256-byte raw frame. Command parsing belongs to
+`program_fetch`; `input_queue` receives a validated start pulse and frame length.
+`credit_ready` invites a future delivery pulse and is not a same-cycle valid/ready
+handshake.
+
+For refactor comparisons, the stream testbench accepts
+`+CYCLE_TRACE=/absolute/path/trace.txt` in `SIM_ARGS` (alongside `+FIXTURE=...`).
+It records pins, accepted instructions, input writes and completion events on
+every clock. Run identical stimuli on both revisions and compare with `cmp`.
+The raw queue suite requires `COCOTB_TEST_MODULES=test_psram_queue QUEUE_SLOT_BITS=2`.
+Trace equality demonstrates cycle preservation for these stimuli, not STA closure.
+
+
 `make -C test` runs the PSRAM stream suite. See [the interface contract](../docs/psram_stream.md)
 and `Makefile.stream`, `Makefile.arbiter`, `Makefile.psram_network`.
 The following Flash/UART-instruction benchmark commands are historical and

@@ -41,6 +41,20 @@ module tb_psram_stream #(parameter integer UART_CLKS_PER_BIT=8, parameter intege
         if(dut.qspi_done && dut.fetch_done)$fatal(1,"double completion");
         if(uio_out[0]!==1 || uio_out[7]!==1)$fatal(1,"unused memories selected");
     end
+    // Optional cycle trace for behavior-preserving RTL refactors.
+    // Capture pins and architectural request/completion events, not FSM encoding.
+    integer trace_fd=0;
+    string trace_path;
+    initial if($value$plusargs("CYCLE_TRACE=%s",trace_path)) trace_fd=$fopen(trace_path,"w");
+    always @(posedge clk) if(trace_fd) begin
+        $fdisplay(trace_fd,"%0t %h %h %h %h %h %h %h %h %h %h %h %h",
+            $time,rst_n,uo_out,uio_out,uio_oe,
+            dut.dispatched_valid && dut.dispatched_ready,
+            dut.dispatched_valid && dut.dispatched_ready ? dut.dispatched_inst : 16'b0,
+            dut.input_write,dut.copy_done,dut.read_data_val,dut.result_val,
+            dut.fetch_done,dut.qspi_done);
+    end
+    final if(trace_fd) $fclose(trace_fd);
     string fixture;
     initial begin
         #1;

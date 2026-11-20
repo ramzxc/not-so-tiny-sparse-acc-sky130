@@ -104,7 +104,7 @@ module data_ctrl (
             saved_accumulate    <= 0;
             result_valid        <= 0;
             base_addr           <= 0;
-            saved_device        <= `MEM_FLASH;
+            saved_device        <= `MEM_PSRAM;
             write_buffer        <= 0;
             exec_data_out       <= 0;
             exec_data_out_val   <= 0;

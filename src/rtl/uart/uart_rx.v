@@ -3,7 +3,7 @@
 
 // Collect `INST_WIDTH/8 UART bytes, low byte first, into one external job.
 module uart_rx # (
-    parameter integer CLKS_PER_BIT = 87 // for 115200 baud, 10MHz clk
+    parameter integer CLKS_PER_BIT = 87 // baud = clock frequency / CLKS_PER_BIT
 ) (
     input  wire clk,
     input  wire rst_n,

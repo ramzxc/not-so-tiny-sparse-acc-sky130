@@ -19,10 +19,12 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87, parameter inte
         else        reset_sync <= {reset_sync[0], 1'b1};
     end
 
-    wire tx, fifo_rdy, rx_inst_val;
+    wire tx, uart_credit_ready, rx_inst_val;
     wire host_error,host_busy,input_write,uart_error;
-    wire frontend_ready,frontend_rx_valid,queue_error,stream_mode;
+    wire frontend_credit_ready,frontend_rx_valid,queue_error,stream_mode;
     wire [15:0] frontend_rx_word;
+    wire stream_start;
+    wire [7:0] frame_words;
     wire queue_valid,queue_write,queue_ready,queue_done,queue_byte_valid;
     wire [22:0] queue_addr;
     wire [15:0] queue_data;
@@ -36,7 +38,7 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87, parameter inte
     wire sequenced_valid, sequenced_ready, micro_error, micro_busy;
     wire [15:0] dispatched_inst;
     wire dispatched_valid, dispatched_ready;
-    wire dma_busy, dma_error, dma_read, dma_write, dma_read_continue;
+    wire dma_busy, dma_error, dma_read;
     wire [23:0] dma_addr;
     wire [9:0] dma_destination;
     wire [2:0] dma_vectors;
@@ -65,12 +67,13 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87, parameter inte
         .inst(rx_inst), .inst_val(rx_inst_val),.error(uart_error)
     );
     uart_tx #(.CLKS_PER_BIT(UART_CLKS_PER_BIT)) transmitter (
-        .clk(clk), .rst_n(core_rst_n), .inst_fifo_rdy(fifo_rdy), .tx(tx)
+        .clk(clk), .rst_n(core_rst_n), .credit_ready(uart_credit_ready), .tx(tx)
     );
     input_queue #(.SLOT_BITS(QUEUE_SLOT_BITS)) ingress (
         .clk(clk),.rst_n(core_rst_n),.rx_word(rx_inst),.rx_valid(rx_inst_val),
-        .rx_ready(fifo_rdy),.stream_mode(stream_mode),.error(queue_error),
-        .frontend_word(frontend_rx_word),.frontend_valid(frontend_rx_valid),.frontend_ready(frontend_ready),
+        .credit_ready(uart_credit_ready),.stream_mode(stream_mode),.error(queue_error),
+        .frontend_word(frontend_rx_word),.frontend_valid(frontend_rx_valid),.frontend_credit_ready(frontend_credit_ready),
+        .stream_start(stream_start),.frame_words(frame_words),
         .req_valid(queue_valid),.req_write(queue_write),.req_addr(queue_addr),.req_data(queue_data),
         .req_ready(queue_ready),.req_done(queue_done),.req_byte_valid(queue_byte_valid),.req_rdata(qspi_read_data)
     );
@@ -79,7 +82,9 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87, parameter inte
         .rst_n(core_rst_n),
         .frontend_rx_word(frontend_rx_word),
         .frontend_rx_valid(frontend_rx_valid),
-        .frontend_ready(frontend_ready),
+        .frontend_credit_ready(frontend_credit_ready),
+        .stream_start(stream_start),
+        .frame_words(frame_words),
         .host_error(host_error),
         .host_busy(host_busy),
         .micro_error(micro_error),
@@ -111,8 +116,8 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87, parameter inte
         .core_inst(dispatched_inst), .core_valid(dispatched_valid), .core_ready(dispatched_ready),
         .units_idle(exec_rdy && data_rdy), .staging_addr(addr),
         .mem_ready(mem_rdy), .mem_read_valid(copy_done), .memory_error(memory_error),
-        .mem_read(dma_read), .mem_write(dma_write), .mem_addr(dma_addr),
-        .mem_read_continue(dma_read_continue),.mem_destination(dma_destination),.mem_vectors(dma_vectors),
+        .mem_read(dma_read), .mem_addr(dma_addr),
+        .mem_destination(dma_destination),.mem_vectors(dma_vectors),
         .busy(dma_busy), .error(dma_error)
     );
     inst_decoder decode (
@@ -146,7 +151,6 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87, parameter inte
         .copy_en(dma_read),.copy_source(dma_addr),.copy_destination(dma_destination),
         .copy_vectors(dma_vectors),.copy_done(copy_done),
         .write_accumulate(!input_write && !dma_busy && write_accumulate),
-        .read_burst(dma_busy), .read_continue(dma_read_continue),
         .error(memory_error), .addr(input_write ? {14'b0,input_addr} : addr),
         .device(input_write ? `MEM_SRAM : device),
         // Ordinary writes use DATA or UART; DMA copies through the row buffer.
@@ -193,6 +197,5 @@ module acc_hard_macro #(parameter integer UART_CLKS_PER_BIT = 87, parameter inte
     assign uio_out = {1'b1,ram_a_cs,dq_out[3:2],sck,dq_out[1:0],1'b1};
     assign uio_oe = core_rst_n && rst_n ? {2'b11,dq_oe[3:2],1'b1,dq_oe[1:0],1'b1} : 8'b0;
     assign uo_out  = {3'b0, tx, 1'b0,stream_mode, (memory_error | micro_error | dma_error | host_error | uart_error | queue_error), !host_busy};
-    wire _unused = &{micro_busy,dma_write,1'b0};
 endmodule
 `default_nettype wire

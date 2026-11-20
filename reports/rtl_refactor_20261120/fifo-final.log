@@ -1,0 +1,4 @@
+mkdir -p /tmp/acc-refactor-fifo-final
+iverilog -g2012 -I src/rtl -I src/rtl/core -s tb_uart_queue_fifo -o /tmp/acc-refactor-fifo-final/test src/rtl/input_queue.v test/tb_uart_queue_fifo.sv
+vvp /tmp/acc-refactor-fifo-final/test
+PASS: FIFO stall/order, simultaneous pop/push, ring full/recovery, overflow/reset

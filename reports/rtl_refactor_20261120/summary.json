@@ -1,0 +1,72 @@
+{
+  "baseline_commit": "f7941a75261cc9b18de856e74d4763a4d02f9b77",
+  "rtl_sha256": {
+    "src/rtl/core/command_ctrl.v": "782649bcbf6e5d00d7184b8d4ffd95a40e1dc0cf5f5da6b9905ee5b977e6283a",
+    "src/rtl/core/data_ctrl.v": "4b357c2145c43fade8d7bcc1b8c37a6456066aa8c3f239f14f09348037de1321",
+    "src/rtl/core/dma_ctrl.v": "a40083bf5d2d4dd175b0116f1d54f2c5e193273bb832a9e4a9d848291847c21f",
+    "src/rtl/core/exec_unit.sv": "16f1a6faf23ff7d76c1f71cb91276351d26e402fd56c7dd1426f86d060688bec",
+    "src/rtl/core/inst_decoder.v": "095914fdc070c5a1808c1ff466c1bff6b2ba58698db70f0ac1cb4780a63a0f88",
+    "src/rtl/defs/defs.vh": "4b4b783b5a4cdb83863c87fa7e1ce2743d3c6c58247a81d3a3e6ddb4ea029ab8",
+    "src/rtl/defs/fp16_math.vh": "8a841f1145d3f1fa4dfb13cbfbdeb05860eeb8073d89483ce1af05927f52df81",
+    "src/rtl/defs/fp8_math.vh": "cc68fd54988a82c83db00a26697c775b98dcc08162e2c8abc5924460bafbecc4",
+    "src/rtl/defs/host_defs.vh": "b13aac288762e7e6e8746a5278a9401be0e45d091f514d423fa43a66dff2fa95",
+    "src/rtl/defs/inst_defs.vh": "10433c3afe5909da4e9779fdfa2483f40999a746af591a9270bd025bae626e9e",
+    "src/rtl/defs/mem_defs.vh": "bf6c8519053535f9d20a02412c27ff6470bb1a31f560605025f7412e6e28372c",
+    "src/rtl/input_queue.v": "89cd05d0f6d46b0fd6b563c822fde354a58ac5839784a84c292da58e048e24a7",
+    "src/rtl/mem_itf.sv": "6dc1ed72e1ae5000e2595d453122736834605491425e9f434e7d78520ca58659",
+    "src/rtl/project.v": "7a211776c1081e0eac7f64a5a32f13cd7e0a6589960ea46807611b6ef15e7d8d",
+    "src/rtl/qspi_ctrl.v": "e219d862902483348396adf7c1078910552a27807075c813b4f7729e80da139e",
+    "src/rtl/shared_sram.sv": "50b0b34204b6bc30474286efdaa55d0b62f429703418163a1c922e46eb66c515",
+    "src/rtl/uart/uart_rx.v": "188f35d809280a99a9aa9144838f2df50508d71ea14dc92ef27c0e3c72eb699a",
+    "src/rtl/uart/uart_tx.v": "abe4bb927261208b156597853b4d6b1019ab942f73811649864cb75cb63f5afa"
+  },
+  "tests": {
+    "default": {
+      "tests": 7,
+      "failures": 0
+    },
+    "raw_queue": {
+      "tests": 3,
+      "failures": 0
+    },
+    "micro": {
+      "tests": 5,
+      "failures": 0
+    },
+    "dma": {
+      "tests": 1,
+      "failures": 0
+    },
+    "sram": {
+      "tests": 2,
+      "failures": 0
+    }
+  },
+  "fifo_unit_suite": "pass",
+  "cycle_comparisons": {
+    "stream": {
+      "identical": true,
+      "clock_samples": 226849,
+      "sha256": "fef0824dd94469425f2cd0e63d3c6d77bff3d48d0629b942cdb789b929d45adf",
+      "baseline_trace": "/tmp/acc-refactor-baseline/stream.trace",
+      "final_trace": "/tmp/acc-refactor-final/stream.trace"
+    },
+    "raw_queue": {
+      "identical": true,
+      "clock_samples": 24781,
+      "sha256": "ffaa7f47521719549c1cd5f84c37df7bc18ecae3fbc07cf1ae2f3f3dd2b73643",
+      "baseline_trace": "/tmp/acc-refactor-queue-baseline/queue.trace",
+      "final_trace": "/tmp/acc-refactor-queue-final/queue.trace"
+    }
+  },
+  "verilator_lint": "exit 0; warnings retained in lint.log",
+  "iverilog_elaboration": "exit 0; diagnostics retained in iverilog.log",
+  "removed_queue_register_bits": 12,
+  "synthesis_run": false,
+  "pnr_run": false,
+  "limits": [
+    "Trace equality covers the recorded regression stimuli, not formal equivalence.",
+    "No post-refactor area or maximum-frequency measurement.",
+    "Corrected framed control-word payload behavior intentionally differs from baseline."
+  ]
+}

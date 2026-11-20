@@ -1,10 +1,13 @@
+`include "defs/host_defs.vh"
 // Program fetch and generic MICRO sequencing form one command-control block.
 // Internal FSMs remain separate; merging their state would change scheduling.
 module command_ctrl (
     input wire clk,rst_n,
     input wire [15:0] frontend_rx_word,
     input wire frontend_rx_valid,
-    output wire frontend_ready,host_error,host_busy,micro_error,micro_busy,
+    output wire frontend_credit_ready,host_error,host_busy,micro_error,micro_busy,
+    output wire stream_start,
+    output wire [7:0] frame_words,
     input wire units_idle,bus_busy,memory_error,uart_error,
     input wire [23:0] addr,
     input wire [1:0] loaded_input_zero_mask,
@@ -25,7 +28,8 @@ module command_ctrl (
     wire inst_val,decoder_rdy;
     program_fetch frontend (
         .clk(clk),.rst_n(rst_n),.rx_word(frontend_rx_word),.rx_valid(frontend_rx_valid),
-        .rx_ready(frontend_ready),.error(host_error),.busy(host_busy),
+        .credit_ready(frontend_credit_ready),.error(host_error),.busy(host_busy),
+        .stream_start(stream_start),.frame_words(frame_words),
         .units_idle(units_idle && !micro_busy && !bus_busy),
         .memory_error(memory_error | micro_error | uart_error),
         .inst(inst),.inst_valid(inst_val),.inst_ready(decoder_rdy),
@@ -54,7 +58,9 @@ module program_fetch (
     input wire clk,rst_n,
     input wire [15:0] rx_word,
     input wire rx_valid,
-    output wire rx_ready,
+    output wire credit_ready,
+    output wire stream_start,
+    output wire [7:0] frame_words,
     output reg error,
     output wire busy,
     input wire units_idle, memory_error,
@@ -85,8 +91,16 @@ module program_fetch (
     reg configured;
     wire [24:0] program_end={1'b0,program_base}+{8'b0,program_words,1'b0};
     wire [11:0] input_end={2'b0,input_base}+{1'b0,input_bytes}+{11'b0,input_bytes[0]};
+    // This controller alone distinguishes commands from configuration/payload.
+    // Configuration is immutable during raw streaming; the queue needs no copy.
+    wire stream_config_valid=configured && input_bytes!=0 && input_bytes<=256;
+    assign stream_start=rst_n && !error && !memory_error && state==IDLE &&
+        rx_valid && rx_word==`HOST_STREAM && stream_config_valid;
+    assign frame_words=input_bytes[8:1]+{7'b0,input_bytes[0]};
     assign busy=state!=IDLE && state!=CONFIG && state!=CHECK;
-    assign rx_ready=rst_n && !error && !rx_valid && (state==IDLE || state==CONFIG || state==INPUT);
+    // A credit invites a future UART word; this is not valid/ready acceptance.
+    // rx_valid is a one-cycle delivery pulse and re-arms the READY transmitter.
+    assign credit_ready=rst_n && !error && !rx_valid && (state==IDLE || state==CONFIG || state==INPUT);
     assign fetch_valid=rst_n && !error && !memory_error && state==FETCH;
     assign fetch_addr=pc[22:0];
     assign fetch_bytes=words_left>=4 ? 4'd8 : {words_left[2:0],1'b0};
@@ -107,10 +121,11 @@ module program_fetch (
             if(rx_valid && state!=IDLE && state!=CONFIG && state!=INPUT)error<=1;
             case(state)
                 IDLE: if(rx_valid)begin
-                    if(rx_word==16'hf100)begin configured<=0;config_index<=0;state<=CONFIG;end
-                    else if(rx_word==16'hf200 && configured && input_bytes!=0)begin
+                    if(rx_word==`HOST_CONFIG)begin configured<=0;config_index<=0;state<=CONFIG;end
+                    else if(rx_word==`HOST_FRAME && configured && input_bytes!=0)begin
                         pc<={14'b0,input_base};words_left<={5'b0,input_bytes};state<=INPUT;
-                    end else if(rx_word==16'hf300 && configured)state<=START;
+                    end else if(rx_word==`HOST_RUN && configured)state<=START;
+                    else if(rx_word==`HOST_STREAM && stream_config_valid)begin end
                     else error<=1;
                 end
                 CONFIG: if(rx_valid)begin
@@ -183,7 +198,7 @@ module micro_ctrl (
 );
     localparam [4:0] IDLE=0, I_DATA=1, I_LO=2, I_HI=3, I_MEM=4, I_SYNC=5,
         COLUMN_CHECK=6, W_DATA=7, W_LO=8, W_HI=9, W_MEM=10, W_SYNC=11,
-        EXEC=12, EXEC_SYNC=13, STORE=14, A_LO=15, A_HI=16, A_MEM=17,
+        EXEC=12, STORE=14, A_LO=15, A_HI=16, A_MEM=17,
         A_SYNC=18, COLUMN_END=19, B_NEXT=20, B_VALIDATE=21,
         D_SRC_LO=22, D_SRC_HI=23, D_SOURCE=24, D_DST_LO=25, D_DST_HI=26,
         D_DEST=27, D_RUN=28, D_WAIT=29, D_NEXT=30, D_VALIDATE_INPUT=31;
@@ -244,26 +259,26 @@ module micro_ctrl (
             case (state)
                 I_DATA: core_inst = compact_sram ?
                     {3'b111,(batched ? (4'd2+{2'b0,sparse,cur}) : 4'd0),read_input_addr[9:1]} :
-                    batched ? (16'h8100 | {4'b0,sparse,1'b0,cur,9'b0}) : 16'h8000; // input pair, vector mode
+                    batched ? `INST_DATA_SCALAR(sparse,`DATA_INPUT,cur) : `INST_DATA_LOAD_INPUT_DENSE; // input pair, vector mode
                 I_LO: core_inst = {4'h2,read_input_addr[11:0]};
                 I_HI: core_inst = {4'h3,read_input_addr[23:12]};
-                I_MEM: core_inst = 16'h4000 | {5'b0,input_sram,10'b0};
-                I_SYNC, W_SYNC, EXEC_SYNC, A_SYNC, D_WAIT: core_inst = 16'hffff;
+                I_MEM: core_inst = `INST_MEM_READ_DEVICE({1'b0,input_sram});
+                I_SYNC, W_SYNC, A_SYNC, D_WAIT: core_inst = `INST_SYNC;
                 W_DATA: core_inst = compact_sram ? {3'b111,compact_weight_kind,buffer_addr[9:1]} :
-                    (batched ? 16'h8400 : (16'h8500 | {4'b0,sparse,1'b0,cur,9'b0}));
+                    (batched ? `INST_DATA_LOAD_WEIGHT_DENSE : `INST_DATA_SCALAR(sparse,`DATA_WEIGHT,cur));
                 W_LO: core_inst = {4'h2,read_weight_addr[11:0]};
                 W_HI: core_inst = {4'h3,read_weight_addr[23:12]};
-                W_MEM: core_inst = 16'h4000 | {5'b0,(weight_sram | dma_mode),10'b0};
-                EXEC: core_inst = 16'h6800; // MUL overwrite, no activation
-                STORE: core_inst = compact_sram ? {3'b111,4'd11,acc_addr[9:1]} : 16'h9000;
+                W_MEM: core_inst = `INST_MEM_READ_DEVICE({1'b0,(weight_sram | dma_mode)});
+                EXEC: core_inst = `INST_EXEC_MUL_NOP; // MUL overwrite, no activation
+                STORE: core_inst = compact_sram ? {3'b111,4'd11,acc_addr[9:1]} : `INST_DATA_STORE;
                 A_LO: core_inst = {4'h2,2'b0,acc_addr};
-                A_HI: core_inst = 16'h3000;
-                A_MEM: core_inst = 16'h5600; // SRAM read-add-write
+                A_HI: core_inst = `INST_ADDR_HIGH(12'b0);
+                A_MEM: core_inst = `INST_SRAM_ACCUMULATE; // SRAM read-add-write
                 D_SRC_LO: core_inst = {4'h2,weight_addr[11:0]};
                 D_SRC_HI: core_inst = {4'h3,weight_addr[23:12]};
                 D_SOURCE: core_inst = `INST_DMA_SOURCE;
                 D_DST_LO: core_inst = {4'h2,2'b0,buffer_base};
-                D_DST_HI: core_inst = 16'h3000;
+                D_DST_HI: core_inst = `INST_ADDR_HIGH(12'b0);
                 D_DEST: core_inst = `INST_DMA_DEST;
                 D_RUN: core_inst = `INST_DMA_RUN(groups);
                 default: core_inst = 16'h0000;
@@ -414,15 +429,14 @@ module micro_ctrl (
                 end
                 D_NEXT: begin weight_addr <= next_pointer; state <= COLUMN_END; end
                 W_DATA: if (fire) state <= compact_sram ? W_SYNC : W_LO;
-                W_LO: if (fire) state <= dma_mode && input_sram ? W_MEM : W_HI;
+                W_LO: if (fire) state <= W_HI; // compact_sram bypasses W_LO entirely.
                 W_HI: if (fire) state <= W_MEM;
                 W_MEM: if (fire) state <= W_SYNC;
                 W_SYNC: if (fire) state <= batched ? I_DATA : EXEC;
                 // STORE waits for idle units itself, including the newest EXEC result.
                 EXEC: if (fire) state <= STORE;
-                EXEC_SYNC: if (fire) state <= STORE;
                 STORE: if (fire) state <= compact_sram ? A_SYNC : A_LO;
-                A_LO: if (fire) state <= dma_mode && input_sram ? A_MEM : A_HI;
+                A_LO: if (fire) state <= A_HI; // compact_sram bypasses A_LO entirely.
                 A_HI: if (fire) state <= A_MEM;
                 A_MEM: if (fire) state <= A_SYNC;
                 A_SYNC: if (fire) begin

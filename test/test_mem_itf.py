@@ -13,7 +13,6 @@ async def local_sram(d):
         d.rst_n.value=0;d.read_en.value=0;d.write_en.value=0;d.write_accumulate.value=0
         d.addr.value=0;d.device.value=1;d.write_data.value=0
         d.copy_en.value=0;d.copy_source.value=0;d.copy_destination.value=0;d.copy_vectors.value=0
-        d.read_burst.value=0;d.read_continue.value=0
         d.qspi_req_rdy.value=0;d.qspi_read_data.value=0;d.qspi_byte_valid.value=0;d.qspi_done.value=0
         for _ in range(3):await tick()
         d.rst_n.value=1;await tick()
@@ -52,7 +51,7 @@ async def row_copy_preserves_neighbors(d):
     async def tick():
         d.clk.value=0;await Timer(50,unit='ns');d.clk.value=1;await Timer(50,unit='ns')
     d.rst_n.value=0
-    for n in ('read_en','write_en','write_accumulate','read_burst','read_continue','copy_en','copy_source','copy_destination','copy_vectors','qspi_req_rdy','qspi_read_data','qspi_byte_valid','qspi_done','addr','device','write_data'):getattr(d,n).value=0
+    for n in ('read_en','write_en','write_accumulate','copy_en','copy_source','copy_destination','copy_vectors','qspi_req_rdy','qspi_read_data','qspi_byte_valid','qspi_done','addr','device','write_data'):getattr(d,n).value=0
     await tick();d.rst_n.value=1;await tick()
     async def vector(a,value=None):
         assert int(d.rdy.value)

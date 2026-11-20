@@ -4,7 +4,6 @@
 // through bounded 2..8-byte QPI reads, then commits one row. No added data cache.
 module mem_itf (
     input wire clk,rst_n,read_en,write_en,write_accumulate,
-    input wire read_burst,read_continue,
     input wire copy_en,
     input wire [23:0] copy_source,
     input wire [9:0] copy_destination,
@@ -26,8 +25,9 @@ module mem_itf (
     input wire qspi_byte_valid,qspi_done
 );
     `include "defs/fp8_math.vh"
-    typedef enum logic [3:0] {IDLE,EXTERNAL_SEND,EXTERNAL_WAIT,SRAM_READ,SRAM_WAIT,
-        ADD_LOW,ADD_HIGH,SRAM_WRITE,SRAM_COMMIT} state_t;
+    // Preserve encodings while removing the obsolete read-launch state (3).
+    typedef enum logic [3:0] {IDLE=0,EXTERNAL_SEND=1,EXTERNAL_WAIT=2,SRAM_WAIT=4,
+        ADD_LOW=5,ADD_HIGH=6,SRAM_WRITE=7,SRAM_COMMIT=8} state_t;
     state_t state;
     reg [23:0] saved_addr;
     reg [15:0] saved_data,old_vector;
@@ -112,7 +112,6 @@ module mem_itf (
                         else begin read_data_val<=!saved_write;state<=IDLE;end
                     end
                 end
-                SRAM_READ:state<=SRAM_WAIT;
                 SRAM_WAIT:begin
                     if(copy_active)begin write_word<=macro_data;state<=EXTERNAL_SEND;end
                     else if(!saved_write)begin
@@ -130,7 +129,4 @@ module mem_itf (
             endcase
         end
     end
-    // Legacy vector-stream hints are unused: copy_en/copy_vectors now request
-    // row-bounded chunks without pause timers or an extra DMA cache.
-    wire _unused=&{read_burst,read_continue,1'b0};
 endmodule

@@ -2,24 +2,27 @@
 module tb_uart_queue_fifo;
     reg clk=0;
     always #5 clk=~clk;
-    reg rst_n=0,rx_valid=0,frontend_ready=0,req_ready=0,req_done=0;
+    reg rst_n=0,rx_valid=0,frontend_credit_ready=0,req_ready=0,req_done=0;
     reg [15:0] rx_word=0;
+    reg stream_start=0;
     wire stream_mode,error,req_valid,req_write,frontend_valid;
     wire [22:0] req_addr;
     wire [15:0] req_data,frontend_word;
     input_queue #(.SLOT_BITS(2),.RX_FIFO_DEPTH(4)) dut (
-        .clk(clk),.rst_n(rst_n),.rx_word(rx_word),.rx_valid(rx_valid),.rx_ready(),
+        .clk(clk),.rst_n(rst_n),.rx_word(rx_word),.rx_valid(rx_valid),.credit_ready(),
         .stream_mode(stream_mode),.error(error),.frontend_word(frontend_word),
-        .frontend_valid(frontend_valid),.frontend_ready(frontend_ready),
+        .frontend_valid(frontend_valid),.frontend_credit_ready(frontend_credit_ready),
+        .stream_start(stream_start),.frame_words(8'd1),
         .req_valid(req_valid),.req_write(req_write),.req_addr(req_addr),.req_data(req_data),
         .req_ready(req_ready),.req_done(req_done),.req_byte_valid(1'b0),.req_rdata(8'b0)
     );
     task tick; begin @(posedge clk); #1; @(negedge clk); end endtask
     task send(input [15:0] word_in); begin rx_word=word_in;rx_valid=1;tick();rx_valid=0;tick();end endtask
     task setup; begin
-        rst_n=0;rx_valid=0;req_ready=0;req_done=0;frontend_ready=1;tick();tick();rst_n=1;
-        send(16'hf100);send(0);send(0);send(0);send(0);send(2);send(16'hf400);
-        frontend_ready=0;
+        rst_n=0;rx_valid=0;req_ready=0;req_done=0;frontend_credit_ready=1;tick();tick();rst_n=1;
+        // The command controller owns parsing and validated configuration.
+        stream_start=1;tick();stream_start=0;
+        frontend_credit_ready=0;
         if(!stream_mode || error)$fatal(1,"configuration failed");
     end endtask
     task write_head(input [15:0] expected,input integer slot,input bit replace_head);
@@ -53,7 +56,7 @@ module tb_uart_queue_fifo;
         if(error || req_valid || dut.queued!=4 || dut.rx_count!=1)
             $fatal(1,"full ring must retain FIFO tail without overwriting");
         // Permit replay; its final delivery frees one ring slot.
-        frontend_ready=1;
+        frontend_credit_ready=1;
         wait(req_valid); @(negedge clk);
         if(req_write)$fatal(1,"full ring must replay before writing");
         req_ready=1;tick();req_ready=0;req_done=1;tick();req_done=0;
