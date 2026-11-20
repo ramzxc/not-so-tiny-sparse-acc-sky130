@@ -57,8 +57,16 @@ and writes `measurements.json` under BUILD. It is not a full-network benchmark.
 The old FP16 fixtures and experiments remain for provenance; they are not valid
 FP8 input images. See [README.fp16_512.md](README.fp16_512.md) for their historical
 instructions. `test_serial.py` still supplies the format-independent UART Host,
-but its FP16 test functions are not the default suite. Old gate-level netlists
-and the old GL harness are not validated against this new build.
+but its FP16 test functions are not the default suite.
+
+`GATES=yes make` selects `Makefile.gates` and the freshly downloaded
+`gate_level_netlist.v` (override with `GATE_NETLIST`). It uses the active
+`PDK_ROOT`/`PDK` standard-cell models and the supplied 1 KiB SRAM behavioral
+model. Pin-level checks run at 50 MHz / UART divider 87: multiply, MICRO batch
+1 and 3 with replay, output-enable gating, and two raw UART frames written to
+and consumed from PSRAM. Results are checked at the external PSRAM. There are
+no RTL-state probes or SRAM preloads. This is zero-delay functional GLS without
+SDF; it does not certify post-layout timing. Historical netlists remain invalid.
 
 ## Converted Bishop test data
 

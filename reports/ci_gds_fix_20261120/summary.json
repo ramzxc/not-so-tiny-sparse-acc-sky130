@@ -1,0 +1,40 @@
+{
+  "failed_run": 44720387698,
+  "failed_commit": "5534b9dffcc7d58b8ed88abeb12dc9b7e39853de",
+  "baseline": {
+    "magic_drc": 56,
+    "klayout_drc": 2,
+    "lvs_errors": 745
+  },
+  "lvs": {
+    "layout": "unchanged failed-CI GDS extraction",
+    "model_changes": [
+      "micron W/L",
+      "active-PDK narrow NFET rule",
+      "descending top-level bus declarations for named Verilog ports"
+    ],
+    "result": "Circuits match uniquely",
+    "property_errors": 0,
+    "bad_net_groups": 0,
+    "negative_control": "Swapping two SRAM address bits in the reference fails LVS",
+    "extracted_spice_sha256": "44e761bc385d9d51f03eb4c79506a89c43343c5afda08d0881e78497a2681cf3"
+  },
+  "pdn": {
+    "feed_width_um": 1.74,
+    "outer_feed_jog_um": 0.6,
+    "jog_x_um": 492,
+    "VPWR_connectivity": "all shapes connected",
+    "VGND_connectivity": "all shapes connected",
+    "magic_drc": "pending",
+    "klayout_drc": 0
+  },
+  "scope": "GitHub RTL hardening flow; published ICC2 candidate core GDS is unchanged.",
+  "gate_simulation": {
+    "netlist": "failed CI routed powered netlist (no RTL sources)",
+    "clock_mhz": 50,
+    "uart_divider": 87,
+    "tests_passed": 2,
+    "tests_failed": 0,
+    "sdf": false
+  }
+}

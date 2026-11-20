@@ -247,9 +247,23 @@ foreach {netname pinname} {VPWR vccd1 VGND vssd1} {
     foreach ring $rings {
         lassign $ring rx ry1 ry2
         set cy [expr {($ry1+$ry2)/2}]
-        # Overlap the left end of the actual M3 ring by its full 1.74um width.
-        odb::dbSBox_create $sw $m3 $x1 $ry1 [expr {$rx+1740}] $ry2 STRIPE
-        odb::dbSBox_create $sw $via $cx $cy STRIPE
+        # The outer (VPWR) ring is only ~0.1um from the neighboring VGND
+        # row-via landing at the left M4 straps. Jog 0.6um toward the SRAM
+        # interior, keeping the full 1.74um feed width and a >=0.6um M3 gap.
+        # Return to the original feed above the logic, beyond both M4 straps,
+        # so the SRAM signal-pin access region retains its original clearance.
+        set dy 0
+        if {$netname eq "VPWR"} {
+            set dy [expr {$cy < ($my1+$my2)/2 ? 600 : -600}]
+        }
+        set fy1 [expr {$ry1+$dy}];set fy2 [expr {$ry2+$dy}]
+        set bend [expr {$x2+5680}]
+        if {$bend+1740 >= $rx} {error "Insufficient room for SRAM PG jog"}
+        odb::dbSBox_create $sw $m3 $x1 $fy1 [expr {$bend+1740}] $fy2 STRIPE
+        odb::dbSBox_create $sw $m3 $bend [expr {min($ry1,$fy1)}] \
+            [expr {$bend+1740}] [expr {max($ry2,$fy2)}] STRIPE
+        odb::dbSBox_create $sw $m3 $bend $ry1 [expr {$rx+1740}] $ry2 STRIPE
+        odb::dbSBox_create $sw $via $cx [expr {$cy+$dy}] STRIPE
     }
     puts "SRAM PDN: $netname uses left stripe at $cx DBU"
 }

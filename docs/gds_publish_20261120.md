@@ -36,3 +36,32 @@ independently, rather than importing this prebuilt core.
 - [Placement preview](../macro/acc_hard_macro/checks/floorplan.svg)
 - [Physical measurements](../macro/acc_hard_macro/checks/physical_fit.json)
 - [Electrical constraints](../macro/acc_hard_macro/checks/constraints.rpt)
+
+## Independent RTL CI failure and correction
+
+[Run 44720387698](https://github.com/ramzxc/not-so-tiny-sparse-acc-sky130/actions/runs/44720387698)
+failed with Magic DRC 56, KLayout DRC 2 and LVS 745. This was the separately
+hardened RTL wrapper, not a check of the published ICC2 core above.
+
+The CI reference incorrectly selected the original SI-unit SRAM SPICE instead
+of the active-PDK micron model. Its ascending SPICE bus declarations also caused
+Netgen to bind named Verilog bus concatenations in reverse order. Preparing and
+selecting the descending-bus model fixes LVS on the **unchanged** CI extraction;
+the full comparison matches uniquely with zero property errors. An intentionally swapped
+SRAM address-bit reference still fails LVS. The positional SPICE used by the
+prebuilt ICC2 core is unchanged.
+
+The two physical DRC locations were SRAM VPWR M3 feeds approaching VGND row-via
+landings by approximately 0.1 µm. The feeds now jog 0.6 µm near the left straps,
+then return to the original path before the SRAM signal-pin region. Feed width
+stays 1.74 µm. The corrected-layout experiment passes KLayout DRC, and rerunning
+the actual PDN Tcl on the CI database confirms both supply networks connected.
+
+The previous gate-test entry point explicitly rejected `GATES=yes`. It now tests
+the current routed wrapper through package pins, including MICRO batch 1 and 3,
+replay, enable gating, and raw UART frames stored/consumed through PSRAM. Both
+tests pass on the failed CI run's routed netlist at a 50 MHz simulation clock.
+This remains functional GLS with the SRAM behavioral model and no SDF.
+
+Local evidence: [CI correction report](../reports/ci_gds_fix_20261120/summary.json).
+A newly routed full CI run is still required after these configuration changes.

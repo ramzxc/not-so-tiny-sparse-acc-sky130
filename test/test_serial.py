@@ -4,15 +4,16 @@ import cocotb
 from cocotb.triggers import Timer
 
 class Host:
+    half_period_ns = 50
     def __init__(self,d):
         self.d=d;self.pins=8;self.credits=0;self.state=-1;self.counter=0;self.byte=0
         self.period=87 if os.environ.get('GATES')=='yes' else 8
     async def cycles(self,n=1):
         for _ in range(n):
             self.d.clk.value=0
-            await Timer(50,unit='ns')
+            await Timer(self.half_period_ns,unit='ns')
             self.d.clk.value=1
-            await Timer(50,unit='ns')
+            await Timer(self.half_period_ns,unit='ns')
             # UART observes TX only; READY is not valid for an empty FIFO head.
             tx=int(self.d.uo_out.value[4])
             if self.state==-1:

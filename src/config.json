@@ -23,7 +23,7 @@
         ]
       },
       "spice": [
-        "dir::../memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.lvs.sp"
+        "dir::../memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/sram.lvs_micron.spice"
       ],
       "instances": {
         "core.itf.memory.size_1k.macro": {
@@ -97,7 +97,7 @@
   "MAGIC_EXT_USE_GDS": true,
   "MAGICRC": "dir::tcl/magicrc.tcl",
   "EXTRA_SPICE_MODELS": [
-    "dir::../memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.lvs.sp"
+    "dir::../memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/sram.lvs_micron.spice"
   ],
   "LVS_INCLUDE_MARCO_NETLISTS": false
 }
