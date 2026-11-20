@@ -18,7 +18,7 @@ from sky130_lvs_models import narrow_nfet_rule, select_nfet_models
 
 ROOT = Path(__file__).resolve().parents[1]
 CORE = ROOT / 'macro/acc_hard_macro'
-SRAM = ROOT / 'memory/openram/generated/tt_sram_1rw_64x64_sky130'
+SRAM = ROOT / 'memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130'
 
 
 def digest(path):
@@ -41,7 +41,7 @@ def main():
     std_v = pdk / 'libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v'
     std_sp = pdk / 'libs.ref/sky130_fd_sc_hd/spice/sky130_fd_sc_hd.spice'
     source = CORE / 'acc_hard_macro.v'
-    sram_source = SRAM / 'tt_sram_1rw_64x64_sky130.lvs.sp'
+    sram_source = SRAM / 'tt_sram_1rw_64x128_buffered_sky130.lvs.sp'
     # Netgen and the PDK's standard-cell SPICE use bare micron W/L values.
     # This derivative is for LVS only, never a replacement simulation model.
     sram_text, unit_count = re.subn(
@@ -130,7 +130,7 @@ def main():
     roundtrip = [(t[-1], t[1:-1]) for line in emitted.splitlines()
                  if (t := line.split()) and t[0].startswith('X')]
     assert roundtrip == connectivity
-    assert counts['tt_sram_1rw_64x64_sky130'] == 1
+    assert counts['tt_sram_1rw_64x128_buffered_sky130'] == 1
     import gdstk
     lib = gdstk.read_gds(CORE / 'acc_hard_macro.gds')
     top = next(c for c in lib.cells if c.name == 'acc_hard_macro')
@@ -165,7 +165,7 @@ def main():
     manifest = json.loads(manifest_path.read_text())
     manifest['lvs_inputs'] = {
         'macro/acc_hard_macro/acc_hard_macro.v': digest(source),
-        'memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.lvs.sp': digest(sram_source),
+        'memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.lvs.sp': digest(sram_source),
         'macro/acc_hard_macro/acc_hard_macro.lvs.spice': digest(core_output),
         'macro/acc_hard_macro/sram.lvs_micron.spice': digest(CORE / 'sram.lvs_micron.spice'),
     }

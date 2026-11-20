@@ -51,6 +51,9 @@ async def queue_overlaps_and_wraps(d):
     assert int(d.queue_count.value)==0
     assert int(d.queue_write_slot.value)==0 # 12 frames / four slots
     assert peak>0
+    wait_max=int(d.ingress_wait_max.value)
+    d._log.info("Maximum pending UART write with ring space: %d core cycles",wait_max)
+    assert wait_max < 20*h.period
 
 @cocotb.test()
 async def incomplete_frame_and_odd_padding(d):

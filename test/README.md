@@ -124,7 +124,7 @@ are sensitivity assumptions, not guaranteed board/PVT timing. See
 
 ## Experimental no-PC-buffer ingress
 
-`program_ctrl.v` is under `src/rtl/`, outside the compute core directory.
+`core/command_ctrl.v` groups program fetch and MICRO sequencing inside the compute core directory. `input_queue.v` owns UART receive buffering and the PSRAM frame queue. `qspi_ctrl.v` owns both request arbitration and the QPI wire engine.
 Run the new four-slot queue stress tests from `test/`:
 
 ```sh

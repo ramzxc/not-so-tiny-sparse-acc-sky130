@@ -8,6 +8,7 @@ module tb_no_pc_network;
     always #10 bench.clk=~bench.clk;
     integer credits=0,words,input_bytes,program_base,fd,failures=0,addr;
     integer peak_queue=0,checked=0;
+    integer ingress_blocked_cycles=0,ingress_core_contention_cycles=0;
     logic [7:0] received;
     logic [63:0] expected[0:256];
     logic [15:0] actual;
@@ -19,6 +20,11 @@ module tb_no_pc_network;
         cycles++;
         if(streaming)begin
             if(bench.uo_out[1])$fatal(1,"DUT error during raw streaming");
+            if(bench.dut.queue_valid && !bench.dut.queue_ready)begin
+                ingress_blocked_cycles++;
+                if(bench.dut.psram.ingress_owner.busy && bench.dut.psram.ingress_owner.owner_fetch)
+                    ingress_core_contention_cycles++;
+            end
             if(bench.queue_count>peak_queue)peak_queue=int'(bench.queue_count);
         end
     end
@@ -72,7 +78,7 @@ module tb_no_pc_network;
         fd=$fopen(report_file,"w");
         $fwrite(fd,"{\"frames\":%0d,\"mismatches\":%0d,\"peak_queue\":%0d,\"finish_cycles\":[",FRAMES,failures,peak_queue);
         for(int i=0;i<FRAMES;i++)$fwrite(fd,"%s%0d",i==0?"":",",finish_cycles[i]);
-        $fwrite(fd,"],\"max_cs_low_ns\":%0d}\n",bench.psram_model.max_active);$fclose(fd);
+        $fwrite(fd,"],\"max_cs_low_ns\":%0d,\"ingress_wait_max_cycles\":%0d,\"ingress_blocked_cycles\":%0d,\"ingress_core_contention_cycles\":%0d}\n",bench.psram_model.max_active,bench.ingress_wait_max,ingress_blocked_cycles,ingress_core_contention_cycles);$fclose(fd);
         if(failures)$fatal(1,"network/queue mismatches %0d",failures);
         $display("PASS %0d raw frames at 20ms; peak queue %0d",FRAMES,peak_queue);$finish;
     end

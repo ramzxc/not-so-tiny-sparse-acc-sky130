@@ -26,10 +26,10 @@ initial begin
     end
 end
 always @(posedge bench.clk)if(profile_enabled && measuring)begin
-    if(bench.dut.frontend.state>=6)begin
+    if(bench.dut.command.frontend.state>=6)begin
         program_seen=1;profile_program_cycles++;
-        if(bench.dut.inst_val && bench.dut.decoder_rdy)begin
-            profile_phase=int'(phase_map[(bench.dut.frontend.pc-program_base)>>1]);
+        if(bench.dut.command.inst_val && bench.dut.command.decoder_rdy)begin
+            profile_phase=int'(phase_map[(bench.dut.command.frontend.pc-program_base)>>1]);
             host_instructions++;
         end
         if(profile_phase>9)$fatal(1,"invalid phase");
@@ -39,22 +39,22 @@ always @(posedge bench.clk)if(profile_enabled && measuring)begin
         else if(bench.dut.itf.state!=0)category=4;
         else if(!bench.dut.exec_rdy)category=5;
         else if(bench.dut.micro_busy)category=6;
-        else if(bench.dut.frontend.state==7 || bench.dut.frontend.state==8)category=7;
+        else if(bench.dut.command.frontend.state==7 || bench.dut.command.frontend.state==8)category=7;
         else category=8;
         partition[category]++;phase_partition[profile_phase][category]++;
-        if(category==6)micro_control_states[bench.dut.sequencer.state]++;
+        if(category==6)micro_control_states[bench.dut.command.sequencer.state]++;
         if(bench.dut.dma_busy)occupancy[0]++;
         if(bench.dut.micro_busy)occupancy[1]++;
         if(!bench.dut.exec_rdy)occupancy[2]++;
         if(!bench.dut.data_rdy)occupancy[3]++;
-        if(bench.dut.bus_busy)occupancy[bench.dut.memory_owner.owner_fetch ? 5 : 4]++;
-        if(bench.dut.serial_memory.state!=0)
-            qpi_states[bench.dut.memory_owner.owner_fetch][bench.dut.serial_memory.state]++;
-        if(bench.dut.bus_valid && bench.dut.bus_ready)begin
+        if(bench.dut.bus_busy)occupancy[bench.dut.psram.memory_owner.owner_fetch ? 5 : 4]++;
+        if(bench.dut.psram.serial_memory.state!=0)
+            qpi_states[bench.dut.psram.memory_owner.owner_fetch][bench.dut.psram.serial_memory.state]++;
+        if(bench.dut.psram.bus_valid && bench.dut.psram.bus_ready)begin
             owner=bench.dut.fetch_valid && bench.dut.fetch_ready;
-            requests[owner]++;payload_bytes[owner]+=bench.dut.bus_bytes;
+            requests[owner]++;payload_bytes[owner]+=bench.dut.psram.bus_bytes;
         end
-        micro_states[bench.dut.sequencer.state]++;
+        micro_states[bench.dut.command.sequencer.state]++;
         dma_states[bench.dut.dma.state]++;
         mem_states[bench.dut.itf.state]++;
         exec_states[bench.dut.exec.state]++;
@@ -70,8 +70,8 @@ always @(posedge bench.clk)if(profile_enabled && measuring)begin
         if(bench.dut.exec_inst_val && bench.dut.exec_rdy)execute_count++;
         if(bench.dut.dispatched_valid && bench.dut.dispatched_ready)core_instructions++;
         // Current benchmark is batch 1. Count decisions, not mask/column time.
-        if(bench.dut.sequencer.state==6 && bench.dut.sequencer.batch_size==1)begin
-            if(bench.dut.sequencer.sparse && bench.dut.loaded_input_zero_mask[bench.dut.sequencer.cur])skipped_columns++;
+        if(bench.dut.command.sequencer.state==6 && bench.dut.command.sequencer.batch_size==1)begin
+            if(bench.dut.command.sequencer.sparse && bench.dut.loaded_input_zero_mask[bench.dut.command.sequencer.cur])skipped_columns++;
             else active_columns++;
         end
     end else if(program_seen)completion_cycles++;

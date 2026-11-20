@@ -5,7 +5,7 @@ project:
   discord:      "ramzxc"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
   description:  "not so tiny sparse acc"      # One line description of what your project does
   language:     "SystemVerilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
-  clock_hz:     10000000       # Clock frequency in Hz (or 0 if not applicable)
+  clock_hz:     50000000       # Clock frequency in Hz (or 0 if not applicable)
 
   # How many tiles your design occupies? A single tile is about 167x108 uM.
   tiles: "8x2"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
@@ -18,6 +18,18 @@ project:
   # Keep the plain-Verilog wrapper first for Tiny Tapeout port discovery.
   source_files:
     - "wrapper/project.v"
+    - "rtl/shared_sram.sv"
+    - "rtl/project.v"
+    - "rtl/uart/uart_rx.v"
+    - "rtl/uart/uart_tx.v"
+    - "rtl/core/command_ctrl.v"
+    - "rtl/core/dma_ctrl.v"
+    - "rtl/core/inst_decoder.v"
+    - "rtl/core/data_ctrl.v"
+    - "rtl/core/exec_unit.sv"
+    - "rtl/mem_itf.sv"
+    - "rtl/qspi_ctrl.v"
+    - "rtl/input_queue.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
@@ -49,7 +61,7 @@ pinout:
   uio[3]: "QSPI_SCK"
   uio[4]: "QSPI_DQ2"
   uio[5]: "QSPI_DQ3"
-  uio[6]: "PSRAM_A_CS_N_UNUSED"
+  uio[6]: "PSRAM_A_CS_N"
   uio[7]: "PSRAM_B_CS_N_UNUSED"
 
 # Do not change!

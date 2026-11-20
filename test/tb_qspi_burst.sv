@@ -7,7 +7,7 @@ module tb_qspi_burst;
     wire [7:0] read_data;
     wire [3:0] dq_in, dq_out, dq_oe;
     wire [31:0] read_ops = flash.read_ops;
-    qspi_ctrl dut (
+    qpi_engine dut (
         .clk(clk), .rst_n(rst_n), .req_val(req_val), .req_rdy(req_rdy),
         .req_write(req_write), .req_continue(req_continue), .abort_read(abort_read),
         .req_addr(req_addr), .req_device(2'b00), .req_data(req_data),

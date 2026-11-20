@@ -13,7 +13,7 @@ module tb_psram_network;
     string expected_file,report_file;
     always @(posedge bench.clk)if(measuring)begin
         cycles++;
-        if(bench.dut.frontend.state>=6)core_cycles++;
+        if(bench.dut.command.frontend.state>=6)core_cycles++;
     end
     `include "test/psram_profile.svh"
     initial forever begin

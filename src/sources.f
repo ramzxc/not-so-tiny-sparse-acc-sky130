@@ -4,9 +4,7 @@ src/rtl/shared_sram.sv
 src/rtl/project.v
 src/rtl/uart/uart_rx.v
 src/rtl/uart/uart_tx.v
-src/rtl/program_ctrl.v
-src/rtl/psram_arbiter.v
-src/rtl/core/micro_ctrl.v
+src/rtl/core/command_ctrl.v
 src/rtl/core/dma_ctrl.v
 src/rtl/core/inst_decoder.v
 src/rtl/core/data_ctrl.v
@@ -14,4 +12,4 @@ src/rtl/core/exec_unit.sv
 src/rtl/mem_itf.sv
 src/rtl/qspi_ctrl.v
 
-src/rtl/uart_psram_queue.v
+src/rtl/input_queue.v

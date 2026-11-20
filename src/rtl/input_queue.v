@@ -3,8 +3,9 @@
 // F400 enables raw, padded 16-bit payload words; no per-word credits thereafter.
 // Slots are 256 bytes in PSRAM [0x400000,0x800000). Reset exits stream mode.
 // Only complete frames become visible to the existing program frontend.
-module uart_psram_queue #(
-    parameter integer SLOT_BITS=14
+module input_queue #(
+    parameter integer SLOT_BITS=14,
+    parameter integer RX_FIFO_DEPTH=1
 )(
     input wire clk,rst_n,
     input wire [15:0] rx_word,
@@ -24,12 +25,46 @@ module uart_psram_queue #(
     localparam [2:0] FRAME_WAIT=0, HEADER=1, READ_WORD=2, WORD_WAIT=3, WORD_SEND=4;
     localparam [SLOT_BITS:0] CAPACITY={1'b1,{SLOT_BITS{1'b0}}};
     reg [2:0] bus_state,replay_state,config_left;
-    reg configured,pending;
+    reg configured;
     reg [7:0] frame_words;
     reg [6:0] write_index,read_index;
     reg [SLOT_BITS-1:0] write_slot,read_slot;
     reg [SLOT_BITS:0] queued;
-    reg [15:0] write_word,read_word;
+    reg [15:0] read_word;
+    wire [15:0] write_word;
+    wire pending,input_ready;
+    // Hold the head until the entire PSRAM write completes. No extra data latch.
+    wire write_complete=bus_state==WRITE_WAIT && req_done;
+    // Receive storage belongs to this queue, not to the instruction path.
+    localparam integer PTR_BITS=RX_FIFO_DEPTH>1 ? $clog2(RX_FIFO_DEPTH) : 1;
+    localparam integer COUNT_BITS=$clog2(RX_FIFO_DEPTH+1);
+    reg [15:0] rx_words[0:RX_FIFO_DEPTH-1];
+    reg [PTR_BITS-1:0] rx_read_ptr,rx_write_ptr;
+    reg [COUNT_BITS-1:0] rx_count;
+    wire rx_pop=rst_n && stream_mode && !error && write_complete && pending;
+    wire rx_push=rst_n && stream_mode && !error && rx_valid && input_ready;
+    assign pending=rst_n && rx_count!=0;
+    assign input_ready=rst_n && (rx_count<COUNT_BITS'(RX_FIFO_DEPTH) || rx_pop);
+    assign write_word=rx_words[rx_read_ptr];
+    function [PTR_BITS-1:0] next_rx_ptr;
+        input [PTR_BITS-1:0] ptr;
+        begin next_rx_ptr=ptr==PTR_BITS'(RX_FIFO_DEPTH-1) ? 0 : ptr+1'b1;end
+    endfunction
+    always @(posedge clk)begin
+        if(!rst_n)begin rx_read_ptr<=0;rx_write_ptr<=0;rx_count<=0;end
+        else begin
+            if(rx_push)begin rx_words[rx_write_ptr]<=rx_word;rx_write_ptr<=next_rx_ptr(rx_write_ptr);end
+            if(rx_pop)rx_read_ptr<=next_rx_ptr(rx_read_ptr);
+            case({rx_push,rx_pop})
+                2'b10:rx_count<=rx_count+1'b1;
+                2'b01:rx_count<=rx_count-1'b1;
+                default:begin end
+            endcase
+        end
+    end
+`ifndef SYNTHESIS
+    initial if(RX_FIFO_DEPTH<1)$fatal(1,"RX_FIFO_DEPTH must be at least one");
+`endif
     wire enable_stream=!stream_mode && config_left==0 && rx_word==16'hf400;
     wire push_frame=bus_state==WRITE_WAIT && req_done && {1'b0,write_index}+8'd1==frame_words;
     wire pop_frame=replay_state==WORD_SEND && {1'b0,read_index}+8'd1==frame_words;
@@ -45,8 +80,8 @@ module uart_psram_queue #(
     always @(posedge clk) begin
         if(!rst_n)begin
             stream_mode<=0;error<=0;configured<=0;config_left<=0;frame_words<=0;
-            bus_state<=BUS_IDLE;replay_state<=FRAME_WAIT;pending<=0;
-            write_word<=0;read_word<=0;write_index<=0;read_index<=0;
+            bus_state<=BUS_IDLE;replay_state<=FRAME_WAIT;
+            read_word<=0;write_index<=0;read_index<=0;
             write_slot<=0;read_slot<=0;queued<=0;
         end else if(!error)begin
             if(!stream_mode)begin
@@ -65,22 +100,20 @@ module uart_psram_queue #(
                     end
                 end
             end else begin
-                // Receiver shift register is not stable during the next UART word.
-                if(rx_valid)begin
-                    if(pending || queued==CAPACITY)error<=1;
-                    else begin write_word<=rx_word;pending<=1;end
-                end
+                // Raw UART cannot be stalled. Report actual FIFO overflow explicitly.
+                if(rx_valid && !input_ready)error<=1;
                 case({push_frame,pop_frame})
                     2'b10:queued<=queued+1'b1;
                     2'b01:queued<=queued-1'b1;
                     default:begin end
                 endcase
                 case(bus_state)
-                    BUS_IDLE: if(pending)bus_state<=WRITE_REQ;
+                    // A full ring must still allow replay to free a slot.
+                    BUS_IDLE: if(pending && queued<CAPACITY)bus_state<=WRITE_REQ;
                         else if(replay_state==READ_WORD)bus_state<=READ_REQ;
                     WRITE_REQ: if(req_ready)bus_state<=WRITE_WAIT;
                     WRITE_WAIT: if(req_done)begin
-                        pending<=0;bus_state<=BUS_IDLE;
+                        bus_state<=BUS_IDLE;
                         if(push_frame)begin write_index<=0;write_slot<=write_slot+1'b1;end
                         else write_index<=write_index+1'b1;
                     end

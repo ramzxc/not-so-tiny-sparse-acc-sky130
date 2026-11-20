@@ -15,9 +15,17 @@ module tb_psram_stream #(parameter integer UART_CLKS_PER_BIT=8, parameter intege
     wire [QUEUE_SLOT_BITS-1:0] queue_write_slot=dut.ingress.write_slot;
     wire queue_pending=dut.ingress.pending;
     logic [31:0] completed=0;
+    logic [31:0] ingress_wait=0,ingress_wait_max=0;
+    always @(posedge clk)begin
+        if(!rst_n)begin ingress_wait<=0;ingress_wait_max<=0;end
+        else if(queue_pending && queue_count < (1<<QUEUE_SLOT_BITS))begin
+            ingress_wait<=ingress_wait+1;
+            if(ingress_wait+1>ingress_wait_max)ingress_wait_max<=ingress_wait+1;
+        end else ingress_wait<=0;
+    end
     always @(posedge clk)begin
         if(!rst_n)completed<=0;
-        else if(dut.frontend.state==10 && dut.frontend.units_idle)completed<=completed+1;
+        else if(dut.command.frontend.state==10 && dut.command.frontend.units_idle)completed<=completed+1;
     end
     logic [22:0] observe_addr;
     wire [15:0] observe_data={psram_model.mem[observe_addr+1],psram_model.mem[observe_addr]};
@@ -27,8 +35,8 @@ module tb_psram_stream #(parameter integer UART_CLKS_PER_BIT=8, parameter intege
     logic [31:0] collisions=0,fetches=0,data_wait_fetch=0,fetch_wait_data=0;
     always @(posedge clk)if(rst_n)begin
         if(dut.qspi_req_val && dut.fetch_valid)collisions<=collisions+1;
-        if(dut.qspi_req_val && dut.bus_busy && dut.memory_owner.owner_fetch)data_wait_fetch<=data_wait_fetch+1;
-        if(dut.fetch_valid && dut.bus_busy && !dut.memory_owner.owner_fetch)fetch_wait_data<=fetch_wait_data+1;
+        if(dut.qspi_req_val && dut.bus_busy && dut.psram.memory_owner.owner_fetch)data_wait_fetch<=data_wait_fetch+1;
+        if(dut.fetch_valid && dut.bus_busy && !dut.psram.memory_owner.owner_fetch)fetch_wait_data<=fetch_wait_data+1;
         if(dut.fetch_valid && dut.fetch_ready)fetches<=fetches+1;
         if(dut.qspi_done && dut.fetch_done)$fatal(1,"double completion");
         if(uio_out[0]!==1 || uio_out[7]!==1)$fatal(1,"unused memories selected");

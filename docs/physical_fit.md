@@ -1,3 +1,5 @@
+> Historical baseline from 2026-11-19. For the current RTL, see [2026-11-20 physical fit](current_physical_fit.md).
+
 # Buffered 1 KiB SRAM: synthesis and physical fit
 
 **Result: the current core fits the TT 8×2 envelope and completes placement, CTS, routing and filler insertion.** Final ICC2 legality, route DRC, opens, antenna and PG checks are zero. This is an area/routability pass, not tapeout signoff.

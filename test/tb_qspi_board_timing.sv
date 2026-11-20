@@ -15,7 +15,7 @@ module tb_qspi_board_timing;
  assign #(OUT_DELAY) mout=dq_out;
  assign #(OUT_DELAY) moe=dq_oe;
  assign #(IN_DELAY+TCO) dq_in=minput;
- qspi_ctrl dut(.*);
+ qpi_engine dut(.*);
  qspi_psram_model #(.DEPTH(256),.MAX_CS_LOW(3000)) mem(.sck(msck),.cs_n(mcs),.dq_out(mout),.dq_oe(moe),.dq_in(minput));
  integer errors=0,checked=0,seen=0;
  realtime last_rise=0,last_fall=0,last_select=0,last_deselect=0,last_dq=0;

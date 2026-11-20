@@ -1,0 +1,7 @@
+# Run from repository root; isolated receive buffering and ring-full recovery.
+BUILD ?= /tmp/acc-uart-queue-fifo
+.PHONY: all
+all:
+	mkdir -p $(BUILD)
+	iverilog -g2012 -I src/rtl/core -s tb_uart_queue_fifo -o $(BUILD)/test src/rtl/input_queue.v test/tb_uart_queue_fifo.sv
+	vvp $(BUILD)/test

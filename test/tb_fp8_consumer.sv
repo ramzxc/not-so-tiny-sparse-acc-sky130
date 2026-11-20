@@ -48,7 +48,7 @@ module tb_fp8_consumer;
                 default:core_profile[2]++;
             endcase
         end else if(dut.micro_busy) begin
-            case(dut.sequencer.state)
+            case(dut.command.sequencer.state)
                 7,8,9,10,11:core_profile[3]++;
                 12,13:core_profile[4]++;
                 14,15,16,17,18:core_profile[5]++;
@@ -57,7 +57,7 @@ module tb_fp8_consumer;
                 default:core_profile[8]++;
             endcase
         end else core_profile[9]++;
-        qspi_profile[dut.serial_memory.state]++;
+        qspi_profile[dut.psram.serial_memory.state]++;
         sram_profile[dut.itf.state]++;
         if(!dut.exec_rdy)exec_active_cycles++;
     end
