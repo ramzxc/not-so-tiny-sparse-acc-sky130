@@ -1,0 +1,50 @@
+{
+  "baseline_run": 44738663053,
+  "refactor_run": 44741023630,
+  "metrics": {
+    "design__instance__area__stdcell": {
+      "before": 88225.9,
+      "after": 87680.3
+    },
+    "design__instance__utilization__stdcell": {
+      "before": 0.723986,
+      "after": 0.719509
+    },
+    "timing__setup__ws": {
+      "before": 3.16883594999955,
+      "after": 2.08243916893587
+    },
+    "timing__hold__ws": {
+      "before": 0.14776214003931745,
+      "after": 0.14876633679349152
+    },
+    "design__max_slew_violation__count": {
+      "before": 428,
+      "after": 288
+    },
+    "design__max_cap_violation__count": {
+      "before": 79,
+      "after": 75
+    },
+    "magic__drc_error__count": {
+      "before": 0,
+      "after": 0
+    },
+    "klayout__drc_error__count": {
+      "before": 0,
+      "after": 0
+    },
+    "design__lvs_error__count": {
+      "before": 0,
+      "after": 0
+    }
+  },
+  "gate_netlist_sha256": "32b1de323e9ee14998dc2d7fab3945fa73aac0a866094b09b8bea77aee353903",
+  "local_gl_tests": 2,
+  "local_gl_passed": 2,
+  "gate_clock_period_ns": 20,
+  "sequential_udp_delay_ns": 1,
+  "sdf": false,
+  "gate_fix": "Zero-delay sequential cells race SRAM control sampling through routed clock buffers. Unit sequential delay resolves the scheduling race; no RTL, netlist or data forcing changes.",
+  "ci_clean_fix": "Set GATES=yes at job level so make clean does not require Verilator."
+}

@@ -80,8 +80,10 @@ but its FP16 test functions are not the default suite.
 model. Pin-level checks run at 50 MHz / UART divider 87: multiply, MICRO batch
 1 and 3 with replay, output-enable gating, and two raw UART frames written to
 and consumed from PSRAM. Results are checked at the external PSRAM. There are
-no RTL-state probes or SRAM preloads. This is zero-delay functional GLS without
-SDF; it does not certify post-layout timing. Historical netlists remain invalid.
+no RTL-state probes or SRAM preloads. This is functional GLS with a 1 ns sequential-cell UDP delay and no SDF.
+The nonzero clock-to-Q prevents same-time-slot races between routed clock
+buffers, updated control signals and the SRAM input sampling. It does not
+certify post-layout timing. Historical netlists remain invalid.
 
 ## Converted Bishop test data
 
