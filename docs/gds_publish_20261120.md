@@ -51,11 +51,22 @@ the full comparison matches uniquely with zero property errors. An intentionally
 SRAM address-bit reference still fails LVS. The positional SPICE used by the
 prebuilt ICC2 core is unchanged.
 
-The two physical DRC locations were SRAM VPWR M3 feeds approaching VGND row-via
-landings by approximately 0.1 µm. The feeds now jog 0.6 µm near the left straps,
-then return to the original path before the SRAM signal-pin region. Feed width
-stays 1.74 µm. The corrected-layout experiment passes KLayout DRC, and rerunning
-the actual PDN Tcl on the CI database confirms both supply networks connected.
+The two physical DRC locations were SRAM VPWR M3 feeds close to row-via
+landings. The first correction jogged both feeds inward. Although its DRC and
+per-net connectivity checks passed, run `44733064497` found 12 LVS errors:
+the lower jog overlapped a VGND landing by 0.05 µm, shorting the supplies.
+Per-net connectivity alone does not detect a bridge between two supply nets.
+
+The corrected PDN bridges the lower feed's small gap to its **own VPWR pad**,
+and only the upper feed jogs inward by 0.6 µm. Main feed width remains 1.74 µm.
+A pre-placement check now rejects M3 feed overlap with the opposite supply,
+including via landing pads. Reintroducing the former jog fails this check.
+The latest routed CI GDS was patched with these exact feed changes, extracted
+again, and compared with its unchanged routed reference: LVS matches uniquely,
+with 8205 nets on both sides and no property errors. This checks the edited
+layout itself, not merely the corrected reference against an older layout.
+Both Magic and KLayout DRC report zero violations for this corrected layout.
+[Corrected PG checks](../reports/ci_pg_short_fix_20261120/summary.json).
 
 The previous gate-test entry point explicitly rejected `GATES=yes`. It now tests
 the current routed wrapper through package pins, including MICRO batch 1 and 3,

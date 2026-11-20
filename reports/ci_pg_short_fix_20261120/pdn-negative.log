@@ -1,0 +1,7 @@
+OpenROAD dcf36133a369abc8f3c5e5738cd4d82e4903c0e0
+Features included (+) or not (-): +GPU +GUI +Python
+This program is licensed under the BSD-3 license. See the LICENSE file for details.
+Components of this program may be licensed under more restrictive licenses which must be honored.
+SRAM PDN: VPWR uses left stripe at 485520 DBU
+SRAM PDN: VGND uses left stripe at 488820 DBU
+Error: acc-pdn-negative.tcl, 189 SRAM PG short: VPWR M3 484720 6305 493740 8045 touches VGND M3 488030 7995 489610 8325

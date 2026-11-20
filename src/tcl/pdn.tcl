@@ -188,6 +188,27 @@ if { $::env(PDN_CORE_RING) == 1 } {
 
 # Complete the standard grid with geometry-derived SRAM side feeds.
 # Integrated PDN DRC/connectivity must be rerun for this new placement.
+# Include generated via landing pads when checking feed-to-supply shorts.
+proc tt_pdn_m3_rectangles {sw} {
+    set rectangles {}
+    foreach box [$sw getWires] {
+        if {[$box isVia]} {
+            lassign [$box getViaXY] vx vy
+            set via [$box getBlockVia]
+            if {$via == "NULL"} {set via [$box getTechVia]}
+            foreach pad [$via getBoxes] {
+                if {[[$pad getTechLayer] getName] == "met3"} {
+                    lappend rectangles [list [expr {$vx+[$pad xMin]}] [expr {$vy+[$pad yMin]}] \
+                        [expr {$vx+[$pad xMax]}] [expr {$vy+[$pad yMax]}]]
+                }
+            }
+        } elseif {[[$box getTechLayer] getName] == "met3"} {
+            lappend rectangles [list [$box xMin] [$box yMin] [$box xMax] [$box yMax]]
+        }
+    }
+    return $rectangles
+}
+
 proc tt_connect_sram_power {} {
 # Right-side, unrotated SRAM: feed its horizontal M3 rings from full-height
 # M4 stripes in the logic region to the left. No top/bottom halo is required.
@@ -244,29 +265,67 @@ foreach {netname pinname} {VPWR vccd1 VGND vssd1} {
     lassign $best x1 x2
     set cx [expr {($x1+$x2)/2}]
     set sw [odb::dbSWire_create $net ROUTED]
+    set side_feeds($netname) $sw
     foreach ring $rings {
         lassign $ring rx ry1 ry2
         set cy [expr {($ry1+$ry2)/2}]
-        # The outer (VPWR) ring is only ~0.1um from the neighboring VGND
-        # row-via landing at the left M4 straps. Jog 0.6um toward the SRAM
-        # interior, keeping the full 1.74um feed width and a >=0.6um M3 gap.
-        # Return to the original feed above the logic, beyond both M4 straps,
-        # so the SRAM signal-pin access region retains its original clearance.
+        # The lower VPWR feed has a narrow gap to its own row-via pad.
+        # Bridge that same-net gap; shifting this feed upward would short the
+        # neighboring VGND pad. Only the upper feed needs an inward jog.
         set dy 0
-        if {$netname eq "VPWR"} {
-            set dy [expr {$cy < ($my1+$my2)/2 ? 600 : -600}]
+        if {$netname eq "VPWR" && $cy > ($my1+$my2)/2} {set dy -600}
+        if {$dy == 0} {
+            odb::dbSBox_create $sw $m3 $x1 $ry1 [expr {$rx+1740}] $ry2 STRIPE
+        } else {
+            set fy1 [expr {$ry1+$dy}];set fy2 [expr {$ry2+$dy}]
+            set bend [expr {$x2+5680}]
+            if {$bend+1740 >= $rx} {error "Insufficient room for SRAM PG jog"}
+            odb::dbSBox_create $sw $m3 $x1 $fy1 [expr {$bend+1740}] $fy2 STRIPE
+            odb::dbSBox_create $sw $m3 $bend [expr {min($ry1,$fy1)}] \
+                [expr {$bend+1740}] [expr {max($ry2,$fy2)}] STRIPE
+            odb::dbSBox_create $sw $m3 $bend $ry1 [expr {$rx+1740}] $ry2 STRIPE
         }
-        set fy1 [expr {$ry1+$dy}];set fy2 [expr {$ry2+$dy}]
-        set bend [expr {$x2+5680}]
-        if {$bend+1740 >= $rx} {error "Insufficient room for SRAM PG jog"}
-        odb::dbSBox_create $sw $m3 $x1 $fy1 [expr {$bend+1740}] $fy2 STRIPE
-        odb::dbSBox_create $sw $m3 $bend [expr {min($ry1,$fy1)}] \
-            [expr {$bend+1740}] [expr {max($ry2,$fy2)}] STRIPE
-        odb::dbSBox_create $sw $m3 $bend $ry1 [expr {$rx+1740}] $ry2 STRIPE
         odb::dbSBox_create $sw $via $cx [expr {$cy+$dy}] STRIPE
+        if {$netname eq "VPWR" && $cy < ($my1+$my2)/2} {
+            set pad {};set pad_top -1
+            foreach wire [$net getSWires] {
+                foreach box [$wire getWires] {
+                    if {![$box isVia] && [[$box getTechLayer] getName] == "met3" &&
+                        [$box xMin] >= $x1 && [$box xMax] <= $x2 &&
+                        [$box yMax] <= $ry1 && $ry1-[$box yMax] < 600 &&
+                        [$box yMax] > $pad_top} {
+                        set pad [list [$box xMin] [$box yMin] [$box xMax]]
+                        set pad_top [$box yMax]
+                    }
+                }
+            }
+            if {[llength $pad] == 0} {error "Missing VPWR row-via pad for lower feed bridge"}
+            lassign $pad px1 py1 px2
+            odb::dbSBox_create $sw $m3 $px1 $py1 $px2 [expr {$ry1+300}] STRIPE
+        }
     }
     puts "SRAM PDN: $netname uses left stripe at $cx DBU"
 }
+
+# check_power_grid proves each supply connected but does not detect a
+# physical bridge between supplies. Reject such a bridge before placement.
+foreach {name other} {VPWR VGND VGND VPWR} {
+    set obstacles {}
+    foreach sw [[$block findNet $other] getSWires] {
+        lappend obstacles {*}[tt_pdn_m3_rectangles $sw]
+    }
+    foreach rect [tt_pdn_m3_rectangles $side_feeds($name)] {
+        lassign $rect ax1 ay1 ax2 ay2
+        foreach obstacle $obstacles {
+            lassign $obstacle bx1 by1 bx2 by2
+            if {max($ax1,$bx1) <= min($ax2,$bx2) &&
+                max($ay1,$by1) <= min($ay2,$by2)} {
+                error "SRAM PG short: $name M3 $rect touches $other M3 $obstacle"
+            }
+        }
+    }
+}
+puts "SRAM PDN: no M3 feed overlap between VPWR and VGND (including via pads)"
 
 # Only continuous full-height M4 straps are external power access pins.
 # Short stripe pieces above/below the SRAM are internal PDN conductors, not

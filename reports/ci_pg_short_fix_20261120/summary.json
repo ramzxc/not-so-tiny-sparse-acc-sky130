@@ -1,0 +1,22 @@
+{
+  "input_ci_run": 44733064497,
+  "input_commit": "9c8241fa",
+  "reference": "unchanged routed powered Verilog from the input CI run",
+  "geometry_fix": "Restore lower VPWR feed, bridge to same-net via pad; retain upper inward jog",
+  "fixed_gds_sha256": "db44c64aed8e329f1bd503a04e6454d97d0ab881cbcc227dec308c438460fd57",
+  "pdn_tcl_sha256": "a1ef26ea4330a6cdd9cd11f52445b9bae8189c36a1d5617f9c0929f762cab1cf",
+  "lvs": {
+    "result": "Circuits match uniquely",
+    "nets": [
+      8205,
+      8205
+    ],
+    "property_errors": 0,
+    "bad_net_groups": 0
+  },
+  "supply_connectivity": "VPWR and VGND each connected",
+  "feed_supply_overlap": "none including M3 via landing pads",
+  "negative_control": "Former lower jog rejected before placement",
+  "magic_drc": 0,
+  "klayout_drc": 0
+}

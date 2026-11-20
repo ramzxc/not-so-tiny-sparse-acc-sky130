@@ -25,7 +25,7 @@
     "jog_x_um": 492,
     "VPWR_connectivity": "all shapes connected",
     "VGND_connectivity": "all shapes connected",
-    "magic_drc": "pending",
+    "magic_drc": 0,
     "klayout_drc": 0
   },
   "scope": "GitHub RTL hardening flow; published ICC2 candidate core GDS is unchanged.",
@@ -36,5 +36,13 @@
     "tests_passed": 2,
     "tests_failed": 0,
     "sdf": false
+  },
+  "status": "First PDN candidate superseded: supply short found by next full CI LVS",
+  "followup_run": {
+    "id": 44733064497,
+    "magic_drc": 0,
+    "klayout_drc": 0,
+    "lvs_errors": 12,
+    "cause": "Lower +0.6um VPWR jog overlaps VGND via landing by 0.05um"
   }
 }
