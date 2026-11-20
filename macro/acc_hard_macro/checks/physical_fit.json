@@ -1,0 +1,39 @@
+{
+  "run": "/docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/reports/gds_publish_20261120_191712",
+  "checkpoint": "/docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/reports/gds_publish_20261120_191712/pnr/acc_hard_macro.ndm:acc_hard_macro/final_clean.design",
+  "tile_um": [
+    1378.16,
+    225.76
+  ],
+  "core_um": [
+    1367.12,
+    214.88
+  ],
+  "sram_origin_core_um": [
+    514.785,
+    0.265
+  ],
+  "synthesis_logic_um2": 64664.51683000001,
+  "synthesis_sram_um2": 180558.71875,
+  "synthesis_total_um2": 245223.23558,
+  "placed_logic_um2": 61365.104,
+  "placement_capacity_um2": 103744.4992,
+  "placed_utilization": 0.5915,
+  "netlist_area_um2": 241923.82,
+  "area_including_physical_only_um2": 284303.22,
+  "internal_setup_slack_ns": 4.85,
+  "internal_hold_slack_ns_report_precision": 0.01,
+  "max_cap_violations": 64,
+  "max_transition_violations": 1,
+  "legality_violations": 0,
+  "route_drc": 0,
+  "route_opens": 0,
+  "antenna_violations": 0,
+  "pg_drc": 0,
+  "all_pg_floating_counts": 0,
+  "source_and_macro_hashes_verified": true,
+  "removed_unused_pg_rail_fragments": 77,
+  "limits": "Area/routability pass only. Internal timing nominal TT with analytical SRAM Liberty; external IO budgets remain historical 20 ns and fail. Capacitance violations remain. No foundry DRC/LVS, full-wrapper PnR, multi-corner STA or equivalence signoff. One max-transition violating net remains.",
+  "manual_antenna_diodes": 2,
+  "source_commit": "e02c2fefcd3f25784fbb0113be88257d3f61004f"
+}

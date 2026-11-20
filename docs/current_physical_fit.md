@@ -1,3 +1,5 @@
+> Latest synthesized GDS: [2026-11-20 published candidate](gds_publish_20261120.md). The measurements below are the earlier pre-refactor run.
+
 > This physical result predates the interface grouping into `input_queue`, `command_ctrl`, and `qspi_ctrl`. That RTL refactor has not been synthesized or routed again; the exact physical-run sources remain in its snapshot.
 
 # Current RTL physical fit — 2026-11-20

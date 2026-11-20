@@ -1,0 +1,7 @@
+{
+  "passed": {
+    "acc-publish-stream": 4,
+    "acc-publish-micro": 5
+  },
+  "previous_refactor_network_comparison": "16 frames, result/completion-cycle/queue/contention metrics identical; see docs/rtl_interfaces.md"
+}

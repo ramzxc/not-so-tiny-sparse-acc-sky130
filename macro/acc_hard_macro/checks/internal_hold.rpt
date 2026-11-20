@@ -1,0 +1,407 @@
+****************************************
+Report : timing
+        -path_type full
+        -delay_type min
+        -max_paths 10
+        -report_by design
+Design : acc_hard_macro
+Version: Y-2026.03
+Date   : Fri Nov 20 19:31:45 2026
+****************************************
+
+  Startpoint: command/frontend/instruction_buffer_reg_24_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: command/frontend/instruction_buffer_reg_32_ (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: min
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.56      0.56
+
+  command/frontend/instruction_buffer_reg_24_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.56 r
+  command/frontend/instruction_buffer_reg_24_/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.37      0.93 r
+  command/frontend/U459/X (sky130_fd_sc_hd__a22o_1)
+                                                   0.12      1.05 r
+  command/frontend/copt_h_inst_2947/X (sky130_fd_sc_hd__clkbuf_2)
+                                                   0.08      1.13 r
+  command/frontend/instruction_buffer_reg_32_/D (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      1.13 r
+  data arrival time                                          1.13
+
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.89      0.89
+  command/frontend/instruction_buffer_reg_32_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.89 r
+  clock uncertainty                                0.25      1.14
+  library hold time                               -0.01      1.13
+  data required time                                         1.13
+  ------------------------------------------------------------------------
+  data required time                                         1.13
+  data arrival time                                         -1.13
+  ------------------------------------------------------------------------
+  slack (MET)                                                0.01
+
+
+
+  Startpoint: ingress/rx_count_reg_0_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: ingress/bus_state_reg_1_ (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: min
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.57      0.57
+
+  ingress/rx_count_reg_0_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.57 r
+  ingress/rx_count_reg_0_/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.37      0.94 f
+  ingress/U252/X (sky130_fd_sc_hd__or3b_2)         0.19      1.13 r
+  ingress/U262/X (sky130_fd_sc_hd__a32o_1)         0.15      1.28 r
+  ingress/copt_h_inst_2950/X (sky130_fd_sc_hd__buf_1)
+                                                   0.08      1.36 r
+  ingress/bus_state_reg_1_/D (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00      1.36 r
+  data arrival time                                          1.36
+
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 1.11      1.11
+  ingress/bus_state_reg_1_/CLK (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00      1.11 r
+  clock uncertainty                                0.25      1.36
+  library hold time                               -0.01      1.35
+  data required time                                         1.35
+  ------------------------------------------------------------------------
+  data required time                                         1.35
+  data arrival time                                         -1.36
+  ------------------------------------------------------------------------
+  slack (MET)                                                0.01
+
+
+
+  Startpoint: command/frontend/program_words_reg_15_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: command/frontend/words_left_reg_15_ (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: min
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.56      0.56
+
+  command/frontend/program_words_reg_15_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.56 r
+  command/frontend/program_words_reg_15_/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.40      0.96 r
+  command/frontend/U220/X (sky130_fd_sc_hd__a21o_1)
+                                                   0.12      1.09 r
+  command/frontend/copt_h_inst_2948/X (sky130_fd_sc_hd__clkbuf_2)
+                                                   0.09      1.18 r
+  command/frontend/words_left_reg_15_/D (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      1.18 r
+  data arrival time                                          1.18
+
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.91      0.91
+  command/frontend/words_left_reg_15_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.91 r
+  clock uncertainty                                0.25      1.16
+  library hold time                                0.00      1.17
+  data required time                                         1.17
+  ------------------------------------------------------------------------
+  data required time                                         1.17
+  data arrival time                                         -1.18
+  ------------------------------------------------------------------------
+  slack (MET)                                                0.01
+
+
+
+  Startpoint: command/frontend/instruction_buffer_reg_1_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: command/frontend/instruction_buffer_reg_9_ (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: min
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.56      0.56
+
+  command/frontend/instruction_buffer_reg_1_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.56 r
+  command/frontend/instruction_buffer_reg_1_/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.38      0.95 r
+  command/frontend/copt_h_inst_2949/X (sky130_fd_sc_hd__buf_1)
+                                                   0.09      1.03 r
+  command/frontend/U430/X (sky130_fd_sc_hd__a22o_1)
+                                                   0.10      1.14 r
+  command/frontend/instruction_buffer_reg_9_/D (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      1.14 r
+  data arrival time                                          1.14
+
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.89      0.89
+  command/frontend/instruction_buffer_reg_9_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.89 r
+  clock uncertainty                                0.25      1.14
+  library hold time                               -0.01      1.12
+  data required time                                         1.12
+  ------------------------------------------------------------------------
+  data required time                                         1.12
+  data arrival time                                         -1.14
+  ------------------------------------------------------------------------
+  slack (MET)                                                0.01
+
+
+
+  Startpoint: command/frontend/program_words_reg_13_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: command/frontend/words_left_reg_13_ (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: min
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.56      0.56
+
+  command/frontend/program_words_reg_13_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.56 r
+  command/frontend/program_words_reg_13_/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.42      0.98 r
+  command/frontend/U152/X (sky130_fd_sc_hd__a21o_1)
+                                                   0.13      1.11 r
+  command/frontend/words_left_reg_13_/D (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      1.11 r
+  data arrival time                                          1.11
+
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.87      0.87
+  command/frontend/words_left_reg_13_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.87 r
+  clock uncertainty                                0.25      1.12
+  library hold time                               -0.02      1.10
+  data required time                                         1.10
+  ------------------------------------------------------------------------
+  data required time                                         1.10
+  data arrival time                                         -1.11
+  ------------------------------------------------------------------------
+  slack (MET)                                                0.02
+
+
+
+  Startpoint: psram/serial_memory/state_reg_0_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: psram/serial_memory/done_reg (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: min
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.56      0.56
+
+  psram/serial_memory/state_reg_0_/CLK (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00      0.56 r
+  psram/serial_memory/state_reg_0_/Q (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.40      0.96 f
+  psram/serial_memory/U63/X (sky130_fd_sc_hd__and3_2)
+                                                   0.20      1.16 f
+  psram/serial_memory/done_reg/D (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      1.16 f
+  data arrival time                                          1.16
+
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.90      0.90
+  psram/serial_memory/done_reg/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.90 r
+  clock uncertainty                                0.25      1.15
+  library hold time                               -0.01      1.14
+  data required time                                         1.14
+  ------------------------------------------------------------------------
+  data required time                                         1.14
+  data arrival time                                         -1.16
+  ------------------------------------------------------------------------
+  slack (MET)                                                0.02
+
+
+
+  Startpoint: command/frontend/instruction_buffer_reg_55_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: command/frontend/instruction_buffer_reg_63_ (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: min
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.56      0.56
+
+  command/frontend/instruction_buffer_reg_55_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.56 r
+  command/frontend/instruction_buffer_reg_55_/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.37      0.93 r
+  command/frontend/U492/X (sky130_fd_sc_hd__a22o_1)
+                                                   0.12      1.05 r
+  command/frontend/copt_h_inst_2958/X (sky130_fd_sc_hd__buf_1)
+                                                   0.07      1.13 r
+  command/frontend/instruction_buffer_reg_63_/D (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      1.13 r
+  data arrival time                                          1.13
+
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.87      0.87
+  command/frontend/instruction_buffer_reg_63_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.87 r
+  clock uncertainty                                0.25      1.12
+  library hold time                               -0.02      1.10
+  data required time                                         1.10
+  ------------------------------------------------------------------------
+  data required time                                         1.10
+  data arrival time                                         -1.13
+  ------------------------------------------------------------------------
+  slack (MET)                                                0.03
+
+
+
+  Startpoint: command/sequencer/batch_left_reg_2_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: command/sequencer/batch_left_reg_3_ (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: min
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.56      0.56
+
+  command/sequencer/batch_left_reg_2_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.56 r
+  command/sequencer/batch_left_reg_2_/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.39      0.95 r
+  command/sequencer/U780/X (sky130_fd_sc_hd__a21o_1)
+                                                   0.12      1.07 r
+  command/sequencer/ctmTdsLR_1_1191/X (sky130_fd_sc_hd__a221o_1)
+                                                   0.12      1.19 r
+  command/sequencer/batch_left_reg_3_/D (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      1.19 r
+  data arrival time                                          1.19
+
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.92      0.92
+  command/sequencer/batch_left_reg_3_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.92 r
+  clock uncertainty                                0.25      1.17
+  library hold time                               -0.02      1.15
+  data required time                                         1.15
+  ------------------------------------------------------------------------
+  data required time                                         1.15
+  data arrival time                                         -1.19
+  ------------------------------------------------------------------------
+  slack (MET)                                                0.04
+
+
+
+  Startpoint: exec/inputs_reg_0_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: exec/saved_inputs_reg_0_ (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: min
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.58      0.58
+
+  exec/inputs_reg_0_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.58 r
+  exec/inputs_reg_0_/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.38      0.96 r
+  exec/U693/X (sky130_fd_sc_hd__a22o_1)            0.12      1.08 r
+  exec/U694/X (sky130_fd_sc_hd__a31o_1)            0.09      1.17 r
+  exec/copt_h_inst_2954/X (sky130_fd_sc_hd__buf_1)
+                                                   0.07      1.24 r
+  exec/saved_inputs_reg_0_/D (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      1.24 r
+  data arrival time                                          1.24
+
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.96      0.96
+  exec/saved_inputs_reg_0_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.96 r
+  clock uncertainty                                0.25      1.21
+  library hold time                               -0.01      1.21
+  data required time                                         1.21
+  ------------------------------------------------------------------------
+  data required time                                         1.21
+  data arrival time                                         -1.24
+  ------------------------------------------------------------------------
+  slack (MET)                                                0.04
+
+
+
+  Startpoint: command/frontend/instruction_buffer_reg_12_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: command/frontend/instruction_buffer_reg_20_ (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: min
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.56      0.56
+
+  command/frontend/instruction_buffer_reg_12_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.56 r
+  command/frontend/instruction_buffer_reg_12_/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.37      0.93 r
+  command/frontend/copt_h_inst_2951/X (sky130_fd_sc_hd__buf_1)
+                                                   0.09      1.02 r
+  command/frontend/U444/X (sky130_fd_sc_hd__a22o_1)
+                                                   0.11      1.13 r
+  command/frontend/instruction_buffer_reg_20_/D (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      1.13 r
+  data arrival time                                          1.13
+
+  clock clk (rise edge)                            0.00      0.00
+  clock network delay (propagated)                 0.87      0.87
+  command/frontend/instruction_buffer_reg_20_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.87 r
+  clock uncertainty                                0.25      1.12
+  library hold time                               -0.02      1.09
+  data required time                                         1.09
+  ------------------------------------------------------------------------
+  data required time                                         1.09
+  data arrival time                                         -1.13
+  ------------------------------------------------------------------------
+  slack (MET)                                                0.04
+
+
+1

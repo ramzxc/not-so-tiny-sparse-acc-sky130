@@ -1,0 +1,17 @@
+{
+  "source_sha256": "e685b0b43ed4441375bcea0beb911b3005f171da5a350262c4cee3bacd8ebc9c",
+  "output_sha256": "36280cc77925b11e95f695b55c0ac779a761c663a46473b3c645feee850f2988",
+  "cell": "acc_hard_macro",
+  "layer": [
+    235,
+    4
+  ],
+  "bbox_um": [
+    0,
+    0,
+    1367.12,
+    214.88
+  ],
+  "added_bytes": 64,
+  "all_other_bytes_unchanged": true
+}
