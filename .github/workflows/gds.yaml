@@ -30,6 +30,7 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       SIM: icarus
+      GATES: "yes" # The upstream action runs make clean before GATES=yes make.
     steps:
       - name: checkout repo
         uses: actions/checkout@v6
