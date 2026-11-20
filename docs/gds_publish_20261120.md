@@ -65,3 +65,9 @@ This remains functional GLS with the SRAM behavioral model and no SDF.
 
 Local evidence: [CI correction report](../reports/ci_gds_fix_20261120/summary.json).
 A newly routed full CI run is still required after these configuration changes.
+
+The Actions summary also now identifies the flow from the final DEF. An RTL run
+uses its own cell inventory and wire length; it does not add the separate ICC2
+core a second time. The displayed OpenROAD standard-cell utilisation explicitly
+states that its macro-excluded denominator is not the stricter row capacity
+with all placement keepouts removed.

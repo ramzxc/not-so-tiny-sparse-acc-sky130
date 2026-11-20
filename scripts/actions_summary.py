@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Read-only Actions summaries for the routed wrapper and hardened core.
+"""Read-only Actions summaries for either RTL+SRAM or a prebuilt-core wrapper.
 
-LibreLane metrics describe the wrapper: they do not include routing inside the
-hard macro. Count core physical cells from the flattened, hash-checked LVS
-source generated from ICC2's powered netlist (including filler/tap cells).
+Only add the packaged core inventory when the routed DEF actually contains
+acc_hard_macro; the RTL flow already includes the core's standard cells.
 """
 import argparse
 from collections import Counter
@@ -70,6 +69,26 @@ def routing(run):
         print('Unavailable: this run has no final/metrics.json.\n')
         return
     metrics = json.loads(path.read_text())
+    defs = list((run / 'final/def').glob('*.def'))
+    if len(defs) != 1:
+        raise ValueError('Expected one final DEF for flow identification')
+    inventory = def_cells(defs[0].read_text())
+    cores = inventory.get('acc_hard_macro', 0)
+    if cores == 0:
+        # These are the routed RTL design's own metrics. Do not double-count
+        # the independently synthesized ICC2 candidate published in macro/.
+        utilization = float(metrics['design__instance__utilization__stdcell']) * 100
+        table(['OpenROAD standard-cell utilisation (%)', 'Wire length (um)'], [
+            [f'{utilization:.2f}', metrics['route__wirelength']],
+        ])
+        print('RTL + SRAM flow. OpenROAD utilisation excludes macro area from '
+              'the core-area denominator; it is not the stricter remaining-row '
+              'capacity after all placement keepouts. Wire length is this routed '
+              'design only, excluding SRAM internal wiring and PG. The separately '
+              'published ICC2 candidate is not added.\n')
+        return
+    if cores != 1:
+        raise ValueError('Expected at most one prebuilt accelerator core')
     core = core_physical(ROOT)
     wrapper_wire = metrics.get('route__wirelength', metrics.get('detailedroute__route__wirelength'))
     length = f"{float(wrapper_wire) + core['wirelength_total_um']:.3f}" if wrapper_wire is not None else 'N/A'
@@ -91,9 +110,10 @@ def cells(root, run, categories_path):
         print('Unavailable: expected one final wrapper DEF.\n')
         return
     wrapper = def_cells(defs[0].read_text())
-    if wrapper.pop('acc_hard_macro', 0) != 1:
-        raise ValueError('Expected exactly one acc_hard_macro in wrapper DEF')
-    inventory = wrapper + core_cells(root)
+    cores = wrapper.pop('acc_hard_macro', 0)
+    if cores not in (0, 1):
+        raise ValueError('Expected at most one prebuilt accelerator core')
+    inventory = wrapper + core_cells(root) if cores else wrapper
     categories = json.loads(categories_path.read_text())
     grouped = {}
     for cell, count in inventory.items():
