@@ -1,0 +1,17 @@
+{
+  "result": "PASS",
+  "tests": 2,
+  "clock_mhz": 50,
+  "cases": [
+    "multiply",
+    "micro_batch_1",
+    "micro_batch_3",
+    "program replay",
+    "ena output disable",
+    "raw UART PSRAM queue"
+  ],
+  "core_netlist_sha256": "23f307b349ac6667760c6f3c748f1c026b569f226153c8b2ae7663dfb5e9e4fd",
+  "test_sha256": "709bb1d005f3f72988826329fadbe1fbcffc030e6a4d2b50145ab4a77bcf2ae0",
+  "wrapper_sha256": "32b918a5efb5e2be65a745464d17a59bc854d767f44f53fb41b8050dc1b0b66a",
+  "limit": "Pin-level core gate simulation with RTL wrapper, behavioral SRAM/PSRAM and 1ns sequential UDP delay; no SDF. Routed wrapper is tested separately by CI."
+}

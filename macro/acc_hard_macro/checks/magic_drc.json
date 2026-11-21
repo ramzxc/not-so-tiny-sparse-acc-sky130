@@ -1,0 +1,7 @@
+{
+  "result": "PASS",
+  "violations": 0,
+  "gds_sha256": "904a0332d4ae16e203f36893840c88019f26a7b8d2d285a5acffbea2698f67bc",
+  "pdk_tech_sha256": "4b817b65d398558946e7d574c5c72b4a0570ea202d85cd9e18e72b681ef13405",
+  "scope": "Standalone merged core GDS; full wrapper checked separately by CI."
+}

@@ -1,0 +1,11 @@
+read_verilog -lib -D USE_POWER_PINS -D FUNCTIONAL -D UNIT_DELAY= /tmp/tt-ci-pdk/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
+read_verilog -lib -D USE_POWER_PINS /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/blackbox.v
+read_verilog -overwrite /tmp/acc-combo-models.v
+read_verilog /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/macro/acc_hard_macro/acc_hard_macro.v
+hierarchy -check -top acc_hard_macro
+flatten
+proc
+opt_clean
+select -module acc_hard_macro
+sat -verify -ignore_unknown_cells -set reset_sync[1] 0 -prove command.sequencer.n886 0
+sat -verify -ignore_unknown_cells -set reset_sync[1] 0 -prove dma.n165 0

@@ -1,17 +1,17 @@
 Information: Timer using 4 threads
-Timing Update Started(Full_timing_update) : updateCount: 1 / Mem-peak : 835 MB / Date: Fri Nov 20 19:31:40 2026
+Timing Update Started(Full_timing_update) : updateCount: 1 / Mem-peak : 563 MB / Date: Sat Nov 21 16:07:49 2026
 
-Timing Update Completed: Mem-peak: 835 MB / Date: Fri Nov 20 19:31:40 2026
+Timing Update Completed: Mem-peak: 563 MB / Date: Sat Nov 21 16:07:49 2026
 
 ****************************************
 Report : qor
 Design : acc_hard_macro
 Version: Y-2026.03
-Date   : Fri Nov 20 19:31:40 2026
+Date   : Sat Nov 21 16:07:49 2026
 ****************************************
 Information: Corner tt: no PVT mismatches. (PVT-032)
 Information: The stitching and editing of coupling caps is turned OFF for design 'acc_hard_macro.ndm:acc_hard_macro/final_clean.design'. (TIM-125)
-Information: Design acc_hard_macro has 6407 nets, 0 global routed, 6405 detail routed. (NEX-024)
+Information: Design acc_hard_macro has 6325 nets, 0 global routed, 6323 detail routed. (NEX-024)
 Information: The RC mode used is DR for design 'acc_hard_macro'. (NEX-022)
 ---extraction options---
 Corner: tt
@@ -29,7 +29,7 @@ Global options:
  extract.enable_coupling_cap    : false
 Extracting design: acc_hard_macro 
 Information: coupling capacitance is lumped to ground. (NEX-030)
-Information: 6405 nets are successfully extracted. (NEX-028)
+Information: 6323 nets are successfully extracted. (NEX-028)
 Warning: Advanced receiver model has not been enabled for detailed routed design. (TIM-204)
 Information: Pin/Port with maximum arrivals in mode: 'functional',  'receiver/rx_meta_reg/D'   : '2'. (TIM-134)
 Information: Average arrivals per pin/port in mode: 'functional' : '0'. (TIM-136)
@@ -50,8 +50,8 @@ Information: Running switching activity propagation with 4 threads!
 
  **** Information : No. of simulation cycles = 6 ****
 Information: Update timing completed net estimation for all the timing graph nets (TIM-111)
-Information: Net estimation statistics: timing graph nets = 6405, routed nets = 6405, across physical hierarchy nets = 0, parasitics cached nets = 6405, delay annotated nets = 0, parasitics annotated nets = 0, multi-voltage nets = 0. (TIM-112)
-[Non-Incremental Power-Update] SCENE[functional_tt_late] PROP[late] InstanceSize[19608]
+Information: Net estimation statistics: timing graph nets = 6323, routed nets = 6323, across physical hierarchy nets = 0, parasitics cached nets = 6323, delay annotated nets = 0, parasitics annotated nets = 0, multi-voltage nets = 0. (TIM-112)
+[Non-Incremental Power-Update] SCENE[functional_tt_late] PROP[late] InstanceSize[19610]
 ************************************************************
 Timer Settings:
 Delay Calculation Style:                   auto
@@ -70,11 +70,11 @@ Smart Arc Optimization:                    disabled
 Scenario           'functional_tt'
 Timing Path Group  '**in2reg_default**'
 ----------------------------------------
-Levels of Logic:                      1
-Critical Path Length:             20.21
-Critical Path Slack:              -1.49
+Levels of Logic:                      2
+Critical Path Length:             20.10
+Critical Path Slack:              -1.53
 Critical Path Clk Period:         20.00
-Total Negative Slack:            -12.57
+Total Negative Slack:            -13.93
 No. of Violating Paths:              11
 Worst Hold Violation:              0.00
 Total Hold Violation:              0.00
@@ -84,12 +84,12 @@ No. of Hold Violations:               0
 Scenario           'functional_tt'
 Timing Path Group  '**reg2out_default**'
 ----------------------------------------
-Levels of Logic:                     13
-Critical Path Length:              2.02
-Critical Path Slack:              -1.58
+Levels of Logic:                     11
+Critical Path Length:              2.24
+Critical Path Slack:              -1.53
 Critical Path Clk Period:         20.00
-Total Negative Slack:            -13.27
-No. of Violating Paths:              17
+Total Negative Slack:            -13.20
+No. of Violating Paths:              14
 Worst Hold Violation:              0.00
 Total Hold Violation:              0.00
 No. of Hold Violations:               0
@@ -98,11 +98,11 @@ No. of Hold Violations:               0
 Scenario           'functional_tt'
 Timing Path Group  '**in2out_default**'
 ----------------------------------------
-Levels of Logic:                      4
-Critical Path Length:             20.43
+Levels of Logic:                      3
+Critical Path Length:             20.45
 Critical Path Slack:             -20.77
 Critical Path Clk Period:         20.00
-Total Negative Slack:           -166.03
+Total Negative Slack:           -165.96
 No. of Violating Paths:               8
 Worst Hold Violation:              0.00
 Total Hold Violation:              0.00
@@ -112,9 +112,9 @@ No. of Hold Violations:               0
 Scenario           'functional_tt'
 Timing Path Group  'clk'
 ----------------------------------------
-Levels of Logic:                     35
-Critical Path Length:             14.62
-Critical Path Slack:               4.85
+Levels of Logic:                     37
+Critical Path Length:             14.24
+Critical Path Slack:               4.99
 Critical Path Clk Period:         20.00
 Total Negative Slack:              0.00
 No. of Violating Paths:               0
@@ -127,12 +127,12 @@ No. of Hold Violations:               0
 Cell Count
 ----------------------------------------
 Hierarchical Cell Count:             16
-Hierarchical Port Count:           1702
-Leaf Cell Count:                   6491
-Buf/Inv Cell Count:                 979
-Buf Cell Count:                     229
-Inv Cell Count:                     750
-Combinational Cell Count:          5527
+Hierarchical Port Count:           1713
+Leaf Cell Count:                   6364
+Buf/Inv Cell Count:                 948
+Buf Cell Count:                     180
+Inv Cell Count:                     768
+Combinational Cell Count:          5412
    Single-bit Isolation Cell Count:                        0
    Multi-bit Isolation Cell Count:                         0
    Isolation Cell Banking Ratio:                           0.00%
@@ -142,10 +142,10 @@ Combinational Cell Count:          5527
    Single-bit ELS Cell Count:                              0
    Multi-bit ELS Cell Count:                               0
    ELS Cell Banking Ratio:                                 0.00%
-Sequential Cell Count:              964
+Sequential Cell Count:              952
    Integrated Clock-Gating Cell Count:                     0
    Sequential Macro Cell Count:                            1
-   Single-bit Sequential Cell Count:                       963
+   Single-bit Sequential Cell Count:                       951
    Multi-bit Sequential Cell Count:                        0
    Sequential Cell Banking Ratio:                          0.00%
    BitsPerflop:                                            1.00
@@ -155,26 +155,26 @@ Macro Count:                          1
 
 Area
 ----------------------------------------
-Combinational Area:            40377.48
-Noncombinational Area:         20987.63
-Buf/Inv Area:                   4742.05
-Total Buffer Area:              1721.65
-Total Inverter Area:            3020.40
+Combinational Area:            39990.85
+Noncombinational Area:         20703.61
+Buf/Inv Area:                   4613.17
+Total Buffer Area:              1427.62
+Total Inverter Area:            3185.56
 Macro/Black Box Area:         180558.72
 Net Area:                             0
-Net XLength:                  246486.11
-Net YLength:                  143499.60
+Net XLength:                  244802.58
+Net YLength:                  142241.05
 ----------------------------------------
-Cell Area (netlist):                         241923.82
+Cell Area (netlist):                         241253.18
 Cell Area (netlist and physical only):       284303.22
-Net Length:                   389985.71
+Net Length:                   387043.63
 
 
 Design Rules
 ----------------------------------------
-Total Number of Nets:              6419
-Nets with Violations:                65
-Max Trans Violations:                 1
+Total Number of Nets:              6337
+Nets with Violations:                68
+Max Trans Violations:                 4
 Max Cap Violations:                  64
 ----------------------------------------
 

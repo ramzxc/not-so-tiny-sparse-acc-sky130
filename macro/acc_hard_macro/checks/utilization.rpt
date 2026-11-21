@@ -2,15 +2,15 @@
 Report : report_utilization
 Design : acc_hard_macro
 Version: Y-2026.03
-Date   : Fri Nov 20 19:31:40 2026
+Date   : Sat Nov 21 16:07:49 2026
 ****************************************
-Utilization Ratio:			0.5915
+Utilization Ratio:			0.5850
 Utilization options:
  - Area calculation based on:		site_row of block acc_hard_macro/final_clean
  - Categories of objects excluded:	hard_macros macro_keepouts soft_macros io_cells hard_blockages 
 Total Area:				281469.9520
 Total Capacity Area:			103744.4992
-Total Area of cells:			61365.1040
+Total Area of cells:			60694.4608
 Area of excluded objects:
  - hard_macros         :		180638.3061
  - macro_keepouts      :		4249.8904
@@ -21,6 +21,6 @@ Total Area of excluded objects:		184888.1965
 Ratio of excluded objects:		0.6569
 
 Utilization of site-rows with:
- - Site 'unithd':				0.5915
+ - Site 'unithd':				0.5850
 
-0.5915
+0.5850

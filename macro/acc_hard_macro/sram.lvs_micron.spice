@@ -31544,7 +31544,7 @@ Xdummy_col_right
 * GROUND: gnd 
 * size: 1
 Xpinv_pmos Z A vdd vdd sky130_fd_pr__pfet_01v8 m=1 w=1.12 l=0.15
-Xpinv_nmos Z A gnd gnd sky130_fd_pr__nfet_01v8 m=1 w=0.36 l=0.15
+Xpinv_nmos Z A gnd gnd sky130_fd_pr__special_nfet_01v8 m=1 w=0.36 l=0.15
 .ENDS tt_sram_1rw_64x128_buffered_sky130_pinv_tapped_1
 
 .SUBCKT tt_sram_1rw_64x128_buffered_sky130_pdriver
@@ -31603,7 +31603,7 @@ Xpand2_inv
 * GROUND: gnd 
 * size: 1
 Xpinv_pmos Z A vdd vdd sky130_fd_pr__pfet_01v8 m=1 w=1.12 l=0.15
-Xpinv_nmos Z A gnd gnd sky130_fd_pr__nfet_01v8 m=1 w=0.36 l=0.15
+Xpinv_nmos Z A gnd gnd sky130_fd_pr__special_nfet_01v8 m=1 w=0.36 l=0.15
 .ENDS tt_sram_1rw_64x128_buffered_sky130_pinv_tapped_2
 
 .SUBCKT tt_sram_1rw_64x128_buffered_sky130_hierarchical_predecode2x4_0
@@ -33031,7 +33031,7 @@ Xpre_column_257
 
 **** Inverter to conver Data_in to data_in_bar ******
 * din_bar = inv(DIN)
-X_1 din_bar DIN GND GND sky130_fd_pr__nfet_01v8 W=0.36 L=0.15 m=1
+X_1 din_bar DIN GND GND sky130_fd_pr__special_nfet_01v8 W=0.36 L=0.15 m=1
 X_2 din_bar DIN VDD VDD sky130_fd_pr__pfet_01v8 W=0.55 L=0.15 m=1
 
 **** 2input nand gate follwed by inverter to drive BL ******
@@ -33042,7 +33042,7 @@ X_5 din_bar_gated EN VDD VDD sky130_fd_pr__pfet_01v8 W=0.55 L=0.15 m=1
 X_6 din_bar_gated DIN VDD VDD sky130_fd_pr__pfet_01v8 W=0.55 L=0.15 m=1
 * din_bar_gated_bar = inv(din_bar_gated)
 X_7 din_bar_gated_bar din_bar_gated VDD VDD sky130_fd_pr__pfet_01v8 W=0.55 L=0.15 m=1
-X_8 din_bar_gated_bar din_bar_gated GND GND sky130_fd_pr__nfet_01v8 W=0.36 L=0.15 m=1
+X_8 din_bar_gated_bar din_bar_gated GND GND sky130_fd_pr__special_nfet_01v8 W=0.36 L=0.15 m=1
 
 **** 2input nand gate follwed by inverter to drive BR******
 * din_gated = nand(EN, din_bar)
@@ -33052,7 +33052,7 @@ X_11 net_8 din_bar GND GND sky130_fd_pr__nfet_01v8 W=0.55 L=0.15 m=1
 X_12 din_gated din_bar VDD VDD sky130_fd_pr__pfet_01v8 W=0.55 L=0.15 m=1
 * din_gated_bar = inv(din_gated)
 X_13 din_gated_bar din_gated VDD VDD sky130_fd_pr__pfet_01v8 W=0.55 L=0.15 m=1
-X_14 din_gated_bar din_gated GND GND sky130_fd_pr__nfet_01v8 W=0.36 L=0.15 m=1
+X_14 din_gated_bar din_gated GND GND sky130_fd_pr__special_nfet_01v8 W=0.36 L=0.15 m=1
 
 ************************************************
 * pull down with EN enable
@@ -36616,7 +36616,7 @@ Xwl_driver_and31
 * GROUND: gnd 
 * size: 1
 Xpinv_pmos Z A vdd vdd sky130_fd_pr__pfet_01v8 m=1 w=1.12 l=0.15
-Xpinv_nmos Z A gnd gnd sky130_fd_pr__nfet_01v8 m=1 w=0.36 l=0.15
+Xpinv_nmos Z A gnd gnd sky130_fd_pr__special_nfet_01v8 m=1 w=0.36 l=0.15
 .ENDS tt_sram_1rw_64x128_buffered_sky130_pinv_dec
 * Top level circuit sky130_fd_bd_sram__openram_sp_custom_nand3_dec
 .subckt sky130_custom_nand3_dec A B C Z VDD GND
@@ -37331,7 +37331,7 @@ Xcol_address_decoder0
 * GROUND: gnd 
 * size: 1
 Xpinv_pmos Z A vdd vdd sky130_fd_pr__pfet_01v8 m=1 w=1.12 l=0.15
-Xpinv_nmos Z A gnd gnd sky130_fd_pr__nfet_01v8 m=1 w=0.36 l=0.15
+Xpinv_nmos Z A gnd gnd sky130_fd_pr__special_nfet_01v8 m=1 w=0.36 l=0.15
 .ENDS tt_sram_1rw_64x128_buffered_sky130_pinv_tapped_19
 
 .SUBCKT tt_sram_1rw_64x128_buffered_sky130_delay_chain

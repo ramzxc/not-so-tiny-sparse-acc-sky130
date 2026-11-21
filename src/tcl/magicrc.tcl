@@ -18,10 +18,10 @@ if {[info exists ::env(_MAGIC_SCRIPT)] &&
 if {[info exists ::env(_MAGIC_SCRIPT)] &&
     [file tail $::env(_MAGIC_SCRIPT)] eq "extract_spice.tcl"} {
     set ::tt_lvs_scripts [file normalize [file join [file dirname [info script]] .. .. scripts]]
-    # Prepare the RTL flow model (descending Verilog buses) for the active PDK.
+    # Prepare positional SRAM SPICE used by the complete hardened-core reference.
     # Magic otherwise continues after an rcfile error. Never run LVS with stale models.
     if {[catch {
-        exec python3 [file join $::tt_lvs_scripts prepare_sram_lvs.py]
+        exec python3 [file join $::tt_lvs_scripts prepare_sram_lvs.py] --core
     } message]} {
         puts stderr "FATAL: $message"
         exit 1

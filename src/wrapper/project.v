@@ -1,5 +1,5 @@
 `default_nettype none
-// Current RTL core. Only the internal 1 KiB SRAM is a hard macro.
+// RTL simulation uses the core sources; hardening imports the packaged core GDS.
 module tt_um_not_so_tiny_sparse_acc_ramzxc (
 `ifdef USE_POWER_PINS
     inout wire VPWR, VGND,
@@ -14,6 +14,11 @@ module tt_um_not_so_tiny_sparse_acc_ramzxc (
     wire [7:0] core_oe;
     assign uio_oe = ena ? core_oe : 8'b0;
     acc_hard_macro core (
+`ifdef ACC_HARD_CORE
+`ifdef USE_POWER_PINS
+        .VPWR(VPWR), .VGND(VGND),
+`endif
+`endif
         .uart_rx_i(ui_in[3]), .uo_out(uo_out),
         .qspi_dq_i({uio_in[5:4], uio_in[2:1]}),
         .uio_out(uio_out), .uio_oe(core_oe), .clk(clk), .rst_n(rst_n)

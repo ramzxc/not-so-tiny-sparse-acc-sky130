@@ -1,0 +1,43 @@
+{
+  "input_lef_sha256": "958ffb1ce9467bcc6dee2445a012f2b82a9840c1abe9c3ae87e7352959d35962",
+  "output_lef_sha256": "7572d3e66f542b60905cb5bfb8eaf6900aaab96ac326b1608e38470935cfd747",
+  "gds_sha256": "904a0332d4ae16e203f36893840c88019f26a7b8d2d285a5acffbea2698f67bc",
+  "gds_metal1_y_bounds_um": [
+    0.59,
+    211.99
+  ],
+  "metal1_polygons_checked": 359625,
+  "changed_obstructions": [
+    {
+      "before": [
+        0.0,
+        0.0,
+        1367.12,
+        214.88
+      ],
+      "after": [
+        0.0,
+        0.59,
+        1367.12,
+        211.99
+      ]
+    },
+    {
+      "before": [
+        0.28,
+        0.28,
+        1366.84,
+        214.6
+      ],
+      "after": [
+        0.28,
+        0.59,
+        1366.84,
+        211.99
+      ]
+    }
+  ],
+  "removed_OBS_intersection_with_actual_M1": "EMPTY",
+  "pin_definitions_unchanged": true,
+  "note": "Only empty top/bottom M1 abstract margins removed. GDS and other layers unchanged."
+}

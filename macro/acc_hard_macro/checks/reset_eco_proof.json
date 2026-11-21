@@ -1,0 +1,10 @@
+{
+  "result": "PASS",
+  "method": "Combinational SAT, Liberty Boolean functions; sequential outputs unconstrained. Original D inputs both zero whenever reset_sync[1]=0; AND gating leaves binary function unchanged. Not whole-design sequential equivalence.",
+  "core_netlist_sha256": "23f307b349ac6667760c6f3c748f1c026b569f226153c8b2ae7663dfb5e9e4fd",
+  "proofs": [
+    "command.sequencer.n886 == 0 under reset_sync[1]=0",
+    "dma.n165 == 0 under reset_sync[1]=0"
+  ],
+  "liberty_sha256": "8e78e14442062dba34d414fca6490b2f6b96038d4510d1438ca44fee31487135"
+}

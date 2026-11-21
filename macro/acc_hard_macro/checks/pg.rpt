@@ -3,7 +3,7 @@ Secondary net will be checked together from primary net. They will be treated as
 Primary Net : VPWR    Secondary Net:
 Primary Net : VGND    Secondary Net:
 Loading cell instances...
-Number of Standard Cells: 19607
+Number of Standard Cells: 19609
 Number of Macro Cells: 1
 Number of IO Pad Cells: 0
 Number of Blocks: 0
@@ -34,4 +34,4 @@ Number of VGND Terminals: 26
   Number of floating terminals: 0
   Number of floating hierarchical blocks: 0
 ************************************************************
-Overall runtime: 0 seconds.
+Overall runtime: 1 seconds.

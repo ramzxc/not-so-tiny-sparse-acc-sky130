@@ -6,11 +6,11 @@ Report : timing
         -report_by design
 Design : acc_hard_macro
 Version: Y-2026.03
-Date   : Fri Nov 20 19:31:45 2026
+Date   : Sat Nov 21 16:07:53 2026
 ****************************************
 
-  Startpoint: command/sequencer/batch_size_reg_5_ (rising edge-triggered flip-flop clocked by clk)
-  Endpoint: command/sequencer/weight_addr_reg_3_ (rising edge-triggered flip-flop clocked by clk)
+  Startpoint: command/sequencer/state_reg_4_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: command/sequencer/batch_addr_reg_10_ (rising edge-triggered flip-flop clocked by clk)
   Mode: functional
   Corner: tt
   Scenario: functional_tt
@@ -20,48 +20,50 @@ Date   : Fri Nov 20 19:31:45 2026
   Point                                            Incr      Path  
   ------------------------------------------------------------------------
   clock clk (rise edge)                            0.00      0.00
-  clock network delay (propagated)                 0.89      0.89
+  clock network delay (propagated)                 0.94      0.94
 
-  command/sequencer/batch_size_reg_5_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00      0.89 r
-  command/sequencer/batch_size_reg_5_/Q (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.44      1.33 f
-  command/sequencer/U65/X (sky130_fd_sc_hd__or4b_1)
-                                                   0.57      1.89 f
-  command/sequencer/U67/Y (sky130_fd_sc_hd__nor2_2)
-                                                   0.53      2.42 r
-  command/sequencer/U89/Y (sky130_fd_sc_hd__inv_1)
-                                                   0.54      2.96 f
-  command/sequencer/U93/X (sky130_fd_sc_hd__a221o_1)
-                                                   0.48      3.44 f
-  command/sequencer/U94/Y (sky130_fd_sc_hd__nand2_2)
-                                                   0.40      3.84 r
-  command/sequencer/U96/X (sky130_fd_sc_hd__a22o_1)
-                                                   0.27      4.11 r
-  command/sequencer/U97/Y (sky130_fd_sc_hd__inv_2)
-                                                   0.03      4.15 f
-  command/sequencer/U99/X (sky130_fd_sc_hd__or3_1)
-                                                   0.47      4.62 f
+  command/sequencer/state_reg_4_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.94 r
+  command/sequencer/state_reg_4_/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.48      1.42 r
+  command/sequencer/U65/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.08      1.49 f
+  command/sequencer/U67/X (sky130_fd_sc_hd__or3_1)
+                                                   0.47      1.97 f
+  command/sequencer/U155/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.36      2.32 r
+  command/sequencer/U156/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.32      2.64 f
+  command/sequencer/U662/X (sky130_fd_sc_hd__or4_1)
+                                                   0.60      3.24 f
+  command/sequencer/U663/X (sky130_fd_sc_hd__or4_1)
+                                                   0.42      3.65 f
+  command/sequencer/U669/X (sky130_fd_sc_hd__or4_1)
+                                                   0.53      4.18 f
+  command/sequencer/U670/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.27      4.45 r
+  command/sequencer/ctmTdsLR_2_1386/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.17      4.62 f
   command/sequencer/intadd_3_U23/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.47      5.08 f
+                                                   0.51      5.12 f
   command/sequencer/intadd_3_U22/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.50 f
+                                                   0.43      5.55 f
   command/sequencer/intadd_3_U21/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.92 f
+                                                   0.43      5.98 f
   command/sequencer/intadd_3_U20/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.33 f
+                                                   0.42      6.40 f
   command/sequencer/intadd_3_U19/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.74 f
+                                                   0.42      6.82 f
   command/sequencer/intadd_3_U18/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43      7.17 f
+                                                   0.42      7.24 f
   command/sequencer/intadd_3_U17/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      7.58 f
+                                                   0.42      7.66 f
   command/sequencer/intadd_3_U16/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.50      8.08 f
+                                                   0.45      8.11 f
   command/sequencer/intadd_3_U15/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.45      8.52 f
+                                                   0.42      8.54 f
   command/sequencer/intadd_3_U14/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      8.94 f
+                                                   0.41      8.95 f
   command/sequencer/intadd_3_U13/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.41      9.36 f
   command/sequencer/intadd_3_U12/COUT (sky130_fd_sc_hd__fa_1)
@@ -71,52 +73,54 @@ Date   : Fri Nov 20 19:31:45 2026
   command/sequencer/intadd_3_U10/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.42     10.61 f
   command/sequencer/intadd_3_U9/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.02 f
+                                                   0.42     11.03 f
   command/sequencer/intadd_3_U8/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.44 f
+                                                   0.42     11.45 f
   command/sequencer/intadd_3_U7/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.86 f
+                                                   0.43     11.88 f
   command/sequencer/intadd_3_U6/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41     12.28 f
+                                                   0.42     12.30 f
   command/sequencer/intadd_3_U5/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     12.69 f
+                                                   0.42     12.71 f
   command/sequencer/intadd_3_U4/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     13.12 f
+                                                   0.41     13.13 f
   command/sequencer/intadd_3_U3/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43     13.54 f
+                                                   0.41     13.54 f
   command/sequencer/intadd_3_U2/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.46     14.00 f
-  command/sequencer/U845/Y (sky130_fd_sc_hd__nor2_1)
-                                                   0.12     14.13 r
-  command/sequencer/U55/Y (sky130_fd_sc_hd__o2bb2ai_1)
-                                                   0.15     14.27 f
-  command/sequencer/U1136/Y (sky130_fd_sc_hd__nor2b_2)
-                                                   0.60     14.87 r
-  command/sequencer/U53/X (sky130_fd_sc_hd__buf_1)
-                                                   0.43     15.30 r
-  command/sequencer/U1147/X (sky130_fd_sc_hd__a211o_1)
-                                                   0.20     15.50 r
-  command/sequencer/weight_addr_reg_3_/D (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     15.50 r
-  data arrival time                                         15.50
+  command/sequencer/U834/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.13     14.13 r
+  command/sequencer/U54/Y (sky130_fd_sc_hd__o2bb2ai_1)
+                                                   0.14     14.27 f
+  command/sequencer/U835/Y (sky130_fd_sc_hd__nor2b_1)
+                                                   0.39     14.65 r
+  command/sequencer/U34/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.10     14.75 f
+  command/sequencer/U35/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.25     15.00 r
+  command/sequencer/U861/X (sky130_fd_sc_hd__a211o_2)
+                                                   0.18     15.18 r
+  command/sequencer/batch_addr_reg_10_/D (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     15.18 r
+  data arrival time                                         15.18
 
   clock clk (rise edge)                           20.00     20.00
-  clock network delay (propagated)                 0.63     20.63
-  command/sequencer/weight_addr_reg_3_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     20.63 r
-  clock uncertainty                               -0.25     20.38
-  library setup time                              -0.03     20.36
-  data required time                                        20.36
+  clock network delay (propagated)                 0.47     20.47
+  command/sequencer/batch_addr_reg_10_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     20.47 r
+  clock uncertainty                               -0.25     20.22
+  library setup time                              -0.04     20.17
+  data required time                                        20.17
   ------------------------------------------------------------------------
-  data required time                                        20.36
-  data arrival time                                        -15.50
+  data required time                                        20.17
+  data arrival time                                        -15.18
   ------------------------------------------------------------------------
-  slack (MET)                                                4.85
+  slack (MET)                                                4.99
 
 
 
-  Startpoint: command/sequencer/batch_size_reg_5_ (rising edge-triggered flip-flop clocked by clk)
-  Endpoint: command/sequencer/weight_addr_reg_0_ (rising edge-triggered flip-flop clocked by clk)
+  Startpoint: command/sequencer/state_reg_4_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: command/sequencer/batch_addr_reg_13_ (rising edge-triggered flip-flop clocked by clk)
   Mode: functional
   Corner: tt
   Scenario: functional_tt
@@ -126,48 +130,50 @@ Date   : Fri Nov 20 19:31:45 2026
   Point                                            Incr      Path  
   ------------------------------------------------------------------------
   clock clk (rise edge)                            0.00      0.00
-  clock network delay (propagated)                 0.89      0.89
+  clock network delay (propagated)                 0.94      0.94
 
-  command/sequencer/batch_size_reg_5_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00      0.89 r
-  command/sequencer/batch_size_reg_5_/Q (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.44      1.33 f
-  command/sequencer/U65/X (sky130_fd_sc_hd__or4b_1)
-                                                   0.57      1.89 f
-  command/sequencer/U67/Y (sky130_fd_sc_hd__nor2_2)
-                                                   0.53      2.42 r
-  command/sequencer/U89/Y (sky130_fd_sc_hd__inv_1)
-                                                   0.54      2.96 f
-  command/sequencer/U93/X (sky130_fd_sc_hd__a221o_1)
-                                                   0.48      3.44 f
-  command/sequencer/U94/Y (sky130_fd_sc_hd__nand2_2)
-                                                   0.40      3.84 r
-  command/sequencer/U96/X (sky130_fd_sc_hd__a22o_1)
-                                                   0.27      4.11 r
-  command/sequencer/U97/Y (sky130_fd_sc_hd__inv_2)
-                                                   0.03      4.15 f
-  command/sequencer/U99/X (sky130_fd_sc_hd__or3_1)
-                                                   0.47      4.62 f
+  command/sequencer/state_reg_4_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.94 r
+  command/sequencer/state_reg_4_/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.48      1.42 r
+  command/sequencer/U65/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.08      1.49 f
+  command/sequencer/U67/X (sky130_fd_sc_hd__or3_1)
+                                                   0.47      1.97 f
+  command/sequencer/U155/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.36      2.32 r
+  command/sequencer/U156/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.32      2.64 f
+  command/sequencer/U662/X (sky130_fd_sc_hd__or4_1)
+                                                   0.60      3.24 f
+  command/sequencer/U663/X (sky130_fd_sc_hd__or4_1)
+                                                   0.42      3.65 f
+  command/sequencer/U669/X (sky130_fd_sc_hd__or4_1)
+                                                   0.53      4.18 f
+  command/sequencer/U670/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.27      4.45 r
+  command/sequencer/ctmTdsLR_2_1386/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.17      4.62 f
   command/sequencer/intadd_3_U23/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.47      5.08 f
+                                                   0.51      5.12 f
   command/sequencer/intadd_3_U22/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.50 f
+                                                   0.43      5.55 f
   command/sequencer/intadd_3_U21/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.92 f
+                                                   0.43      5.98 f
   command/sequencer/intadd_3_U20/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.33 f
+                                                   0.42      6.40 f
   command/sequencer/intadd_3_U19/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.74 f
+                                                   0.42      6.82 f
   command/sequencer/intadd_3_U18/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43      7.17 f
+                                                   0.42      7.24 f
   command/sequencer/intadd_3_U17/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      7.58 f
+                                                   0.42      7.66 f
   command/sequencer/intadd_3_U16/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.50      8.08 f
+                                                   0.45      8.11 f
   command/sequencer/intadd_3_U15/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.45      8.52 f
+                                                   0.42      8.54 f
   command/sequencer/intadd_3_U14/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      8.94 f
+                                                   0.41      8.95 f
   command/sequencer/intadd_3_U13/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.41      9.36 f
   command/sequencer/intadd_3_U12/COUT (sky130_fd_sc_hd__fa_1)
@@ -177,52 +183,54 @@ Date   : Fri Nov 20 19:31:45 2026
   command/sequencer/intadd_3_U10/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.42     10.61 f
   command/sequencer/intadd_3_U9/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.02 f
+                                                   0.42     11.03 f
   command/sequencer/intadd_3_U8/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.44 f
+                                                   0.42     11.45 f
   command/sequencer/intadd_3_U7/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.86 f
+                                                   0.43     11.88 f
   command/sequencer/intadd_3_U6/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41     12.28 f
+                                                   0.42     12.30 f
   command/sequencer/intadd_3_U5/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     12.69 f
+                                                   0.42     12.71 f
   command/sequencer/intadd_3_U4/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     13.12 f
+                                                   0.41     13.13 f
   command/sequencer/intadd_3_U3/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43     13.54 f
+                                                   0.41     13.54 f
   command/sequencer/intadd_3_U2/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.46     14.00 f
-  command/sequencer/U845/Y (sky130_fd_sc_hd__nor2_1)
-                                                   0.12     14.13 r
-  command/sequencer/U55/Y (sky130_fd_sc_hd__o2bb2ai_1)
-                                                   0.15     14.27 f
-  command/sequencer/U1136/Y (sky130_fd_sc_hd__nor2b_2)
-                                                   0.60     14.87 r
-  command/sequencer/U53/X (sky130_fd_sc_hd__buf_1)
-                                                   0.43     15.30 r
-  command/sequencer/U1140/X (sky130_fd_sc_hd__a211o_2)
-                                                   0.18     15.49 r
-  command/sequencer/weight_addr_reg_0_/D (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     15.49 r
-  data arrival time                                         15.49
+  command/sequencer/U834/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.13     14.13 r
+  command/sequencer/U54/Y (sky130_fd_sc_hd__o2bb2ai_1)
+                                                   0.14     14.27 f
+  command/sequencer/U835/Y (sky130_fd_sc_hd__nor2b_1)
+                                                   0.39     14.65 r
+  command/sequencer/U34/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.10     14.75 f
+  command/sequencer/U35/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.25     15.00 r
+  command/sequencer/U872/X (sky130_fd_sc_hd__a211o_2)
+                                                   0.18     15.18 r
+  command/sequencer/batch_addr_reg_13_/D (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     15.18 r
+  data arrival time                                         15.18
 
   clock clk (rise edge)                           20.00     20.00
-  clock network delay (propagated)                 0.63     20.63
-  command/sequencer/weight_addr_reg_0_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     20.63 r
-  clock uncertainty                               -0.25     20.38
-  library setup time                              -0.02     20.36
-  data required time                                        20.36
+  clock network delay (propagated)                 0.47     20.47
+  command/sequencer/batch_addr_reg_13_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     20.47 r
+  clock uncertainty                               -0.25     20.22
+  library setup time                              -0.04     20.17
+  data required time                                        20.17
   ------------------------------------------------------------------------
-  data required time                                        20.36
-  data arrival time                                        -15.49
+  data required time                                        20.17
+  data arrival time                                        -15.18
   ------------------------------------------------------------------------
-  slack (MET)                                                4.88
+  slack (MET)                                                5.00
 
 
 
-  Startpoint: command/sequencer/batch_size_reg_5_ (rising edge-triggered flip-flop clocked by clk)
-  Endpoint: command/sequencer/weight_addr_reg_11_ (rising edge-triggered flip-flop clocked by clk)
+  Startpoint: command/sequencer/state_reg_4_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: command/sequencer/batch_addr_reg_0_ (rising edge-triggered flip-flop clocked by clk)
   Mode: functional
   Corner: tt
   Scenario: functional_tt
@@ -232,48 +240,50 @@ Date   : Fri Nov 20 19:31:45 2026
   Point                                            Incr      Path  
   ------------------------------------------------------------------------
   clock clk (rise edge)                            0.00      0.00
-  clock network delay (propagated)                 0.89      0.89
+  clock network delay (propagated)                 0.94      0.94
 
-  command/sequencer/batch_size_reg_5_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00      0.89 r
-  command/sequencer/batch_size_reg_5_/Q (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.44      1.33 f
-  command/sequencer/U65/X (sky130_fd_sc_hd__or4b_1)
-                                                   0.57      1.89 f
-  command/sequencer/U67/Y (sky130_fd_sc_hd__nor2_2)
-                                                   0.53      2.42 r
-  command/sequencer/U89/Y (sky130_fd_sc_hd__inv_1)
-                                                   0.54      2.96 f
-  command/sequencer/U93/X (sky130_fd_sc_hd__a221o_1)
-                                                   0.48      3.44 f
-  command/sequencer/U94/Y (sky130_fd_sc_hd__nand2_2)
-                                                   0.40      3.84 r
-  command/sequencer/U96/X (sky130_fd_sc_hd__a22o_1)
-                                                   0.27      4.11 r
-  command/sequencer/U97/Y (sky130_fd_sc_hd__inv_2)
-                                                   0.03      4.15 f
-  command/sequencer/U99/X (sky130_fd_sc_hd__or3_1)
-                                                   0.47      4.62 f
+  command/sequencer/state_reg_4_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.94 r
+  command/sequencer/state_reg_4_/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.48      1.42 r
+  command/sequencer/U65/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.08      1.49 f
+  command/sequencer/U67/X (sky130_fd_sc_hd__or3_1)
+                                                   0.47      1.97 f
+  command/sequencer/U155/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.36      2.32 r
+  command/sequencer/U156/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.32      2.64 f
+  command/sequencer/U662/X (sky130_fd_sc_hd__or4_1)
+                                                   0.60      3.24 f
+  command/sequencer/U663/X (sky130_fd_sc_hd__or4_1)
+                                                   0.42      3.65 f
+  command/sequencer/U669/X (sky130_fd_sc_hd__or4_1)
+                                                   0.53      4.18 f
+  command/sequencer/U670/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.27      4.45 r
+  command/sequencer/ctmTdsLR_2_1386/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.17      4.62 f
   command/sequencer/intadd_3_U23/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.47      5.08 f
+                                                   0.51      5.12 f
   command/sequencer/intadd_3_U22/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.50 f
+                                                   0.43      5.55 f
   command/sequencer/intadd_3_U21/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.92 f
+                                                   0.43      5.98 f
   command/sequencer/intadd_3_U20/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.33 f
+                                                   0.42      6.40 f
   command/sequencer/intadd_3_U19/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.74 f
+                                                   0.42      6.82 f
   command/sequencer/intadd_3_U18/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43      7.17 f
+                                                   0.42      7.24 f
   command/sequencer/intadd_3_U17/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      7.58 f
+                                                   0.42      7.66 f
   command/sequencer/intadd_3_U16/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.50      8.08 f
+                                                   0.45      8.11 f
   command/sequencer/intadd_3_U15/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.45      8.52 f
+                                                   0.42      8.54 f
   command/sequencer/intadd_3_U14/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      8.94 f
+                                                   0.41      8.95 f
   command/sequencer/intadd_3_U13/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.41      9.36 f
   command/sequencer/intadd_3_U12/COUT (sky130_fd_sc_hd__fa_1)
@@ -283,52 +293,54 @@ Date   : Fri Nov 20 19:31:45 2026
   command/sequencer/intadd_3_U10/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.42     10.61 f
   command/sequencer/intadd_3_U9/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.02 f
+                                                   0.42     11.03 f
   command/sequencer/intadd_3_U8/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.44 f
+                                                   0.42     11.45 f
   command/sequencer/intadd_3_U7/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.86 f
+                                                   0.43     11.88 f
   command/sequencer/intadd_3_U6/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41     12.28 f
+                                                   0.42     12.30 f
   command/sequencer/intadd_3_U5/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     12.69 f
+                                                   0.42     12.71 f
   command/sequencer/intadd_3_U4/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     13.12 f
+                                                   0.41     13.13 f
   command/sequencer/intadd_3_U3/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43     13.54 f
+                                                   0.41     13.54 f
   command/sequencer/intadd_3_U2/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.46     14.00 f
-  command/sequencer/U845/Y (sky130_fd_sc_hd__nor2_1)
-                                                   0.12     14.13 r
-  command/sequencer/U55/Y (sky130_fd_sc_hd__o2bb2ai_1)
-                                                   0.15     14.27 f
-  command/sequencer/U1136/Y (sky130_fd_sc_hd__nor2b_2)
-                                                   0.60     14.87 r
-  command/sequencer/U53/X (sky130_fd_sc_hd__buf_1)
-                                                   0.43     15.30 r
-  command/sequencer/U1163/X (sky130_fd_sc_hd__a211o_1)
-                                                   0.18     15.48 r
-  command/sequencer/weight_addr_reg_11_/D (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     15.48 r
-  data arrival time                                         15.48
+  command/sequencer/U834/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.13     14.13 r
+  command/sequencer/U54/Y (sky130_fd_sc_hd__o2bb2ai_1)
+                                                   0.14     14.27 f
+  command/sequencer/U835/Y (sky130_fd_sc_hd__nor2b_1)
+                                                   0.39     14.65 r
+  command/sequencer/U34/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.10     14.75 f
+  command/sequencer/U35/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.25     15.00 r
+  command/sequencer/U839/X (sky130_fd_sc_hd__a211o_2)
+                                                   0.18     15.18 r
+  command/sequencer/batch_addr_reg_0_/D (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     15.18 r
+  data arrival time                                         15.18
 
   clock clk (rise edge)                           20.00     20.00
-  clock network delay (propagated)                 0.63     20.63
-  command/sequencer/weight_addr_reg_11_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     20.63 r
-  clock uncertainty                               -0.25     20.38
-  library setup time                              -0.02     20.36
-  data required time                                        20.36
+  clock network delay (propagated)                 0.47     20.47
+  command/sequencer/batch_addr_reg_0_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     20.47 r
+  clock uncertainty                               -0.25     20.22
+  library setup time                              -0.04     20.18
+  data required time                                        20.18
   ------------------------------------------------------------------------
-  data required time                                        20.36
-  data arrival time                                        -15.48
+  data required time                                        20.18
+  data arrival time                                        -15.18
   ------------------------------------------------------------------------
-  slack (MET)                                                4.88
+  slack (MET)                                                5.00
 
 
 
-  Startpoint: command/sequencer/batch_size_reg_5_ (rising edge-triggered flip-flop clocked by clk)
-  Endpoint: command/sequencer/weight_addr_reg_9_ (rising edge-triggered flip-flop clocked by clk)
+  Startpoint: command/sequencer/state_reg_4_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: command/sequencer/batch_addr_reg_6_ (rising edge-triggered flip-flop clocked by clk)
   Mode: functional
   Corner: tt
   Scenario: functional_tt
@@ -338,48 +350,50 @@ Date   : Fri Nov 20 19:31:45 2026
   Point                                            Incr      Path  
   ------------------------------------------------------------------------
   clock clk (rise edge)                            0.00      0.00
-  clock network delay (propagated)                 0.89      0.89
+  clock network delay (propagated)                 0.94      0.94
 
-  command/sequencer/batch_size_reg_5_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00      0.89 r
-  command/sequencer/batch_size_reg_5_/Q (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.44      1.33 f
-  command/sequencer/U65/X (sky130_fd_sc_hd__or4b_1)
-                                                   0.57      1.89 f
-  command/sequencer/U67/Y (sky130_fd_sc_hd__nor2_2)
-                                                   0.53      2.42 r
-  command/sequencer/U89/Y (sky130_fd_sc_hd__inv_1)
-                                                   0.54      2.96 f
-  command/sequencer/U93/X (sky130_fd_sc_hd__a221o_1)
-                                                   0.48      3.44 f
-  command/sequencer/U94/Y (sky130_fd_sc_hd__nand2_2)
-                                                   0.40      3.84 r
-  command/sequencer/U96/X (sky130_fd_sc_hd__a22o_1)
-                                                   0.27      4.11 r
-  command/sequencer/U97/Y (sky130_fd_sc_hd__inv_2)
-                                                   0.03      4.15 f
-  command/sequencer/U99/X (sky130_fd_sc_hd__or3_1)
-                                                   0.47      4.62 f
+  command/sequencer/state_reg_4_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.94 r
+  command/sequencer/state_reg_4_/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.48      1.42 r
+  command/sequencer/U65/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.08      1.49 f
+  command/sequencer/U67/X (sky130_fd_sc_hd__or3_1)
+                                                   0.47      1.97 f
+  command/sequencer/U155/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.36      2.32 r
+  command/sequencer/U156/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.32      2.64 f
+  command/sequencer/U662/X (sky130_fd_sc_hd__or4_1)
+                                                   0.60      3.24 f
+  command/sequencer/U663/X (sky130_fd_sc_hd__or4_1)
+                                                   0.42      3.65 f
+  command/sequencer/U669/X (sky130_fd_sc_hd__or4_1)
+                                                   0.53      4.18 f
+  command/sequencer/U670/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.27      4.45 r
+  command/sequencer/ctmTdsLR_2_1386/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.17      4.62 f
   command/sequencer/intadd_3_U23/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.47      5.08 f
+                                                   0.51      5.12 f
   command/sequencer/intadd_3_U22/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.50 f
+                                                   0.43      5.55 f
   command/sequencer/intadd_3_U21/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.92 f
+                                                   0.43      5.98 f
   command/sequencer/intadd_3_U20/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.33 f
+                                                   0.42      6.40 f
   command/sequencer/intadd_3_U19/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.74 f
+                                                   0.42      6.82 f
   command/sequencer/intadd_3_U18/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43      7.17 f
+                                                   0.42      7.24 f
   command/sequencer/intadd_3_U17/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      7.58 f
+                                                   0.42      7.66 f
   command/sequencer/intadd_3_U16/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.50      8.08 f
+                                                   0.45      8.11 f
   command/sequencer/intadd_3_U15/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.45      8.52 f
+                                                   0.42      8.54 f
   command/sequencer/intadd_3_U14/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      8.94 f
+                                                   0.41      8.95 f
   command/sequencer/intadd_3_U13/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.41      9.36 f
   command/sequencer/intadd_3_U12/COUT (sky130_fd_sc_hd__fa_1)
@@ -389,52 +403,54 @@ Date   : Fri Nov 20 19:31:45 2026
   command/sequencer/intadd_3_U10/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.42     10.61 f
   command/sequencer/intadd_3_U9/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.02 f
+                                                   0.42     11.03 f
   command/sequencer/intadd_3_U8/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.44 f
+                                                   0.42     11.45 f
   command/sequencer/intadd_3_U7/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.86 f
+                                                   0.43     11.88 f
   command/sequencer/intadd_3_U6/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41     12.28 f
+                                                   0.42     12.30 f
   command/sequencer/intadd_3_U5/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     12.69 f
+                                                   0.42     12.71 f
   command/sequencer/intadd_3_U4/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     13.12 f
+                                                   0.41     13.13 f
   command/sequencer/intadd_3_U3/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43     13.54 f
+                                                   0.41     13.54 f
   command/sequencer/intadd_3_U2/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.46     14.00 f
-  command/sequencer/U845/Y (sky130_fd_sc_hd__nor2_1)
-                                                   0.12     14.13 r
-  command/sequencer/U55/Y (sky130_fd_sc_hd__o2bb2ai_1)
-                                                   0.15     14.27 f
-  command/sequencer/U1136/Y (sky130_fd_sc_hd__nor2b_2)
-                                                   0.60     14.87 r
-  command/sequencer/U53/X (sky130_fd_sc_hd__buf_1)
-                                                   0.43     15.30 r
-  command/sequencer/U1159/X (sky130_fd_sc_hd__a211o_1)
-                                                   0.17     15.48 r
-  command/sequencer/weight_addr_reg_9_/D (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     15.48 r
-  data arrival time                                         15.48
+  command/sequencer/U834/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.13     14.13 r
+  command/sequencer/U54/Y (sky130_fd_sc_hd__o2bb2ai_1)
+                                                   0.14     14.27 f
+  command/sequencer/U835/Y (sky130_fd_sc_hd__nor2b_1)
+                                                   0.39     14.65 r
+  command/sequencer/U34/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.10     14.75 f
+  command/sequencer/U35/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.25     15.00 r
+  command/sequencer/U852/X (sky130_fd_sc_hd__a211o_1)
+                                                   0.17     15.17 r
+  command/sequencer/batch_addr_reg_6_/D (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     15.17 r
+  data arrival time                                         15.17
 
   clock clk (rise edge)                           20.00     20.00
-  clock network delay (propagated)                 0.63     20.63
-  command/sequencer/weight_addr_reg_9_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     20.63 r
-  clock uncertainty                               -0.25     20.38
-  library setup time                              -0.02     20.36
-  data required time                                        20.36
+  clock network delay (propagated)                 0.47     20.47
+  command/sequencer/batch_addr_reg_6_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     20.47 r
+  clock uncertainty                               -0.25     20.22
+  library setup time                              -0.04     20.17
+  data required time                                        20.17
   ------------------------------------------------------------------------
-  data required time                                        20.36
-  data arrival time                                        -15.48
+  data required time                                        20.17
+  data arrival time                                        -15.17
   ------------------------------------------------------------------------
-  slack (MET)                                                4.88
+  slack (MET)                                                5.00
 
 
 
-  Startpoint: command/sequencer/batch_size_reg_5_ (rising edge-triggered flip-flop clocked by clk)
-  Endpoint: command/sequencer/weight_addr_reg_6_ (rising edge-triggered flip-flop clocked by clk)
+  Startpoint: command/sequencer/state_reg_4_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: command/sequencer/batch_addr_reg_3_ (rising edge-triggered flip-flop clocked by clk)
   Mode: functional
   Corner: tt
   Scenario: functional_tt
@@ -444,48 +460,50 @@ Date   : Fri Nov 20 19:31:45 2026
   Point                                            Incr      Path  
   ------------------------------------------------------------------------
   clock clk (rise edge)                            0.00      0.00
-  clock network delay (propagated)                 0.89      0.89
+  clock network delay (propagated)                 0.94      0.94
 
-  command/sequencer/batch_size_reg_5_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00      0.89 r
-  command/sequencer/batch_size_reg_5_/Q (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.44      1.33 f
-  command/sequencer/U65/X (sky130_fd_sc_hd__or4b_1)
-                                                   0.57      1.89 f
-  command/sequencer/U67/Y (sky130_fd_sc_hd__nor2_2)
-                                                   0.53      2.42 r
-  command/sequencer/U89/Y (sky130_fd_sc_hd__inv_1)
-                                                   0.54      2.96 f
-  command/sequencer/U93/X (sky130_fd_sc_hd__a221o_1)
-                                                   0.48      3.44 f
-  command/sequencer/U94/Y (sky130_fd_sc_hd__nand2_2)
-                                                   0.40      3.84 r
-  command/sequencer/U96/X (sky130_fd_sc_hd__a22o_1)
-                                                   0.27      4.11 r
-  command/sequencer/U97/Y (sky130_fd_sc_hd__inv_2)
-                                                   0.03      4.15 f
-  command/sequencer/U99/X (sky130_fd_sc_hd__or3_1)
-                                                   0.47      4.62 f
+  command/sequencer/state_reg_4_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.94 r
+  command/sequencer/state_reg_4_/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.48      1.42 r
+  command/sequencer/U65/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.08      1.49 f
+  command/sequencer/U67/X (sky130_fd_sc_hd__or3_1)
+                                                   0.47      1.97 f
+  command/sequencer/U155/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.36      2.32 r
+  command/sequencer/U156/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.32      2.64 f
+  command/sequencer/U662/X (sky130_fd_sc_hd__or4_1)
+                                                   0.60      3.24 f
+  command/sequencer/U663/X (sky130_fd_sc_hd__or4_1)
+                                                   0.42      3.65 f
+  command/sequencer/U669/X (sky130_fd_sc_hd__or4_1)
+                                                   0.53      4.18 f
+  command/sequencer/U670/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.27      4.45 r
+  command/sequencer/ctmTdsLR_2_1386/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.17      4.62 f
   command/sequencer/intadd_3_U23/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.47      5.08 f
+                                                   0.51      5.12 f
   command/sequencer/intadd_3_U22/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.50 f
+                                                   0.43      5.55 f
   command/sequencer/intadd_3_U21/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.92 f
+                                                   0.43      5.98 f
   command/sequencer/intadd_3_U20/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.33 f
+                                                   0.42      6.40 f
   command/sequencer/intadd_3_U19/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.74 f
+                                                   0.42      6.82 f
   command/sequencer/intadd_3_U18/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43      7.17 f
+                                                   0.42      7.24 f
   command/sequencer/intadd_3_U17/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      7.58 f
+                                                   0.42      7.66 f
   command/sequencer/intadd_3_U16/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.50      8.08 f
+                                                   0.45      8.11 f
   command/sequencer/intadd_3_U15/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.45      8.52 f
+                                                   0.42      8.54 f
   command/sequencer/intadd_3_U14/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      8.94 f
+                                                   0.41      8.95 f
   command/sequencer/intadd_3_U13/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.41      9.36 f
   command/sequencer/intadd_3_U12/COUT (sky130_fd_sc_hd__fa_1)
@@ -495,52 +513,54 @@ Date   : Fri Nov 20 19:31:45 2026
   command/sequencer/intadd_3_U10/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.42     10.61 f
   command/sequencer/intadd_3_U9/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.02 f
+                                                   0.42     11.03 f
   command/sequencer/intadd_3_U8/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.44 f
+                                                   0.42     11.45 f
   command/sequencer/intadd_3_U7/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.86 f
+                                                   0.43     11.88 f
   command/sequencer/intadd_3_U6/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41     12.28 f
+                                                   0.42     12.30 f
   command/sequencer/intadd_3_U5/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     12.69 f
+                                                   0.42     12.71 f
   command/sequencer/intadd_3_U4/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     13.12 f
+                                                   0.41     13.13 f
   command/sequencer/intadd_3_U3/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43     13.54 f
+                                                   0.41     13.54 f
   command/sequencer/intadd_3_U2/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.46     14.00 f
-  command/sequencer/U845/Y (sky130_fd_sc_hd__nor2_1)
-                                                   0.12     14.13 r
-  command/sequencer/U55/Y (sky130_fd_sc_hd__o2bb2ai_1)
-                                                   0.15     14.27 f
-  command/sequencer/U1136/Y (sky130_fd_sc_hd__nor2b_2)
-                                                   0.60     14.87 r
-  command/sequencer/U53/X (sky130_fd_sc_hd__buf_1)
-                                                   0.43     15.30 r
-  command/sequencer/U1153/X (sky130_fd_sc_hd__a211o_1)
-                                                   0.17     15.47 r
-  command/sequencer/weight_addr_reg_6_/D (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     15.47 r
-  data arrival time                                         15.47
+  command/sequencer/U834/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.13     14.13 r
+  command/sequencer/U54/Y (sky130_fd_sc_hd__o2bb2ai_1)
+                                                   0.14     14.27 f
+  command/sequencer/U835/Y (sky130_fd_sc_hd__nor2b_1)
+                                                   0.39     14.65 r
+  command/sequencer/U34/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.10     14.75 f
+  command/sequencer/U35/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.25     15.00 r
+  command/sequencer/U846/X (sky130_fd_sc_hd__a211o_1)
+                                                   0.16     15.16 r
+  command/sequencer/batch_addr_reg_3_/D (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     15.16 r
+  data arrival time                                         15.16
 
   clock clk (rise edge)                           20.00     20.00
-  clock network delay (propagated)                 0.63     20.63
-  command/sequencer/weight_addr_reg_6_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     20.63 r
-  clock uncertainty                               -0.25     20.38
-  library setup time                              -0.02     20.36
-  data required time                                        20.36
+  clock network delay (propagated)                 0.46     20.46
+  command/sequencer/batch_addr_reg_3_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     20.46 r
+  clock uncertainty                               -0.25     20.21
+  library setup time                              -0.04     20.17
+  data required time                                        20.17
   ------------------------------------------------------------------------
-  data required time                                        20.36
-  data arrival time                                        -15.47
+  data required time                                        20.17
+  data arrival time                                        -15.16
   ------------------------------------------------------------------------
-  slack (MET)                                                4.89
+  slack (MET)                                                5.01
 
 
 
-  Startpoint: command/sequencer/batch_size_reg_5_ (rising edge-triggered flip-flop clocked by clk)
-  Endpoint: command/sequencer/weight_addr_reg_20_ (rising edge-triggered flip-flop clocked by clk)
+  Startpoint: command/sequencer/state_reg_4_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: command/sequencer/batch_addr_reg_9_ (rising edge-triggered flip-flop clocked by clk)
   Mode: functional
   Corner: tt
   Scenario: functional_tt
@@ -550,48 +570,50 @@ Date   : Fri Nov 20 19:31:45 2026
   Point                                            Incr      Path  
   ------------------------------------------------------------------------
   clock clk (rise edge)                            0.00      0.00
-  clock network delay (propagated)                 0.89      0.89
+  clock network delay (propagated)                 0.94      0.94
 
-  command/sequencer/batch_size_reg_5_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00      0.89 r
-  command/sequencer/batch_size_reg_5_/Q (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.44      1.33 f
-  command/sequencer/U65/X (sky130_fd_sc_hd__or4b_1)
-                                                   0.57      1.89 f
-  command/sequencer/U67/Y (sky130_fd_sc_hd__nor2_2)
-                                                   0.53      2.42 r
-  command/sequencer/U89/Y (sky130_fd_sc_hd__inv_1)
-                                                   0.54      2.96 f
-  command/sequencer/U93/X (sky130_fd_sc_hd__a221o_1)
-                                                   0.48      3.44 f
-  command/sequencer/U94/Y (sky130_fd_sc_hd__nand2_2)
-                                                   0.40      3.84 r
-  command/sequencer/U96/X (sky130_fd_sc_hd__a22o_1)
-                                                   0.27      4.11 r
-  command/sequencer/U97/Y (sky130_fd_sc_hd__inv_2)
-                                                   0.03      4.15 f
-  command/sequencer/U99/X (sky130_fd_sc_hd__or3_1)
-                                                   0.47      4.62 f
+  command/sequencer/state_reg_4_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.94 r
+  command/sequencer/state_reg_4_/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.48      1.42 r
+  command/sequencer/U65/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.08      1.49 f
+  command/sequencer/U67/X (sky130_fd_sc_hd__or3_1)
+                                                   0.47      1.97 f
+  command/sequencer/U155/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.36      2.32 r
+  command/sequencer/U156/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.32      2.64 f
+  command/sequencer/U662/X (sky130_fd_sc_hd__or4_1)
+                                                   0.60      3.24 f
+  command/sequencer/U663/X (sky130_fd_sc_hd__or4_1)
+                                                   0.42      3.65 f
+  command/sequencer/U669/X (sky130_fd_sc_hd__or4_1)
+                                                   0.53      4.18 f
+  command/sequencer/U670/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.27      4.45 r
+  command/sequencer/ctmTdsLR_2_1386/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.17      4.62 f
   command/sequencer/intadd_3_U23/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.47      5.08 f
+                                                   0.51      5.12 f
   command/sequencer/intadd_3_U22/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.50 f
+                                                   0.43      5.55 f
   command/sequencer/intadd_3_U21/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.92 f
+                                                   0.43      5.98 f
   command/sequencer/intadd_3_U20/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.33 f
+                                                   0.42      6.40 f
   command/sequencer/intadd_3_U19/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.74 f
+                                                   0.42      6.82 f
   command/sequencer/intadd_3_U18/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43      7.17 f
+                                                   0.42      7.24 f
   command/sequencer/intadd_3_U17/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      7.58 f
+                                                   0.42      7.66 f
   command/sequencer/intadd_3_U16/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.50      8.08 f
+                                                   0.45      8.11 f
   command/sequencer/intadd_3_U15/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.45      8.52 f
+                                                   0.42      8.54 f
   command/sequencer/intadd_3_U14/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      8.94 f
+                                                   0.41      8.95 f
   command/sequencer/intadd_3_U13/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.41      9.36 f
   command/sequencer/intadd_3_U12/COUT (sky130_fd_sc_hd__fa_1)
@@ -601,52 +623,54 @@ Date   : Fri Nov 20 19:31:45 2026
   command/sequencer/intadd_3_U10/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.42     10.61 f
   command/sequencer/intadd_3_U9/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.02 f
+                                                   0.42     11.03 f
   command/sequencer/intadd_3_U8/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.44 f
+                                                   0.42     11.45 f
   command/sequencer/intadd_3_U7/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.86 f
+                                                   0.43     11.88 f
   command/sequencer/intadd_3_U6/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41     12.28 f
+                                                   0.42     12.30 f
   command/sequencer/intadd_3_U5/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     12.69 f
+                                                   0.42     12.71 f
   command/sequencer/intadd_3_U4/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     13.12 f
+                                                   0.41     13.13 f
   command/sequencer/intadd_3_U3/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43     13.54 f
+                                                   0.41     13.54 f
   command/sequencer/intadd_3_U2/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.46     14.00 f
-  command/sequencer/U845/Y (sky130_fd_sc_hd__nor2_1)
-                                                   0.12     14.13 r
-  command/sequencer/U55/Y (sky130_fd_sc_hd__o2bb2ai_1)
-                                                   0.15     14.27 f
-  command/sequencer/U1136/Y (sky130_fd_sc_hd__nor2b_2)
-                                                   0.60     14.87 r
-  command/sequencer/U53/X (sky130_fd_sc_hd__buf_1)
-                                                   0.43     15.30 r
-  command/sequencer/U1182/X (sky130_fd_sc_hd__a211o_1)
-                                                   0.18     15.48 r
-  command/sequencer/weight_addr_reg_20_/D (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     15.48 r
-  data arrival time                                         15.48
+  command/sequencer/U834/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.13     14.13 r
+  command/sequencer/U54/Y (sky130_fd_sc_hd__o2bb2ai_1)
+                                                   0.14     14.27 f
+  command/sequencer/U835/Y (sky130_fd_sc_hd__nor2b_1)
+                                                   0.39     14.65 r
+  command/sequencer/U34/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.10     14.75 f
+  command/sequencer/U35/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.25     15.00 r
+  command/sequencer/U858/X (sky130_fd_sc_hd__a211o_1)
+                                                   0.16     15.16 r
+  command/sequencer/batch_addr_reg_9_/D (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     15.16 r
+  data arrival time                                         15.16
 
   clock clk (rise edge)                           20.00     20.00
-  clock network delay (propagated)                 0.88     20.88
-  command/sequencer/weight_addr_reg_20_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     20.88 r
-  clock uncertainty                               -0.25     20.63
-  library setup time                              -0.01     20.62
-  data required time                                        20.62
+  clock network delay (propagated)                 0.47     20.47
+  command/sequencer/batch_addr_reg_9_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     20.47 r
+  clock uncertainty                               -0.25     20.22
+  library setup time                              -0.04     20.17
+  data required time                                        20.17
   ------------------------------------------------------------------------
-  data required time                                        20.62
-  data arrival time                                        -15.48
+  data required time                                        20.17
+  data arrival time                                        -15.16
   ------------------------------------------------------------------------
-  slack (MET)                                                5.13
+  slack (MET)                                                5.01
 
 
 
-  Startpoint: command/sequencer/batch_size_reg_5_ (rising edge-triggered flip-flop clocked by clk)
-  Endpoint: command/sequencer/weight_addr_reg_17_ (rising edge-triggered flip-flop clocked by clk)
+  Startpoint: command/sequencer/state_reg_4_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: command/sequencer/batch_addr_reg_1_ (rising edge-triggered flip-flop clocked by clk)
   Mode: functional
   Corner: tt
   Scenario: functional_tt
@@ -656,48 +680,50 @@ Date   : Fri Nov 20 19:31:45 2026
   Point                                            Incr      Path  
   ------------------------------------------------------------------------
   clock clk (rise edge)                            0.00      0.00
-  clock network delay (propagated)                 0.89      0.89
+  clock network delay (propagated)                 0.94      0.94
 
-  command/sequencer/batch_size_reg_5_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00      0.89 r
-  command/sequencer/batch_size_reg_5_/Q (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.44      1.33 f
-  command/sequencer/U65/X (sky130_fd_sc_hd__or4b_1)
-                                                   0.57      1.89 f
-  command/sequencer/U67/Y (sky130_fd_sc_hd__nor2_2)
-                                                   0.53      2.42 r
-  command/sequencer/U89/Y (sky130_fd_sc_hd__inv_1)
-                                                   0.54      2.96 f
-  command/sequencer/U93/X (sky130_fd_sc_hd__a221o_1)
-                                                   0.48      3.44 f
-  command/sequencer/U94/Y (sky130_fd_sc_hd__nand2_2)
-                                                   0.40      3.84 r
-  command/sequencer/U96/X (sky130_fd_sc_hd__a22o_1)
-                                                   0.27      4.11 r
-  command/sequencer/U97/Y (sky130_fd_sc_hd__inv_2)
-                                                   0.03      4.15 f
-  command/sequencer/U99/X (sky130_fd_sc_hd__or3_1)
-                                                   0.47      4.62 f
+  command/sequencer/state_reg_4_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.94 r
+  command/sequencer/state_reg_4_/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.48      1.42 r
+  command/sequencer/U65/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.08      1.49 f
+  command/sequencer/U67/X (sky130_fd_sc_hd__or3_1)
+                                                   0.47      1.97 f
+  command/sequencer/U155/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.36      2.32 r
+  command/sequencer/U156/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.32      2.64 f
+  command/sequencer/U662/X (sky130_fd_sc_hd__or4_1)
+                                                   0.60      3.24 f
+  command/sequencer/U663/X (sky130_fd_sc_hd__or4_1)
+                                                   0.42      3.65 f
+  command/sequencer/U669/X (sky130_fd_sc_hd__or4_1)
+                                                   0.53      4.18 f
+  command/sequencer/U670/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.27      4.45 r
+  command/sequencer/ctmTdsLR_2_1386/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.17      4.62 f
   command/sequencer/intadd_3_U23/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.47      5.08 f
+                                                   0.51      5.12 f
   command/sequencer/intadd_3_U22/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.50 f
+                                                   0.43      5.55 f
   command/sequencer/intadd_3_U21/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.92 f
+                                                   0.43      5.98 f
   command/sequencer/intadd_3_U20/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.33 f
+                                                   0.42      6.40 f
   command/sequencer/intadd_3_U19/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.74 f
+                                                   0.42      6.82 f
   command/sequencer/intadd_3_U18/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43      7.17 f
+                                                   0.42      7.24 f
   command/sequencer/intadd_3_U17/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      7.58 f
+                                                   0.42      7.66 f
   command/sequencer/intadd_3_U16/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.50      8.08 f
+                                                   0.45      8.11 f
   command/sequencer/intadd_3_U15/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.45      8.52 f
+                                                   0.42      8.54 f
   command/sequencer/intadd_3_U14/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      8.94 f
+                                                   0.41      8.95 f
   command/sequencer/intadd_3_U13/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.41      9.36 f
   command/sequencer/intadd_3_U12/COUT (sky130_fd_sc_hd__fa_1)
@@ -707,52 +733,54 @@ Date   : Fri Nov 20 19:31:45 2026
   command/sequencer/intadd_3_U10/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.42     10.61 f
   command/sequencer/intadd_3_U9/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.02 f
+                                                   0.42     11.03 f
   command/sequencer/intadd_3_U8/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.44 f
+                                                   0.42     11.45 f
   command/sequencer/intadd_3_U7/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.86 f
+                                                   0.43     11.88 f
   command/sequencer/intadd_3_U6/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41     12.28 f
+                                                   0.42     12.30 f
   command/sequencer/intadd_3_U5/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     12.69 f
+                                                   0.42     12.71 f
   command/sequencer/intadd_3_U4/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     13.12 f
+                                                   0.41     13.13 f
   command/sequencer/intadd_3_U3/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43     13.54 f
+                                                   0.41     13.54 f
   command/sequencer/intadd_3_U2/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.46     14.00 f
-  command/sequencer/U845/Y (sky130_fd_sc_hd__nor2_1)
-                                                   0.12     14.13 r
-  command/sequencer/U55/Y (sky130_fd_sc_hd__o2bb2ai_1)
-                                                   0.15     14.27 f
-  command/sequencer/U1136/Y (sky130_fd_sc_hd__nor2b_2)
-                                                   0.60     14.87 r
-  command/sequencer/U53/X (sky130_fd_sc_hd__buf_1)
-                                                   0.43     15.30 r
-  command/sequencer/U1176/X (sky130_fd_sc_hd__a211o_1)
-                                                   0.18     15.48 r
-  command/sequencer/weight_addr_reg_17_/D (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     15.48 r
-  data arrival time                                         15.48
+  command/sequencer/U834/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.13     14.13 r
+  command/sequencer/U54/Y (sky130_fd_sc_hd__o2bb2ai_1)
+                                                   0.14     14.27 f
+  command/sequencer/U835/Y (sky130_fd_sc_hd__nor2b_1)
+                                                   0.39     14.65 r
+  command/sequencer/U34/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.10     14.75 f
+  command/sequencer/U36/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.23     14.98 r
+  command/sequencer/U842/X (sky130_fd_sc_hd__a211o_1)
+                                                   0.16     15.14 r
+  command/sequencer/batch_addr_reg_1_/D (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     15.14 r
+  data arrival time                                         15.14
 
   clock clk (rise edge)                           20.00     20.00
-  clock network delay (propagated)                 0.88     20.88
-  command/sequencer/weight_addr_reg_17_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     20.88 r
-  clock uncertainty                               -0.25     20.63
-  library setup time                              -0.01     20.62
-  data required time                                        20.62
+  clock network delay (propagated)                 0.46     20.46
+  command/sequencer/batch_addr_reg_1_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     20.46 r
+  clock uncertainty                               -0.25     20.21
+  library setup time                              -0.04     20.17
+  data required time                                        20.17
   ------------------------------------------------------------------------
-  data required time                                        20.62
-  data arrival time                                        -15.48
+  data required time                                        20.17
+  data arrival time                                        -15.14
   ------------------------------------------------------------------------
-  slack (MET)                                                5.14
+  slack (MET)                                                5.03
 
 
 
-  Startpoint: command/sequencer/batch_size_reg_5_ (rising edge-triggered flip-flop clocked by clk)
-  Endpoint: command/sequencer/weight_addr_reg_14_ (rising edge-triggered flip-flop clocked by clk)
+  Startpoint: command/sequencer/state_reg_4_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: command/sequencer/batch_addr_reg_11_ (rising edge-triggered flip-flop clocked by clk)
   Mode: functional
   Corner: tt
   Scenario: functional_tt
@@ -762,48 +790,50 @@ Date   : Fri Nov 20 19:31:45 2026
   Point                                            Incr      Path  
   ------------------------------------------------------------------------
   clock clk (rise edge)                            0.00      0.00
-  clock network delay (propagated)                 0.89      0.89
+  clock network delay (propagated)                 0.94      0.94
 
-  command/sequencer/batch_size_reg_5_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00      0.89 r
-  command/sequencer/batch_size_reg_5_/Q (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.44      1.33 f
-  command/sequencer/U65/X (sky130_fd_sc_hd__or4b_1)
-                                                   0.57      1.89 f
-  command/sequencer/U67/Y (sky130_fd_sc_hd__nor2_2)
-                                                   0.53      2.42 r
-  command/sequencer/U89/Y (sky130_fd_sc_hd__inv_1)
-                                                   0.54      2.96 f
-  command/sequencer/U93/X (sky130_fd_sc_hd__a221o_1)
-                                                   0.48      3.44 f
-  command/sequencer/U94/Y (sky130_fd_sc_hd__nand2_2)
-                                                   0.40      3.84 r
-  command/sequencer/U96/X (sky130_fd_sc_hd__a22o_1)
-                                                   0.27      4.11 r
-  command/sequencer/U97/Y (sky130_fd_sc_hd__inv_2)
-                                                   0.03      4.15 f
-  command/sequencer/U99/X (sky130_fd_sc_hd__or3_1)
-                                                   0.47      4.62 f
+  command/sequencer/state_reg_4_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.94 r
+  command/sequencer/state_reg_4_/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.48      1.42 r
+  command/sequencer/U65/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.08      1.49 f
+  command/sequencer/U67/X (sky130_fd_sc_hd__or3_1)
+                                                   0.47      1.97 f
+  command/sequencer/U155/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.36      2.32 r
+  command/sequencer/U156/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.32      2.64 f
+  command/sequencer/U662/X (sky130_fd_sc_hd__or4_1)
+                                                   0.60      3.24 f
+  command/sequencer/U663/X (sky130_fd_sc_hd__or4_1)
+                                                   0.42      3.65 f
+  command/sequencer/U669/X (sky130_fd_sc_hd__or4_1)
+                                                   0.53      4.18 f
+  command/sequencer/U670/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.27      4.45 r
+  command/sequencer/ctmTdsLR_2_1386/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.17      4.62 f
   command/sequencer/intadd_3_U23/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.47      5.08 f
+                                                   0.51      5.12 f
   command/sequencer/intadd_3_U22/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.50 f
+                                                   0.43      5.55 f
   command/sequencer/intadd_3_U21/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.92 f
+                                                   0.43      5.98 f
   command/sequencer/intadd_3_U20/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.33 f
+                                                   0.42      6.40 f
   command/sequencer/intadd_3_U19/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.74 f
+                                                   0.42      6.82 f
   command/sequencer/intadd_3_U18/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43      7.17 f
+                                                   0.42      7.24 f
   command/sequencer/intadd_3_U17/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      7.58 f
+                                                   0.42      7.66 f
   command/sequencer/intadd_3_U16/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.50      8.08 f
+                                                   0.45      8.11 f
   command/sequencer/intadd_3_U15/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.45      8.52 f
+                                                   0.42      8.54 f
   command/sequencer/intadd_3_U14/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      8.94 f
+                                                   0.41      8.95 f
   command/sequencer/intadd_3_U13/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.41      9.36 f
   command/sequencer/intadd_3_U12/COUT (sky130_fd_sc_hd__fa_1)
@@ -813,52 +843,54 @@ Date   : Fri Nov 20 19:31:45 2026
   command/sequencer/intadd_3_U10/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.42     10.61 f
   command/sequencer/intadd_3_U9/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.02 f
+                                                   0.42     11.03 f
   command/sequencer/intadd_3_U8/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.44 f
+                                                   0.42     11.45 f
   command/sequencer/intadd_3_U7/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.86 f
+                                                   0.43     11.88 f
   command/sequencer/intadd_3_U6/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41     12.28 f
+                                                   0.42     12.30 f
   command/sequencer/intadd_3_U5/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     12.69 f
+                                                   0.42     12.71 f
   command/sequencer/intadd_3_U4/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     13.12 f
+                                                   0.41     13.13 f
   command/sequencer/intadd_3_U3/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43     13.54 f
+                                                   0.41     13.54 f
   command/sequencer/intadd_3_U2/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.46     14.00 f
-  command/sequencer/U845/Y (sky130_fd_sc_hd__nor2_1)
-                                                   0.12     14.13 r
-  command/sequencer/U55/Y (sky130_fd_sc_hd__o2bb2ai_1)
-                                                   0.15     14.27 f
-  command/sequencer/U1136/Y (sky130_fd_sc_hd__nor2b_2)
-                                                   0.60     14.87 r
-  command/sequencer/U53/X (sky130_fd_sc_hd__buf_1)
-                                                   0.43     15.30 r
-  command/sequencer/U1170/X (sky130_fd_sc_hd__a211o_1)
-                                                   0.17     15.47 r
-  command/sequencer/weight_addr_reg_14_/D (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     15.47 r
-  data arrival time                                         15.47
+  command/sequencer/U834/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.13     14.13 r
+  command/sequencer/U54/Y (sky130_fd_sc_hd__o2bb2ai_1)
+                                                   0.14     14.27 f
+  command/sequencer/U835/Y (sky130_fd_sc_hd__nor2b_1)
+                                                   0.39     14.65 r
+  command/sequencer/U34/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.10     14.75 f
+  command/sequencer/U36/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.23     14.98 r
+  command/sequencer/U864/X (sky130_fd_sc_hd__a211o_2)
+                                                   0.17     15.15 r
+  command/sequencer/batch_addr_reg_11_/D (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     15.15 r
+  data arrival time                                         15.15
 
   clock clk (rise edge)                           20.00     20.00
-  clock network delay (propagated)                 0.88     20.88
-  command/sequencer/weight_addr_reg_14_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     20.88 r
-  clock uncertainty                               -0.25     20.63
-  library setup time                              -0.01     20.62
-  data required time                                        20.62
+  clock network delay (propagated)                 0.46     20.46
+  command/sequencer/batch_addr_reg_11_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     20.46 r
+  clock uncertainty                               -0.25     20.21
+  library setup time                              -0.04     20.17
+  data required time                                        20.17
   ------------------------------------------------------------------------
-  data required time                                        20.62
-  data arrival time                                        -15.47
+  data required time                                        20.17
+  data arrival time                                        -15.15
   ------------------------------------------------------------------------
-  slack (MET)                                                5.15
+  slack (MET)                                                5.03
 
 
 
-  Startpoint: command/sequencer/batch_size_reg_5_ (rising edge-triggered flip-flop clocked by clk)
-  Endpoint: command/sequencer/weight_addr_reg_16_ (rising edge-triggered flip-flop clocked by clk)
+  Startpoint: command/sequencer/state_reg_4_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: command/sequencer/batch_addr_reg_12_ (rising edge-triggered flip-flop clocked by clk)
   Mode: functional
   Corner: tt
   Scenario: functional_tt
@@ -868,48 +900,50 @@ Date   : Fri Nov 20 19:31:45 2026
   Point                                            Incr      Path  
   ------------------------------------------------------------------------
   clock clk (rise edge)                            0.00      0.00
-  clock network delay (propagated)                 0.89      0.89
+  clock network delay (propagated)                 0.94      0.94
 
-  command/sequencer/batch_size_reg_5_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00      0.89 r
-  command/sequencer/batch_size_reg_5_/Q (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.44      1.33 f
-  command/sequencer/U65/X (sky130_fd_sc_hd__or4b_1)
-                                                   0.57      1.89 f
-  command/sequencer/U67/Y (sky130_fd_sc_hd__nor2_2)
-                                                   0.53      2.42 r
-  command/sequencer/U89/Y (sky130_fd_sc_hd__inv_1)
-                                                   0.54      2.96 f
-  command/sequencer/U93/X (sky130_fd_sc_hd__a221o_1)
-                                                   0.48      3.44 f
-  command/sequencer/U94/Y (sky130_fd_sc_hd__nand2_2)
-                                                   0.40      3.84 r
-  command/sequencer/U96/X (sky130_fd_sc_hd__a22o_1)
-                                                   0.27      4.11 r
-  command/sequencer/U97/Y (sky130_fd_sc_hd__inv_2)
-                                                   0.03      4.15 f
-  command/sequencer/U99/X (sky130_fd_sc_hd__or3_1)
-                                                   0.47      4.62 f
+  command/sequencer/state_reg_4_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.94 r
+  command/sequencer/state_reg_4_/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.48      1.42 r
+  command/sequencer/U65/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.08      1.49 f
+  command/sequencer/U67/X (sky130_fd_sc_hd__or3_1)
+                                                   0.47      1.97 f
+  command/sequencer/U155/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.36      2.32 r
+  command/sequencer/U156/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.32      2.64 f
+  command/sequencer/U662/X (sky130_fd_sc_hd__or4_1)
+                                                   0.60      3.24 f
+  command/sequencer/U663/X (sky130_fd_sc_hd__or4_1)
+                                                   0.42      3.65 f
+  command/sequencer/U669/X (sky130_fd_sc_hd__or4_1)
+                                                   0.53      4.18 f
+  command/sequencer/U670/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.27      4.45 r
+  command/sequencer/ctmTdsLR_2_1386/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.17      4.62 f
   command/sequencer/intadd_3_U23/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.47      5.08 f
+                                                   0.51      5.12 f
   command/sequencer/intadd_3_U22/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.50 f
+                                                   0.43      5.55 f
   command/sequencer/intadd_3_U21/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.92 f
+                                                   0.43      5.98 f
   command/sequencer/intadd_3_U20/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.33 f
+                                                   0.42      6.40 f
   command/sequencer/intadd_3_U19/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.74 f
+                                                   0.42      6.82 f
   command/sequencer/intadd_3_U18/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43      7.17 f
+                                                   0.42      7.24 f
   command/sequencer/intadd_3_U17/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      7.58 f
+                                                   0.42      7.66 f
   command/sequencer/intadd_3_U16/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.50      8.08 f
+                                                   0.45      8.11 f
   command/sequencer/intadd_3_U15/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.45      8.52 f
+                                                   0.42      8.54 f
   command/sequencer/intadd_3_U14/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      8.94 f
+                                                   0.41      8.95 f
   command/sequencer/intadd_3_U13/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.41      9.36 f
   command/sequencer/intadd_3_U12/COUT (sky130_fd_sc_hd__fa_1)
@@ -919,50 +953,54 @@ Date   : Fri Nov 20 19:31:45 2026
   command/sequencer/intadd_3_U10/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.42     10.61 f
   command/sequencer/intadd_3_U9/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.02 f
+                                                   0.42     11.03 f
   command/sequencer/intadd_3_U8/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.44 f
+                                                   0.42     11.45 f
   command/sequencer/intadd_3_U7/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.86 f
+                                                   0.43     11.88 f
   command/sequencer/intadd_3_U6/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41     12.28 f
+                                                   0.42     12.30 f
   command/sequencer/intadd_3_U5/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     12.69 f
+                                                   0.42     12.71 f
   command/sequencer/intadd_3_U4/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     13.12 f
+                                                   0.41     13.13 f
   command/sequencer/intadd_3_U3/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43     13.54 f
+                                                   0.41     13.54 f
   command/sequencer/intadd_3_U2/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.46     14.00 f
-  command/sequencer/U845/Y (sky130_fd_sc_hd__nor2_1)
-                                                   0.12     14.13 r
-  command/sequencer/U55/Y (sky130_fd_sc_hd__o2bb2ai_1)
-                                                   0.15     14.27 f
-  command/sequencer/U1136/Y (sky130_fd_sc_hd__nor2b_2)
-                                                   0.60     14.87 r
-  command/sequencer/U1174/X (sky130_fd_sc_hd__a211o_1)
-                                                   0.22     15.09 r
-  command/sequencer/weight_addr_reg_16_/D (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     15.09 r
-  data arrival time                                         15.09
+  command/sequencer/U834/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.13     14.13 r
+  command/sequencer/U54/Y (sky130_fd_sc_hd__o2bb2ai_1)
+                                                   0.14     14.27 f
+  command/sequencer/U835/Y (sky130_fd_sc_hd__nor2b_1)
+                                                   0.39     14.65 r
+  command/sequencer/U34/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.10     14.75 f
+  command/sequencer/U36/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.23     14.98 r
+  command/sequencer/U869/X (sky130_fd_sc_hd__a211o_2)
+                                                   0.17     15.15 r
+  command/sequencer/batch_addr_reg_12_/D (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     15.15 r
+  data arrival time                                         15.15
 
   clock clk (rise edge)                           20.00     20.00
-  clock network delay (propagated)                 0.57     20.57
-  command/sequencer/weight_addr_reg_16_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     20.57 r
-  clock uncertainty                               -0.25     20.32
-  library setup time                              -0.04     20.28
-  data required time                                        20.28
+  clock network delay (propagated)                 0.47     20.47
+  command/sequencer/batch_addr_reg_12_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     20.47 r
+  clock uncertainty                               -0.25     20.22
+  library setup time                              -0.04     20.17
+  data required time                                        20.17
   ------------------------------------------------------------------------
-  data required time                                        20.28
-  data arrival time                                        -15.09
+  data required time                                        20.17
+  data arrival time                                        -15.15
   ------------------------------------------------------------------------
-  slack (MET)                                                5.19
+  slack (MET)                                                5.03
 
 
 
-  Startpoint: command/sequencer/batch_size_reg_5_ (rising edge-triggered flip-flop clocked by clk)
-  Endpoint: command/sequencer/input_addr_reg_20_ (rising edge-triggered flip-flop clocked by clk)
+  Startpoint: command/sequencer/state_reg_4_ (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: command/sequencer/batch_addr_reg_15_ (rising edge-triggered flip-flop clocked by clk)
   Mode: functional
   Corner: tt
   Scenario: functional_tt
@@ -972,48 +1010,50 @@ Date   : Fri Nov 20 19:31:45 2026
   Point                                            Incr      Path  
   ------------------------------------------------------------------------
   clock clk (rise edge)                            0.00      0.00
-  clock network delay (propagated)                 0.89      0.89
+  clock network delay (propagated)                 0.94      0.94
 
-  command/sequencer/batch_size_reg_5_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00      0.89 r
-  command/sequencer/batch_size_reg_5_/Q (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.44      1.33 f
-  command/sequencer/U65/X (sky130_fd_sc_hd__or4b_1)
-                                                   0.57      1.89 f
-  command/sequencer/U67/Y (sky130_fd_sc_hd__nor2_2)
-                                                   0.53      2.42 r
-  command/sequencer/U89/Y (sky130_fd_sc_hd__inv_1)
-                                                   0.54      2.96 f
-  command/sequencer/U93/X (sky130_fd_sc_hd__a221o_1)
-                                                   0.48      3.44 f
-  command/sequencer/U94/Y (sky130_fd_sc_hd__nand2_2)
-                                                   0.40      3.84 r
-  command/sequencer/U96/X (sky130_fd_sc_hd__a22o_1)
-                                                   0.27      4.11 r
-  command/sequencer/U97/Y (sky130_fd_sc_hd__inv_2)
-                                                   0.03      4.15 f
-  command/sequencer/U99/X (sky130_fd_sc_hd__or3_1)
-                                                   0.47      4.62 f
+  command/sequencer/state_reg_4_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00      0.94 r
+  command/sequencer/state_reg_4_/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.48      1.42 r
+  command/sequencer/U65/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.08      1.49 f
+  command/sequencer/U67/X (sky130_fd_sc_hd__or3_1)
+                                                   0.47      1.97 f
+  command/sequencer/U155/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.36      2.32 r
+  command/sequencer/U156/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.32      2.64 f
+  command/sequencer/U662/X (sky130_fd_sc_hd__or4_1)
+                                                   0.60      3.24 f
+  command/sequencer/U663/X (sky130_fd_sc_hd__or4_1)
+                                                   0.42      3.65 f
+  command/sequencer/U669/X (sky130_fd_sc_hd__or4_1)
+                                                   0.53      4.18 f
+  command/sequencer/U670/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.27      4.45 r
+  command/sequencer/ctmTdsLR_2_1386/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.17      4.62 f
   command/sequencer/intadd_3_U23/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.47      5.08 f
+                                                   0.51      5.12 f
   command/sequencer/intadd_3_U22/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.50 f
+                                                   0.43      5.55 f
   command/sequencer/intadd_3_U21/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      5.92 f
+                                                   0.43      5.98 f
   command/sequencer/intadd_3_U20/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.33 f
+                                                   0.42      6.40 f
   command/sequencer/intadd_3_U19/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      6.74 f
+                                                   0.42      6.82 f
   command/sequencer/intadd_3_U18/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43      7.17 f
+                                                   0.42      7.24 f
   command/sequencer/intadd_3_U17/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41      7.58 f
+                                                   0.42      7.66 f
   command/sequencer/intadd_3_U16/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.50      8.08 f
+                                                   0.45      8.11 f
   command/sequencer/intadd_3_U15/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.45      8.52 f
+                                                   0.42      8.54 f
   command/sequencer/intadd_3_U14/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42      8.94 f
+                                                   0.41      8.95 f
   command/sequencer/intadd_3_U13/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.41      9.36 f
   command/sequencer/intadd_3_U12/COUT (sky130_fd_sc_hd__fa_1)
@@ -1023,49 +1063,49 @@ Date   : Fri Nov 20 19:31:45 2026
   command/sequencer/intadd_3_U10/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.42     10.61 f
   command/sequencer/intadd_3_U9/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.02 f
+                                                   0.42     11.03 f
   command/sequencer/intadd_3_U8/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.44 f
+                                                   0.42     11.45 f
   command/sequencer/intadd_3_U7/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     11.86 f
+                                                   0.43     11.88 f
   command/sequencer/intadd_3_U6/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.41     12.28 f
+                                                   0.42     12.30 f
   command/sequencer/intadd_3_U5/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     12.69 f
+                                                   0.42     12.71 f
   command/sequencer/intadd_3_U4/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.42     13.12 f
+                                                   0.41     13.13 f
   command/sequencer/intadd_3_U3/COUT (sky130_fd_sc_hd__fa_1)
-                                                   0.43     13.54 f
+                                                   0.41     13.54 f
   command/sequencer/intadd_3_U2/COUT (sky130_fd_sc_hd__fa_1)
                                                    0.46     14.00 f
-  command/sequencer/U845/Y (sky130_fd_sc_hd__nor2_1)
-                                                   0.12     14.13 r
-  command/sequencer/U55/Y (sky130_fd_sc_hd__o2bb2ai_1)
-                                                   0.15     14.27 f
-  command/sequencer/U1193/Y (sky130_fd_sc_hd__nor2b_1)
-                                                   0.37     14.64 r
-  command/sequencer/U42/Y (sky130_fd_sc_hd__inv_2)
-                                                   0.10     14.74 f
-  command/sequencer/U43/Y (sky130_fd_sc_hd__inv_2)
-                                                   0.20     14.94 r
-  command/sequencer/U1240/X (sky130_fd_sc_hd__a211o_2)
-                                                   0.15     15.10 r
-  command/sequencer/input_addr_reg_20_/D (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     15.10 r
-  data arrival time                                         15.10
+  command/sequencer/U834/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.13     14.13 r
+  command/sequencer/U54/Y (sky130_fd_sc_hd__o2bb2ai_1)
+                                                   0.14     14.27 f
+  command/sequencer/U835/Y (sky130_fd_sc_hd__nor2b_1)
+                                                   0.39     14.65 r
+  command/sequencer/U34/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.10     14.75 f
+  command/sequencer/U36/Y (sky130_fd_sc_hd__inv_2)
+                                                   0.23     14.98 r
+  command/sequencer/U878/X (sky130_fd_sc_hd__a211o_2)
+                                                   0.16     15.14 r
+  command/sequencer/batch_addr_reg_15_/D (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     15.14 r
+  data arrival time                                         15.14
 
   clock clk (rise edge)                           20.00     20.00
-  clock network delay (propagated)                 0.57     20.57
-  command/sequencer/input_addr_reg_20_/CLK (sky130_fd_sc_hd__dfxtp_2)
-                                                   0.00     20.57 r
-  clock uncertainty                               -0.25     20.32
-  library setup time                              -0.03     20.29
-  data required time                                        20.29
+  clock network delay (propagated)                 0.47     20.47
+  command/sequencer/batch_addr_reg_15_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                   0.00     20.47 r
+  clock uncertainty                               -0.25     20.22
+  library setup time                              -0.04     20.18
+  data required time                                        20.18
   ------------------------------------------------------------------------
-  data required time                                        20.29
-  data arrival time                                        -15.10
+  data required time                                        20.18
+  data arrival time                                        -15.14
   ------------------------------------------------------------------------
-  slack (MET)                                                5.19
+  slack (MET)                                                5.03
 
 
 1

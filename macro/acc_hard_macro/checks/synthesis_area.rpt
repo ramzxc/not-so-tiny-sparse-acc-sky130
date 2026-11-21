@@ -3,7 +3,7 @@
 Report : area
 Design : acc_hard_macro
 Version: Y-2026.03-SP1
-Date   : Fri Nov 20 19:19:55 2026
+Date   : Sat Nov 21 15:41:45 2026
 ****************************************
 
 Information: Updating design information... (UID-85)
@@ -12,22 +12,22 @@ Library(s) Used:
     sky130_fd_sc_hd__tt_025C_1v80 (File: /docker/projects/egru/acc/archive/sky130_20261102_192346/pdk/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.db)
     tt_sram_1rw_64x128_buffered_sky130_TT_1p8V_25C_lib (File: /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130_TT_1p8V_25C.db)
 
-Number of ports:                         1603
-Number of nets:                          7947
-Number of cells:                         6279
-Number of combinational cells:           5299
-Number of sequential cells:               963
+Number of ports:                         1626
+Number of nets:                          7905
+Number of cells:                         6211
+Number of combinational cells:           5243
+Number of sequential cells:               951
 Number of macros/black boxes:               1
-Number of buf/inv:                       1022
+Number of buf/inv:                       1015
 Number of references:                      20
 
-Combinational area:              44171.112901
-Buf/Inv area:                     3836.179080
-Noncombinational area:           20493.403929
+Combinational area:              43794.501706
+Buf/Inv area:                     3809.903880
+Noncombinational area:           20238.159140
 Macro/Black Box area:           180558.718750
 Net Interconnect area:      undefined  (Wire load has zero net area)
 
-Total cell area:                245223.235580
+Total cell area:                244591.379596
 Total area:                 undefined
 
 Hierarchical area distribution
@@ -38,24 +38,24 @@ Hierarchical area distribution
 Hierarchical cell                 Absolute     Percent  Combi-      Noncombi-   Black-
                                   Total        Total    national    national    boxes        Design
 --------------------------------  -----------  -------  ----------  ----------  -----------  ---------------------------
-acc_hard_macro                    245223.2356    100.0    578.0544     52.5504       0.0000  acc_hard_macro
-command                            25066.5402     10.2     23.7728      0.0000       0.0000  command_ctrl
-command/frontend                    9659.2638      3.9   5915.6735   3743.5902       0.0000  program_fetch
-command/sequencer                  15383.5036      6.3  11023.0718   4360.4318       0.0000  micro_ctrl
+acc_hard_macro                    244591.3796    100.0    581.8080     52.5504       0.0000  acc_hard_macro
+command                            25209.1770     10.3     27.5264      0.0000       0.0000  command_ctrl
+command/frontend                    9866.9630      4.0   6123.3727   3743.5902       0.0000  program_fetch
+command/sequencer                  15314.6876      6.3  10954.2558   4360.4318       0.0000  micro_ctrl
 data                                4157.7375      1.7   2626.2688   1531.4687       0.0000  data_ctrl
 decode                               195.1872      0.1    195.1872      0.0000       0.0000  inst_decoder
-dma                                 3693.5423      1.5   2757.6448    935.8976       0.0000  dma_ctrl
-exec                                9550.4094      3.9   6785.2575   2765.1519       0.0000  exec_unit
-ingress                             6204.7006      2.5   3864.9567   2339.7439       0.0000  input_queue_SLOT_BITS14
-itf                               190748.4913     77.8   7030.4927   3148.0191       0.0000  mem_itf
-itf/memory                        180569.9795     73.6     11.2608      0.0000  180558.7188  shared_sram_SRAM_BYTES1024
+dma                                 3684.7839      1.5   2748.8864    935.8976       0.0000  dma_ctrl
+exec                                9551.6606      3.9   6786.5087   2765.1519       0.0000  exec_unit
+ingress                             5440.2175      2.2   3355.7183   2084.4991       0.0000  input_queue_SLOT_BITS14
+itf                               190743.4865     78.0   7025.4879   3148.0191       0.0000  mem_itf
+itf/memory                        180569.9795     73.8     11.2608      0.0000  180558.7188  shared_sram_SRAM_BYTES1024
 psram                               2782.6687      1.1     11.2608      0.0000       0.0000  qspi_ctrl
 psram/ingress_owner                  613.0880      0.3    570.5472     42.5408       0.0000  psram_arbiter_FETCH_WRITES1
 psram/memory_owner                   514.2432      0.2    471.7024     42.5408       0.0000  psram_arbiter
 psram/serial_memory                 1644.0768      0.7   1112.3168    531.7600       0.0000  qpi_engine
-receiver                            1492.6816      0.6    769.4880    723.1936       0.0000  uart_rx_CLKS_PER_BIT87
+receiver                            1491.4304      0.6    768.2368    723.1936       0.0000  uart_rx_CLKS_PER_BIT87
 transmitter                          700.6720      0.3    424.1568    276.5152       0.0000  uart_tx_CLKS_PER_BIT87
 --------------------------------  -----------  -------  ----------  ----------  -----------  ---------------------------
-Total                                                   44171.1129  20493.4039  180558.7188
+Total                                                   43794.5017  20238.1591  180558.7188
 
 1

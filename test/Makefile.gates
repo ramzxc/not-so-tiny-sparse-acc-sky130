@@ -14,6 +14,8 @@ PDK_MODELS = $(PDK_ROOT)/$(PDK)/libs.ref/sky130_fd_sc_hd/verilog
 # SRAM model sampling inputs through a zero-delay routed clock tree. No SDF.
 COMPILE_ARGS += -DFUNCTIONAL -DUSE_POWER_PINS -g2012 -DUNIT_DELAY=\#1
 VERILOG_SOURCES = $(PDK_MODELS)/primitives.v $(PDK_MODELS)/sky130_fd_sc_hd.v $(GATE_NETLIST)
+# The wrapper netlist retains this hard macro instance. Use its powered circuit.
+VERILOG_SOURCES += $(ROOT)/macro/acc_hard_macro/acc_hard_macro.v
 VERILOG_SOURCES += $(ROOT)/memory/openram/generated/tt_sram_1rw_64x128_buffered_sky130/tt_sram_1rw_64x128_buffered_sky130.v
 VERILOG_SOURCES += $(CURDIR)/tb_gate_psram.sv $(CURDIR)/qspi_psram_model.sv
 export STREAM_FIXTURE=$(BUILD)/psram.hex

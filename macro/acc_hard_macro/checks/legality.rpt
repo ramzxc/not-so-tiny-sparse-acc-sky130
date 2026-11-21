@@ -14,10 +14,10 @@ PDC app_options settings =========
 	place.legalize.preroute_shape_merge_distance: 0.0
 	place.legalize.enable_non_preferred_direction_span_check: 0
 
-Layer li1: cached 0 shapes out of 1078 total shapes.
-Layer met1: cached 0 shapes out of 26519 total shapes.
-Layer met2: cached 0 shapes out of 21632 total shapes.
-Cached 2002 vias out of 65522 total vias.
+Layer li1: cached 0 shapes out of 989 total shapes.
+Layer met1: cached 0 shapes out of 25998 total shapes.
+Layer met2: cached 0 shapes out of 21115 total shapes.
+Cached 2002 vias out of 64486 total vias.
 
 check_legality for block design acc_hard_macro ... 
 Information: Initializing classic cellmap without advanced rules enabled and without PDC enabled
@@ -36,10 +36,10 @@ Information: The following app options are used in cellmap
         place.common.use_placement_model : false
         place.common.enable_advanced_placement_model : true
         cts.placement.cell_spacing_rule_style : maximum
-Total 0.2527 seconds to build cellmap data
+Total 0.2083 seconds to build cellmap data
 Information: Creating classic rule checker.
 Warning: Routing direction of metal layer fieldpoly is neither "horizontal" nor "vertical".  PDC checks will not be performed on this layer. (PDC-003)
-=====> Processed 163 ref cells (13 fillers) from library
+=====> Processed 171 ref cells (13 fillers) from library
 Design has no advanced rules
 Checking legality
 Checking cell legality:
