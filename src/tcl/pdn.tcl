@@ -292,7 +292,7 @@ proc pdngen {args} {
             foreach span $spans {
                 lassign $span y1 y2
                 set box [list [expr {round($x1*$units)}] [expr {round($y1*$units)}] [expr {round($x2*$units)}] [expr {round($y2*$units)}]]
-                odb::dbBox_create $bp $m4 {*}$box
+                odb::dbBox_create $pin $m4 {*}$box
             }
         }
     }
