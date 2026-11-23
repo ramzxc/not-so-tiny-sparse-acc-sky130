@@ -1,21 +1,24 @@
 {
-  "source_export": "final_1795079110",
+  "source_export": "quad_local_fc_50mhz_20261123_155755_x3PhPW",
+  "source_gds_sha256": "13c3b33a2a9be6b2921c7333f66869e0d15e5fe015dd9c66ef2a38091aebfe5c",
+  "packaging": "Renamed ICC2 top cell consistently for the Tiny Tapeout macro interface.",
   "sha256": {
-    "acc_hard_macro.gds": "73a2ec3da5fa4594b17670701ccf8ef72ea27baf629a756167a4a453adb69f70",
-    "acc_hard_macro.lef": "80c53856d8344b4f820798be926dc9454cd8b0ed2c4a45f58c6f6ffbf7a128f0"
+    "acc_hard_macro.gds": "46c19736c7b8b421c02bbdf9d93bff70ce265e0babaa1da483379fb630f4366b",
+    "acc_hard_macro.lef": "fd5bc1aaebbd259d56afeeeada7c24425ca0b2fa6242421233d14c7e62bb79fc",
+    "acc_hard_macro.v": "23ba3e262947ff3940ee6448297a71f2cf5750f7168730d0e661e78e42c7535f",
+    "acc_hard_macro.sdc": "12b12248ac5fce585ea6a078ca0110e6a42ee58f0cd356f1f8313cb28b9bac66"
   },
+  "pr_boundary": "boundary_validation.json: only added top-level SKY130 235/4 boundary; all other GDS records unchanged",
+  "gds_units": "units_validation.json: exact 0.1nm to 1nm DBU conversion without rounding",
   "lef_obstructions": "Removed only empty M1 margins after checking all GDS M1 geometry; pins and GDS unchanged. Regenerate with scripts/fix_core_lef_obstructions.py.",
-  "lef_power_pins": "43 continuous M4 supply columns verified against actual GDS; full-height pins and matching M4 OBS subtraction. Reproduce with scripts/expose_core_power_pins.py.",
   "lvs_inputs": {
-    "macro/acc_hard_macro/acc_hard_macro.v": "47e4a857ccd79627a5c1d6e9c87ae3a77c1c8506e7d22591c9cf9afb7e00a68f",
+    "macro/acc_hard_macro/acc_hard_macro.v": "23ba3e262947ff3940ee6448297a71f2cf5750f7168730d0e661e78e42c7535f",
     "memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.lvs.sp": "aecf2d431c88a9e6a144f23c69ec1eae3442e8054eb3da9a8ea30721d195bf3b",
-    "macro/acc_hard_macro/acc_hard_macro.lvs.spice": "e7c06a0a4b2eb7a0fa8403a3360cd6e4fb2317d5c4b35526e720ed84e40a3a84",
+    "macro/acc_hard_macro/acc_hard_macro.lvs.spice": "35913517497b5b0b7ecdfd8df30f177839882e64c98c0ca389d8ea7fc983d853",
     "macro/acc_hard_macro/sram.lvs_micron.spice": "f6e25d29d38a08721eed0578a2933c8f27126d5644952567706ff15f3e66b163"
   },
   "lvs_nfet_rule": {
     "model": null,
     "width_lt_um": null
-  },
-  "packaging": "Added top PR boundary and exactly rescaled GDS database units without rounding; manufacturing geometry unchanged.",
-  "functional_eco": "One and2_1 gate on dma.remaining_reg_7_ D enforces synchronous reset with reset_sync[1]; binary-equivalent to the original reset cone. Physically placed, powered and routed."
+  }
 }

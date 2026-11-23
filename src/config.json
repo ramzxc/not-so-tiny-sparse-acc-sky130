@@ -1,7 +1,7 @@
 {
   "//": "Full LVS uses actual GDS and complete core/SRAM SPICE models. Macro Verilog import is disabled only to avoid duplicate circuit definitions.",
   "PL_TARGET_DENSITY_PCT": 70,
-  "CLOCK_PERIOD": 100,
+  "CLOCK_PERIOD": 20,
   "USE_SLANG": true,
   "SLANG_ARGUMENTS": [
     "--unroll-limit=16384"

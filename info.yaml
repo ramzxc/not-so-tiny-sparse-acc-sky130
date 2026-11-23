@@ -5,7 +5,7 @@ project:
   discord:      "ramzxc"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
   description:  "not so tiny sparse acc"      # One line description of what your project does
   language:     "SystemVerilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
-  clock_hz:     10000000       # Clock frequency in Hz (or 0 if not applicable)
+  clock_hz:     50000000       # Clock frequency in Hz (or 0 if not applicable)
 
   # How many tiles your design occupies? A single tile is about 167x108 uM.
   tiles: "8x2"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
@@ -33,9 +33,9 @@ pinout:
   ui[7]: ""
 
   # Outputs
-  uo[0]: "DECODER_READY"
+  uo[0]: ""
   uo[1]: "ERROR"
-  uo[2]: ""
+  uo[2]: "DECODER_READY"
   uo[3]: ""
   uo[4]: "UART_TX"
   uo[5]: ""
@@ -43,13 +43,13 @@ pinout:
   uo[7]: ""
 
   # Bidirectional pins
-  uio[0]: "FLASH_CS_N"
+  uio[0]: "FLASH_CS_N_HIGH"
   uio[1]: "QSPI_DQ0"
   uio[2]: "QSPI_DQ1"
   uio[3]: "QSPI_SCK"
   uio[4]: "QSPI_DQ2"
   uio[5]: "QSPI_DQ3"
-  uio[6]: "PSRAM_A_CS_N_UNUSED"
+  uio[6]: "PSRAM_A_CS_N"
   uio[7]: "PSRAM_B_CS_N_UNUSED"
 
 # Do not change!

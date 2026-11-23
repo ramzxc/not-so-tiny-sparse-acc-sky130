@@ -1,0 +1,1539 @@
+****************************************
+Report : timing
+        -path_type full
+        -delay_type max
+        -max_paths 10
+        -report_by design
+Design : acc_native_fp8_macro
+Version: Y-2026.03
+Date   : Mon Nov 23 16:06:51 2026
+****************************************
+
+  Startpoint: accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_54_ (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: max
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (fall edge)                           10.00     10.00
+  clock network delay (propagated)                 0.86     10.86
+
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/clk0 (tt_sram_1rw_64x64_sky130)
+                                                   0.00     10.86 f
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/dout0[32] (tt_sram_1rw_64x64_sky130)
+                                                   0.51     11.37 f ~
+  accelerator/dut/tpu_core_tpu/memory_controller/HFSBUF_55_9/X (sky130_fd_sc_hd__buf_6)
+                                                   0.14     11.51 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U807/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     11.61 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U808/Y (sky130_fd_sc_hd__nand2_2)
+                                                   0.16     11.77 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1007/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.11     11.87 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1010/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.16     12.03 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1059/Y (sky130_fd_sc_hd__o22ai_1)
+                                                   0.22     12.25 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1060/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     12.38 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1066/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     12.52 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1067/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.11     12.63 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1073/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     12.77 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1074/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.11     12.88 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1080/X (sky130_fd_sc_hd__a21o_1)
+                                                   0.17     13.05 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1081/X (sky130_fd_sc_hd__o211a_1)
+                                                   0.13     13.18 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U162/X (sky130_fd_sc_hd__o21a_2)
+                                                   0.28     13.46 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1101/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     13.57 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1111/Y (sky130_fd_sc_hd__nand3_2)
+                                                   0.14     13.71 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1112/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.12     13.83 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1118/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.13     13.95 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1121/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.15     14.11 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1123/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     14.19 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1125/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     14.27 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1126/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.09     14.36 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1128/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.12     14.49 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1133/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     14.60 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1140/X (sky130_fd_sc_hd__or2_1)
+                                                   0.30     14.90 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1144/X (sky130_fd_sc_hd__o22a_1)
+                                                   0.21     15.10 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1149/X (sky130_fd_sc_hd__mux2_2)
+                                                   0.29     15.39 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1150/Y (sky130_fd_sc_hd__xnor2_1)
+                                                   0.15     15.54 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1151/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.20     15.74 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1189/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.07     15.81 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1192/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.21     16.02 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1194/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     16.15 f
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_1068/X (sky130_fd_sc_hd__a21bo_1)
+                                                   0.22     16.37 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1199/X (sky130_fd_sc_hd__xor2_2)
+                                                   0.45     16.82 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1204/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.12     16.94 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1205/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.19     17.13 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1233/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.10     17.23 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1236/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.07     17.30 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1237/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.07     17.37 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1238/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.08     17.45 r
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_3270/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.14     17.59 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1241/X (sky130_fd_sc_hd__or2_1)
+                                                   0.28     17.87 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1245/Y (sky130_fd_sc_hd__nand2_4)
+                                                   0.14     18.01 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1256/Y (sky130_fd_sc_hd__inv_4)
+                                                   0.06     18.07 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U87/Y (sky130_fd_sc_hd__clkinv_1)
+                                                   0.05     18.12 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1286/Y (sky130_fd_sc_hd__nand2b_1)
+                                                   0.05     18.17 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1289/COUT (sky130_fd_sc_hd__fah_1)
+                                                   0.27     18.44 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1290/COUT (sky130_fd_sc_hd__fa_1)
+                                                   0.40     18.84 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1287/Y (sky130_fd_sc_hd__xnor2_1)
+                                                   0.36     19.20 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1296/Y (sky130_fd_sc_hd__nand4_1)
+                                                   0.13     19.34 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1300/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.09     19.43 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1301/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.04     19.47 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1302/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.10     19.57 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1314/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.06     19.63 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1315/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     19.71 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1316/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.07     19.78 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1327/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.41     20.19 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1331/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.08     20.28 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1332/X (sky130_fd_sc_hd__a211o_1)
+                                                   0.26     20.54 f
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_54_/D (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.54 f
+  data arrival time                                         20.54
+
+  clock clk (rise edge)                           20.00     20.00
+  clock network delay (propagated)                 0.86     20.86
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_54_/CLK (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.86 r
+  clock uncertainty                               -0.25     20.61
+  library setup time                              -0.08     20.53
+  data required time                                        20.53
+  ------------------------------------------------------------------------
+  data required time                                        20.53
+  data arrival time                                        -20.54
+  ------------------------------------------------------------------------
+  slack (VIOLATED)                                          -0.01
+
+
+
+  Startpoint: accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_22_ (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: max
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (fall edge)                           10.00     10.00
+  clock network delay (propagated)                 0.86     10.86
+
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/clk0 (tt_sram_1rw_64x64_sky130)
+                                                   0.00     10.86 f
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/dout0[32] (tt_sram_1rw_64x64_sky130)
+                                                   0.51     11.37 f ~
+  accelerator/dut/tpu_core_tpu/memory_controller/HFSBUF_55_9/X (sky130_fd_sc_hd__buf_6)
+                                                   0.14     11.51 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U807/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     11.61 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U808/Y (sky130_fd_sc_hd__nand2_2)
+                                                   0.16     11.77 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1007/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.11     11.87 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1010/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.16     12.03 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1059/Y (sky130_fd_sc_hd__o22ai_1)
+                                                   0.22     12.25 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1060/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     12.38 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1066/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     12.52 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1067/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.11     12.63 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1073/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     12.77 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1074/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.11     12.88 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1080/X (sky130_fd_sc_hd__a21o_1)
+                                                   0.17     13.05 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1081/X (sky130_fd_sc_hd__o211a_1)
+                                                   0.13     13.18 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U162/X (sky130_fd_sc_hd__o21a_2)
+                                                   0.28     13.46 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1101/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     13.57 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1111/Y (sky130_fd_sc_hd__nand3_2)
+                                                   0.14     13.71 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1112/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.12     13.83 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1118/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.13     13.95 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1121/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.15     14.11 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1123/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     14.19 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1125/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     14.27 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1126/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.09     14.36 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1128/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.12     14.49 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1133/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     14.60 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1140/X (sky130_fd_sc_hd__or2_1)
+                                                   0.30     14.90 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1144/X (sky130_fd_sc_hd__o22a_1)
+                                                   0.21     15.10 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1149/X (sky130_fd_sc_hd__mux2_2)
+                                                   0.29     15.39 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1150/Y (sky130_fd_sc_hd__xnor2_1)
+                                                   0.15     15.54 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1151/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.20     15.74 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1189/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.07     15.81 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1192/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.21     16.02 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1194/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     16.15 f
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_1068/X (sky130_fd_sc_hd__a21bo_1)
+                                                   0.22     16.37 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1199/X (sky130_fd_sc_hd__xor2_2)
+                                                   0.45     16.82 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1204/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.12     16.94 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1205/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.19     17.13 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1233/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.10     17.23 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1236/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.07     17.30 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1237/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.07     17.37 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1238/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.08     17.45 r
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_3270/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.14     17.59 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1241/X (sky130_fd_sc_hd__or2_1)
+                                                   0.28     17.87 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1245/Y (sky130_fd_sc_hd__nand2_4)
+                                                   0.14     18.01 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1256/Y (sky130_fd_sc_hd__inv_4)
+                                                   0.06     18.07 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U87/Y (sky130_fd_sc_hd__clkinv_1)
+                                                   0.05     18.12 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1286/Y (sky130_fd_sc_hd__nand2b_1)
+                                                   0.05     18.17 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1289/COUT (sky130_fd_sc_hd__fah_1)
+                                                   0.27     18.44 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1290/COUT (sky130_fd_sc_hd__fa_1)
+                                                   0.40     18.84 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1287/Y (sky130_fd_sc_hd__xnor2_1)
+                                                   0.36     19.20 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1296/Y (sky130_fd_sc_hd__nand4_1)
+                                                   0.13     19.34 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1300/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.09     19.43 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1301/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.04     19.47 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1302/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.10     19.57 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1314/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.06     19.63 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1315/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     19.71 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1316/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.07     19.78 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1327/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.41     20.19 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1328/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.09     20.28 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1329/X (sky130_fd_sc_hd__a211o_1)
+                                                   0.26     20.54 f
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_22_/D (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.54 f
+  data arrival time                                         20.54
+
+  clock clk (rise edge)                           20.00     20.00
+  clock network delay (propagated)                 0.86     20.86
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_22_/CLK (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.86 r
+  clock uncertainty                               -0.25     20.61
+  library setup time                              -0.08     20.53
+  data required time                                        20.53
+  ------------------------------------------------------------------------
+  data required time                                        20.53
+  data arrival time                                        -20.54
+  ------------------------------------------------------------------------
+  slack (VIOLATED)                                          -0.01
+
+
+
+  Startpoint: accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_52_ (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: max
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (fall edge)                           10.00     10.00
+  clock network delay (propagated)                 0.86     10.86
+
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/clk0 (tt_sram_1rw_64x64_sky130)
+                                                   0.00     10.86 f
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/dout0[32] (tt_sram_1rw_64x64_sky130)
+                                                   0.51     11.37 f ~
+  accelerator/dut/tpu_core_tpu/memory_controller/HFSBUF_55_9/X (sky130_fd_sc_hd__buf_6)
+                                                   0.14     11.51 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U807/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     11.61 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U808/Y (sky130_fd_sc_hd__nand2_2)
+                                                   0.16     11.77 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1007/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.11     11.87 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1010/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.16     12.03 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1059/Y (sky130_fd_sc_hd__o22ai_1)
+                                                   0.22     12.25 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1060/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     12.38 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1066/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     12.52 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1067/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.11     12.63 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1073/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     12.77 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1074/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.11     12.88 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1080/X (sky130_fd_sc_hd__a21o_1)
+                                                   0.17     13.05 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1081/X (sky130_fd_sc_hd__o211a_1)
+                                                   0.13     13.18 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U162/X (sky130_fd_sc_hd__o21a_2)
+                                                   0.28     13.46 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1101/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     13.57 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1111/Y (sky130_fd_sc_hd__nand3_2)
+                                                   0.14     13.71 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1112/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.12     13.83 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1118/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.13     13.95 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1121/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.15     14.11 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1123/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     14.19 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1125/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     14.27 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1126/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.09     14.36 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1128/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.12     14.49 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1133/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     14.60 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1140/X (sky130_fd_sc_hd__or2_1)
+                                                   0.30     14.90 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1144/X (sky130_fd_sc_hd__o22a_1)
+                                                   0.21     15.10 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1149/X (sky130_fd_sc_hd__mux2_2)
+                                                   0.29     15.39 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1150/Y (sky130_fd_sc_hd__xnor2_1)
+                                                   0.15     15.54 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1151/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.20     15.74 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1189/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.07     15.81 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1192/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.21     16.02 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1194/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     16.15 f
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_1068/X (sky130_fd_sc_hd__a21bo_1)
+                                                   0.22     16.37 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1199/X (sky130_fd_sc_hd__xor2_2)
+                                                   0.45     16.82 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1204/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.12     16.94 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1205/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.19     17.13 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1233/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.10     17.23 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1236/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.07     17.30 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1237/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.07     17.37 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1238/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.08     17.45 r
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_3270/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.14     17.59 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1241/X (sky130_fd_sc_hd__or2_1)
+                                                   0.28     17.87 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1245/Y (sky130_fd_sc_hd__nand2_4)
+                                                   0.14     18.01 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1256/Y (sky130_fd_sc_hd__inv_4)
+                                                   0.06     18.07 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U87/Y (sky130_fd_sc_hd__clkinv_1)
+                                                   0.05     18.12 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1286/Y (sky130_fd_sc_hd__nand2b_1)
+                                                   0.05     18.17 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1289/COUT (sky130_fd_sc_hd__fah_1)
+                                                   0.27     18.44 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1290/COUT (sky130_fd_sc_hd__fa_1)
+                                                   0.40     18.84 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1287/Y (sky130_fd_sc_hd__xnor2_1)
+                                                   0.36     19.20 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1296/Y (sky130_fd_sc_hd__nand4_1)
+                                                   0.13     19.34 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1300/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.09     19.43 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1301/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.04     19.47 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1302/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.10     19.57 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1314/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.06     19.63 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1315/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     19.71 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1316/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.07     19.78 f
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_3245/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.35     20.13 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1322/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.10     20.23 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1323/X (sky130_fd_sc_hd__a211o_1)
+                                                   0.29     20.52 f
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_52_/D (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.52 f
+  data arrival time                                         20.52
+
+  clock clk (rise edge)                           20.00     20.00
+  clock network delay (propagated)                 0.87     20.87
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_52_/CLK (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.87 r
+  clock uncertainty                               -0.25     20.62
+  library setup time                              -0.09     20.52
+  data required time                                        20.52
+  ------------------------------------------------------------------------
+  data required time                                        20.52
+  data arrival time                                        -20.52
+  ------------------------------------------------------------------------
+  slack (MET)                                                0.00
+
+
+
+  Startpoint: accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_62_ (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: max
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (fall edge)                           10.00     10.00
+  clock network delay (propagated)                 0.86     10.86
+
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/clk0 (tt_sram_1rw_64x64_sky130)
+                                                   0.00     10.86 f
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/dout0[42] (tt_sram_1rw_64x64_sky130)
+                                                   0.48     11.34 r ~
+  accelerator/dut/tpu_core_tpu/memory_controller/HFSBUF_44_20/X (sky130_fd_sc_hd__buf_4)
+                                                   0.20     11.54 r
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_1278/X (sky130_fd_sc_hd__a22o_1)
+                                                   0.45     11.99 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U418/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.10     12.09 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U421/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.35     12.44 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U422/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     12.57 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U423/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.15     12.72 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U432/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.09     12.80 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U433/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     12.93 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U439/X (sky130_fd_sc_hd__a21o_1)
+                                                   0.14     13.08 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U440/X (sky130_fd_sc_hd__o211a_1)
+                                                   0.18     13.25 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U160/X (sky130_fd_sc_hd__o21a_2)
+                                                   0.24     13.50 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U461/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     13.58 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U470/Y (sky130_fd_sc_hd__nand3_1)
+                                                   0.17     13.76 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U471/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.07     13.83 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U477/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.14     13.96 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U480/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.08     14.04 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U482/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.09     14.14 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U484/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.07     14.21 f
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_1089/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     14.34 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U492/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.14     14.48 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U505/X (sky130_fd_sc_hd__or2_1)
+                                                   0.30     14.78 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U506/X (sky130_fd_sc_hd__o22a_1)
+                                                   0.20     14.98 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U540/X (sky130_fd_sc_hd__mux2_2)
+                                                   0.29     15.27 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U541/Y (sky130_fd_sc_hd__xnor2_1)
+                                                   0.14     15.41 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U4/X (sky130_fd_sc_hd__or2_1)
+                                                   0.24     15.65 f
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_1016/Y (sky130_fd_sc_hd__a21boi_1)
+                                                   0.21     15.86 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U550/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     15.99 f
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_3059/X (sky130_fd_sc_hd__a21bo_1)
+                                                   0.20     16.19 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U572/COUT (sky130_fd_sc_hd__fa_2)
+                                                   0.37     16.56 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U556/Y (sky130_fd_sc_hd__xnor2_2)
+                                                   0.22     16.79 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U561/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.14     16.92 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U564/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.18     17.10 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U567/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.13     17.24 f
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_1262/X (sky130_fd_sc_hd__o21a_1)
+                                                   0.18     17.41 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U591/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.18     17.59 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U593/Y (sky130_fd_sc_hd__nand3b_1)
+                                                   0.19     17.78 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U597/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     17.91 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U598/X (sky130_fd_sc_hd__o21a_2)
+                                                   0.28     18.19 r
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_1103/X (sky130_fd_sc_hd__o2bb2a_2)
+                                                   0.27     18.46 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U620/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.09     18.55 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U621/X (sky130_fd_sc_hd__or2b_1)
+                                                   0.19     18.73 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U622/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.08     18.82 f
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_1271/X (sky130_fd_sc_hd__or2_1)
+                                                   0.23     19.05 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U644/X (sky130_fd_sc_hd__and3_1)
+                                                   0.18     19.23 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U645/Y (sky130_fd_sc_hd__nand4_1)
+                                                   0.10     19.32 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U648/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.06     19.38 f
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_3253/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.11     19.49 r
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_3240/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.10     19.59 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U655/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     19.67 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U662/Y (sky130_fd_sc_hd__nand2_2)
+                                                   0.09     19.76 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U709/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.38     20.14 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U911/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.12     20.26 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U912/X (sky130_fd_sc_hd__a211o_1)
+                                                   0.26     20.53 f
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_62_/D (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.53 f
+  data arrival time                                         20.53
+
+  clock clk (rise edge)                           20.00     20.00
+  clock network delay (propagated)                 0.86     20.86
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_62_/CLK (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.86 r
+  clock uncertainty                               -0.25     20.61
+  library setup time                              -0.08     20.53
+  data required time                                        20.53
+  ------------------------------------------------------------------------
+  data required time                                        20.53
+  data arrival time                                        -20.53
+  ------------------------------------------------------------------------
+  slack (MET)                                                0.01
+
+
+
+  Startpoint: accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_38_ (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: max
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (fall edge)                           10.00     10.00
+  clock network delay (propagated)                 0.86     10.86
+
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/clk0 (tt_sram_1rw_64x64_sky130)
+                                                   0.00     10.86 f
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/dout0[32] (tt_sram_1rw_64x64_sky130)
+                                                   0.51     11.37 f ~
+  accelerator/dut/tpu_core_tpu/memory_controller/HFSBUF_55_9/X (sky130_fd_sc_hd__buf_6)
+                                                   0.14     11.51 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U807/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     11.61 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U808/Y (sky130_fd_sc_hd__nand2_2)
+                                                   0.16     11.77 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1007/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.11     11.87 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1010/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.16     12.03 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1059/Y (sky130_fd_sc_hd__o22ai_1)
+                                                   0.22     12.25 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1060/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     12.38 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1066/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     12.52 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1067/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.11     12.63 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1073/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     12.77 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1074/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.11     12.88 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1080/X (sky130_fd_sc_hd__a21o_1)
+                                                   0.17     13.05 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1081/X (sky130_fd_sc_hd__o211a_1)
+                                                   0.13     13.18 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U162/X (sky130_fd_sc_hd__o21a_2)
+                                                   0.28     13.46 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1101/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     13.57 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1111/Y (sky130_fd_sc_hd__nand3_2)
+                                                   0.14     13.71 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1112/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.12     13.83 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1118/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.13     13.95 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1121/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.15     14.11 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1123/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     14.19 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1125/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     14.27 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1126/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.09     14.36 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1128/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.12     14.49 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1133/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     14.60 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1140/X (sky130_fd_sc_hd__or2_1)
+                                                   0.30     14.90 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1144/X (sky130_fd_sc_hd__o22a_1)
+                                                   0.21     15.10 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1149/X (sky130_fd_sc_hd__mux2_2)
+                                                   0.29     15.39 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1150/Y (sky130_fd_sc_hd__xnor2_1)
+                                                   0.15     15.54 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1151/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.20     15.74 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1189/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.07     15.81 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1192/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.21     16.02 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1194/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     16.15 f
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_1068/X (sky130_fd_sc_hd__a21bo_1)
+                                                   0.22     16.37 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1199/X (sky130_fd_sc_hd__xor2_2)
+                                                   0.45     16.82 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1204/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.12     16.94 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1205/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.19     17.13 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1233/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.10     17.23 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1236/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.07     17.30 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1237/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.07     17.37 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1238/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.08     17.45 r
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_3270/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.14     17.59 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1241/X (sky130_fd_sc_hd__or2_1)
+                                                   0.28     17.87 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1245/Y (sky130_fd_sc_hd__nand2_4)
+                                                   0.14     18.01 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1256/Y (sky130_fd_sc_hd__inv_4)
+                                                   0.06     18.07 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U87/Y (sky130_fd_sc_hd__clkinv_1)
+                                                   0.05     18.12 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1286/Y (sky130_fd_sc_hd__nand2b_1)
+                                                   0.05     18.17 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1289/COUT (sky130_fd_sc_hd__fah_1)
+                                                   0.27     18.44 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1290/COUT (sky130_fd_sc_hd__fa_1)
+                                                   0.40     18.84 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1287/Y (sky130_fd_sc_hd__xnor2_1)
+                                                   0.36     19.20 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1296/Y (sky130_fd_sc_hd__nand4_1)
+                                                   0.13     19.34 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1300/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.09     19.43 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1301/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.04     19.47 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1302/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.10     19.57 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1314/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.06     19.63 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1315/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     19.71 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1316/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.07     19.78 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1327/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.41     20.19 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1394/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.09     20.28 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1395/X (sky130_fd_sc_hd__a211o_1)
+                                                   0.24     20.53 f
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_38_/D (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.53 f
+  data arrival time                                         20.53
+
+  clock clk (rise edge)                           20.00     20.00
+  clock network delay (propagated)                 0.86     20.86
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_38_/CLK (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.86 r
+  clock uncertainty                               -0.25     20.61
+  library setup time                              -0.08     20.54
+  data required time                                        20.54
+  ------------------------------------------------------------------------
+  data required time                                        20.54
+  data arrival time                                        -20.53
+  ------------------------------------------------------------------------
+  slack (MET)                                                0.01
+
+
+
+  Startpoint: accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_6_ (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: max
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (fall edge)                           10.00     10.00
+  clock network delay (propagated)                 0.86     10.86
+
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/clk0 (tt_sram_1rw_64x64_sky130)
+                                                   0.00     10.86 f
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/dout0[32] (tt_sram_1rw_64x64_sky130)
+                                                   0.51     11.37 f ~
+  accelerator/dut/tpu_core_tpu/memory_controller/HFSBUF_55_9/X (sky130_fd_sc_hd__buf_6)
+                                                   0.14     11.51 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U807/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     11.61 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U808/Y (sky130_fd_sc_hd__nand2_2)
+                                                   0.16     11.77 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1007/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.11     11.87 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1010/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.16     12.03 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1059/Y (sky130_fd_sc_hd__o22ai_1)
+                                                   0.22     12.25 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1060/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     12.38 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1066/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     12.52 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1067/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.11     12.63 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1073/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     12.77 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1074/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.11     12.88 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1080/X (sky130_fd_sc_hd__a21o_1)
+                                                   0.17     13.05 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1081/X (sky130_fd_sc_hd__o211a_1)
+                                                   0.13     13.18 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U162/X (sky130_fd_sc_hd__o21a_2)
+                                                   0.28     13.46 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1101/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     13.57 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1111/Y (sky130_fd_sc_hd__nand3_2)
+                                                   0.14     13.71 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1112/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.12     13.83 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1118/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.13     13.95 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1121/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.15     14.11 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1123/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     14.19 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1125/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     14.27 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1126/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.09     14.36 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1128/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.12     14.49 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1133/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     14.60 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1140/X (sky130_fd_sc_hd__or2_1)
+                                                   0.30     14.90 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1144/X (sky130_fd_sc_hd__o22a_1)
+                                                   0.21     15.10 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1149/X (sky130_fd_sc_hd__mux2_2)
+                                                   0.29     15.39 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1150/Y (sky130_fd_sc_hd__xnor2_1)
+                                                   0.15     15.54 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1151/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.20     15.74 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1189/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.07     15.81 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1192/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.21     16.02 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1194/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     16.15 f
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_1068/X (sky130_fd_sc_hd__a21bo_1)
+                                                   0.22     16.37 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1199/X (sky130_fd_sc_hd__xor2_2)
+                                                   0.45     16.82 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1204/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.12     16.94 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1205/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.19     17.13 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1233/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.10     17.23 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1236/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.07     17.30 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1237/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.07     17.37 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1238/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.08     17.45 r
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_3270/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.14     17.59 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1241/X (sky130_fd_sc_hd__or2_1)
+                                                   0.28     17.87 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1245/Y (sky130_fd_sc_hd__nand2_4)
+                                                   0.14     18.01 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1256/Y (sky130_fd_sc_hd__inv_4)
+                                                   0.06     18.07 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U87/Y (sky130_fd_sc_hd__clkinv_1)
+                                                   0.05     18.12 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1286/Y (sky130_fd_sc_hd__nand2b_1)
+                                                   0.05     18.17 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1289/COUT (sky130_fd_sc_hd__fah_1)
+                                                   0.27     18.44 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1290/COUT (sky130_fd_sc_hd__fa_1)
+                                                   0.40     18.84 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1287/Y (sky130_fd_sc_hd__xnor2_1)
+                                                   0.36     19.20 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1296/Y (sky130_fd_sc_hd__nand4_1)
+                                                   0.13     19.34 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1300/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.09     19.43 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1301/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.04     19.47 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1302/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.10     19.57 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1314/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.06     19.63 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1315/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     19.71 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1316/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.07     19.78 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1327/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.41     20.19 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1427/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.09     20.28 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1428/X (sky130_fd_sc_hd__a211o_1)
+                                                   0.24     20.53 f
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_6_/D (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.53 f
+  data arrival time                                         20.53
+
+  clock clk (rise edge)                           20.00     20.00
+  clock network delay (propagated)                 0.86     20.86
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_6_/CLK (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.86 r
+  clock uncertainty                               -0.25     20.61
+  library setup time                              -0.08     20.54
+  data required time                                        20.54
+  ------------------------------------------------------------------------
+  data required time                                        20.54
+  data arrival time                                        -20.53
+  ------------------------------------------------------------------------
+  slack (MET)                                                0.01
+
+
+
+  Startpoint: accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_36_ (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: max
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (fall edge)                           10.00     10.00
+  clock network delay (propagated)                 0.86     10.86
+
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/clk0 (tt_sram_1rw_64x64_sky130)
+                                                   0.00     10.86 f
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/dout0[32] (tt_sram_1rw_64x64_sky130)
+                                                   0.51     11.37 f ~
+  accelerator/dut/tpu_core_tpu/memory_controller/HFSBUF_55_9/X (sky130_fd_sc_hd__buf_6)
+                                                   0.14     11.51 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U807/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     11.61 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U808/Y (sky130_fd_sc_hd__nand2_2)
+                                                   0.16     11.77 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1007/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.11     11.87 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1010/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.16     12.03 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1059/Y (sky130_fd_sc_hd__o22ai_1)
+                                                   0.22     12.25 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1060/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     12.38 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1066/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     12.52 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1067/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.11     12.63 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1073/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     12.77 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1074/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.11     12.88 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1080/X (sky130_fd_sc_hd__a21o_1)
+                                                   0.17     13.05 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1081/X (sky130_fd_sc_hd__o211a_1)
+                                                   0.13     13.18 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U162/X (sky130_fd_sc_hd__o21a_2)
+                                                   0.28     13.46 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1101/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     13.57 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1111/Y (sky130_fd_sc_hd__nand3_2)
+                                                   0.14     13.71 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1112/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.12     13.83 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1118/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.13     13.95 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1121/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.15     14.11 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1123/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     14.19 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1125/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     14.27 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1126/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.09     14.36 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1128/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.12     14.49 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1133/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     14.60 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1140/X (sky130_fd_sc_hd__or2_1)
+                                                   0.30     14.90 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1144/X (sky130_fd_sc_hd__o22a_1)
+                                                   0.21     15.10 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1149/X (sky130_fd_sc_hd__mux2_2)
+                                                   0.29     15.39 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1150/Y (sky130_fd_sc_hd__xnor2_1)
+                                                   0.15     15.54 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1151/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.20     15.74 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1189/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.07     15.81 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1192/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.21     16.02 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1194/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     16.15 f
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_1068/X (sky130_fd_sc_hd__a21bo_1)
+                                                   0.22     16.37 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1199/X (sky130_fd_sc_hd__xor2_2)
+                                                   0.45     16.82 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1204/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.12     16.94 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1205/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.19     17.13 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1233/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.10     17.23 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1236/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.07     17.30 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1237/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.07     17.37 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1238/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.08     17.45 r
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_3270/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.14     17.59 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1241/X (sky130_fd_sc_hd__or2_1)
+                                                   0.28     17.87 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1245/Y (sky130_fd_sc_hd__nand2_4)
+                                                   0.14     18.01 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1256/Y (sky130_fd_sc_hd__inv_4)
+                                                   0.06     18.07 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U87/Y (sky130_fd_sc_hd__clkinv_1)
+                                                   0.05     18.12 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1286/Y (sky130_fd_sc_hd__nand2b_1)
+                                                   0.05     18.17 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1289/COUT (sky130_fd_sc_hd__fah_1)
+                                                   0.27     18.44 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1290/COUT (sky130_fd_sc_hd__fa_1)
+                                                   0.40     18.84 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1287/Y (sky130_fd_sc_hd__xnor2_1)
+                                                   0.36     19.20 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1296/Y (sky130_fd_sc_hd__nand4_1)
+                                                   0.13     19.34 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1300/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.09     19.43 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1301/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.04     19.47 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1302/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.10     19.57 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1314/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.06     19.63 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1315/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     19.71 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1316/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.07     19.78 f
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_3245/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.35     20.13 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1400/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.10     20.23 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1401/X (sky130_fd_sc_hd__a211o_1)
+                                                   0.28     20.51 f
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_36_/D (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.52 f
+  data arrival time                                         20.52
+
+  clock clk (rise edge)                           20.00     20.00
+  clock network delay (propagated)                 0.87     20.87
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_36_/CLK (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.87 r
+  clock uncertainty                               -0.25     20.62
+  library setup time                              -0.09     20.53
+  data required time                                        20.53
+  ------------------------------------------------------------------------
+  data required time                                        20.53
+  data arrival time                                        -20.52
+  ------------------------------------------------------------------------
+  slack (MET)                                                0.01
+
+
+
+  Startpoint: accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_20_ (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: max
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (fall edge)                           10.00     10.00
+  clock network delay (propagated)                 0.86     10.86
+
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/clk0 (tt_sram_1rw_64x64_sky130)
+                                                   0.00     10.86 f
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/dout0[32] (tt_sram_1rw_64x64_sky130)
+                                                   0.51     11.37 f ~
+  accelerator/dut/tpu_core_tpu/memory_controller/HFSBUF_55_9/X (sky130_fd_sc_hd__buf_6)
+                                                   0.14     11.51 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U807/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     11.61 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U808/Y (sky130_fd_sc_hd__nand2_2)
+                                                   0.16     11.77 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1007/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.11     11.87 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1010/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.16     12.03 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1059/Y (sky130_fd_sc_hd__o22ai_1)
+                                                   0.22     12.25 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1060/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     12.38 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1066/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     12.52 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1067/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.11     12.63 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1073/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     12.77 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1074/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.11     12.88 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1080/X (sky130_fd_sc_hd__a21o_1)
+                                                   0.17     13.05 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1081/X (sky130_fd_sc_hd__o211a_1)
+                                                   0.13     13.18 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U162/X (sky130_fd_sc_hd__o21a_2)
+                                                   0.28     13.46 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1101/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     13.57 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1111/Y (sky130_fd_sc_hd__nand3_2)
+                                                   0.14     13.71 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1112/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.12     13.83 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1118/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.13     13.95 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1121/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.15     14.11 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1123/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     14.19 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1125/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     14.27 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1126/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.09     14.36 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1128/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.12     14.49 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1133/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     14.60 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1140/X (sky130_fd_sc_hd__or2_1)
+                                                   0.30     14.90 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1144/X (sky130_fd_sc_hd__o22a_1)
+                                                   0.21     15.10 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1149/X (sky130_fd_sc_hd__mux2_2)
+                                                   0.29     15.39 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1150/Y (sky130_fd_sc_hd__xnor2_1)
+                                                   0.15     15.54 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1151/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.20     15.74 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1189/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.07     15.81 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1192/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.21     16.02 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1194/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     16.15 f
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_1068/X (sky130_fd_sc_hd__a21bo_1)
+                                                   0.22     16.37 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1199/X (sky130_fd_sc_hd__xor2_2)
+                                                   0.45     16.82 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1204/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.12     16.94 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1205/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.19     17.13 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1233/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.10     17.23 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1236/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.07     17.30 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1237/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.07     17.37 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1238/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.08     17.45 r
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_3270/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.14     17.59 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1241/X (sky130_fd_sc_hd__or2_1)
+                                                   0.28     17.87 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1245/Y (sky130_fd_sc_hd__nand2_4)
+                                                   0.14     18.01 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1256/Y (sky130_fd_sc_hd__inv_4)
+                                                   0.06     18.07 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U87/Y (sky130_fd_sc_hd__clkinv_1)
+                                                   0.05     18.12 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1286/Y (sky130_fd_sc_hd__nand2b_1)
+                                                   0.05     18.17 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1289/COUT (sky130_fd_sc_hd__fah_1)
+                                                   0.27     18.44 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1290/COUT (sky130_fd_sc_hd__fa_1)
+                                                   0.40     18.84 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1287/Y (sky130_fd_sc_hd__xnor2_1)
+                                                   0.36     19.20 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1296/Y (sky130_fd_sc_hd__nand4_1)
+                                                   0.13     19.34 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1300/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.09     19.43 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1301/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.04     19.47 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1302/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.10     19.57 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1314/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.06     19.63 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1315/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     19.71 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1316/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.07     19.78 f
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_3245/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.35     20.13 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1319/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.11     20.24 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1320/X (sky130_fd_sc_hd__a211o_1)
+                                                   0.25     20.48 f
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_20_/D (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.48 f
+  data arrival time                                         20.48
+
+  clock clk (rise edge)                           20.00     20.00
+  clock network delay (propagated)                 0.86     20.86
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_20_/CLK (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.86 r
+  clock uncertainty                               -0.25     20.61
+  library setup time                              -0.08     20.54
+  data required time                                        20.54
+  ------------------------------------------------------------------------
+  data required time                                        20.54
+  data arrival time                                        -20.48
+  ------------------------------------------------------------------------
+  slack (MET)                                                0.05
+
+
+
+  Startpoint: accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_4_ (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: max
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (fall edge)                           10.00     10.00
+  clock network delay (propagated)                 0.86     10.86
+
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/clk0 (tt_sram_1rw_64x64_sky130)
+                                                   0.00     10.86 f
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/dout0[32] (tt_sram_1rw_64x64_sky130)
+                                                   0.51     11.37 f ~
+  accelerator/dut/tpu_core_tpu/memory_controller/HFSBUF_55_9/X (sky130_fd_sc_hd__buf_6)
+                                                   0.14     11.51 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U807/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     11.61 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U808/Y (sky130_fd_sc_hd__nand2_2)
+                                                   0.16     11.77 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1007/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.11     11.87 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1010/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.16     12.03 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1059/Y (sky130_fd_sc_hd__o22ai_1)
+                                                   0.22     12.25 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1060/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     12.38 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1066/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     12.52 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1067/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.11     12.63 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1073/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     12.77 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1074/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.11     12.88 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1080/X (sky130_fd_sc_hd__a21o_1)
+                                                   0.17     13.05 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1081/X (sky130_fd_sc_hd__o211a_1)
+                                                   0.13     13.18 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U162/X (sky130_fd_sc_hd__o21a_2)
+                                                   0.28     13.46 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1101/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     13.57 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1111/Y (sky130_fd_sc_hd__nand3_2)
+                                                   0.14     13.71 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1112/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.12     13.83 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1118/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.13     13.95 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1121/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.15     14.11 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1123/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     14.19 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1125/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     14.27 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1126/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.09     14.36 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1128/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.12     14.49 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1133/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     14.60 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1140/X (sky130_fd_sc_hd__or2_1)
+                                                   0.30     14.90 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1144/X (sky130_fd_sc_hd__o22a_1)
+                                                   0.21     15.10 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1149/X (sky130_fd_sc_hd__mux2_2)
+                                                   0.29     15.39 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1150/Y (sky130_fd_sc_hd__xnor2_1)
+                                                   0.15     15.54 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1151/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.20     15.74 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1189/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.07     15.81 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1192/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.21     16.02 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1194/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     16.15 f
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_1068/X (sky130_fd_sc_hd__a21bo_1)
+                                                   0.22     16.37 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1199/X (sky130_fd_sc_hd__xor2_2)
+                                                   0.45     16.82 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1204/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.12     16.94 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1205/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.19     17.13 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1233/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.10     17.23 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1236/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.07     17.30 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1237/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.07     17.37 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1238/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.08     17.45 r
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_3270/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.14     17.59 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1241/X (sky130_fd_sc_hd__or2_1)
+                                                   0.28     17.87 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1245/Y (sky130_fd_sc_hd__nand2_4)
+                                                   0.14     18.01 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1256/Y (sky130_fd_sc_hd__inv_4)
+                                                   0.06     18.07 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U87/Y (sky130_fd_sc_hd__clkinv_1)
+                                                   0.05     18.12 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1286/Y (sky130_fd_sc_hd__nand2b_1)
+                                                   0.05     18.17 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1289/COUT (sky130_fd_sc_hd__fah_1)
+                                                   0.27     18.44 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1290/COUT (sky130_fd_sc_hd__fa_1)
+                                                   0.40     18.84 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1287/Y (sky130_fd_sc_hd__xnor2_1)
+                                                   0.36     19.20 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1296/Y (sky130_fd_sc_hd__nand4_1)
+                                                   0.13     19.34 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1300/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.09     19.43 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1301/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.04     19.47 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1302/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.10     19.57 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1314/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.06     19.63 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1315/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     19.71 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1316/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.07     19.78 f
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_3245/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.35     20.13 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1433/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.09     20.22 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1434/X (sky130_fd_sc_hd__a211o_1)
+                                                   0.26     20.47 f
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_4_/D (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.47 f
+  data arrival time                                         20.47
+
+  clock clk (rise edge)                           20.00     20.00
+  clock network delay (propagated)                 0.87     20.87
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_4_/CLK (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.87 r
+  clock uncertainty                               -0.25     20.62
+  library setup time                              -0.08     20.53
+  data required time                                        20.53
+  ------------------------------------------------------------------------
+  data required time                                        20.53
+  data arrival time                                        -20.47
+  ------------------------------------------------------------------------
+  slack (MET)                                                0.06
+
+
+
+  Startpoint: accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_37_ (rising edge-triggered flip-flop clocked by clk)
+  Mode: functional
+  Corner: tt
+  Scenario: functional_tt
+  Path Group: clk
+  Path Type: max
+
+  Point                                            Incr      Path  
+  ------------------------------------------------------------------------
+  clock clk (fall edge)                           10.00     10.00
+  clock network delay (propagated)                 0.86     10.86
+
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/clk0 (tt_sram_1rw_64x64_sky130)
+                                                   0.00     10.86 f
+  accelerator/dut/tpu_core_tpu/memory_controller/memory/size_512_macro/dout0[32] (tt_sram_1rw_64x64_sky130)
+                                                   0.51     11.37 f ~
+  accelerator/dut/tpu_core_tpu/memory_controller/HFSBUF_55_9/X (sky130_fd_sc_hd__buf_6)
+                                                   0.14     11.51 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U807/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     11.61 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U808/Y (sky130_fd_sc_hd__nand2_2)
+                                                   0.16     11.77 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1007/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.11     11.87 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1010/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.16     12.03 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1059/Y (sky130_fd_sc_hd__o22ai_1)
+                                                   0.22     12.25 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1060/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     12.38 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1066/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     12.52 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1067/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.11     12.63 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1073/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.14     12.77 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1074/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.11     12.88 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1080/X (sky130_fd_sc_hd__a21o_1)
+                                                   0.17     13.05 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1081/X (sky130_fd_sc_hd__o211a_1)
+                                                   0.13     13.18 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U162/X (sky130_fd_sc_hd__o21a_2)
+                                                   0.28     13.46 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1101/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     13.57 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1111/Y (sky130_fd_sc_hd__nand3_2)
+                                                   0.14     13.71 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1112/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.12     13.83 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1118/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.13     13.95 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1121/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.15     14.11 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1123/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     14.19 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1125/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     14.27 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1126/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.09     14.36 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1128/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.12     14.49 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1133/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.11     14.60 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1140/X (sky130_fd_sc_hd__or2_1)
+                                                   0.30     14.90 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1144/X (sky130_fd_sc_hd__o22a_1)
+                                                   0.21     15.10 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1149/X (sky130_fd_sc_hd__mux2_2)
+                                                   0.29     15.39 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1150/Y (sky130_fd_sc_hd__xnor2_1)
+                                                   0.15     15.54 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1151/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.20     15.74 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1189/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.07     15.81 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1192/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.21     16.02 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1194/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.13     16.15 f
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_1068/X (sky130_fd_sc_hd__a21bo_1)
+                                                   0.22     16.37 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1199/X (sky130_fd_sc_hd__xor2_2)
+                                                   0.45     16.82 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1204/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.12     16.94 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1205/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.19     17.13 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1233/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.10     17.23 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1236/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.07     17.30 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1237/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.07     17.37 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1238/Y (sky130_fd_sc_hd__o211ai_1)
+                                                   0.08     17.45 r
+  accelerator/dut/tpu_core_tpu/memory_controller/ctmTdsLR_1_3270/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.14     17.59 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1241/X (sky130_fd_sc_hd__or2_1)
+                                                   0.28     17.87 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1245/Y (sky130_fd_sc_hd__nand2_4)
+                                                   0.14     18.01 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1256/Y (sky130_fd_sc_hd__inv_4)
+                                                   0.06     18.07 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U87/Y (sky130_fd_sc_hd__clkinv_1)
+                                                   0.05     18.12 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1286/Y (sky130_fd_sc_hd__nand2b_1)
+                                                   0.05     18.17 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1289/COUT (sky130_fd_sc_hd__fah_1)
+                                                   0.27     18.44 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1290/COUT (sky130_fd_sc_hd__fa_1)
+                                                   0.40     18.84 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1287/Y (sky130_fd_sc_hd__xnor2_1)
+                                                   0.36     19.20 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1296/Y (sky130_fd_sc_hd__nand4_1)
+                                                   0.13     19.34 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1300/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.09     19.43 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1301/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.04     19.47 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1302/Y (sky130_fd_sc_hd__o21ai_1)
+                                                   0.10     19.57 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1314/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.06     19.63 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1315/Y (sky130_fd_sc_hd__nand2_1)
+                                                   0.08     19.71 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1316/Y (sky130_fd_sc_hd__inv_1)
+                                                   0.07     19.78 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1375/Y (sky130_fd_sc_hd__a21oi_1)
+                                                   0.32     20.10 r
+  accelerator/dut/tpu_core_tpu/memory_controller/U1397/Y (sky130_fd_sc_hd__nor2_1)
+                                                   0.09     20.19 f
+  accelerator/dut/tpu_core_tpu/memory_controller/U1398/X (sky130_fd_sc_hd__a211o_1)
+                                                   0.26     20.45 f
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_37_/D (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.45 f
+  data arrival time                                         20.45
+
+  clock clk (rise edge)                           20.00     20.00
+  clock network delay (propagated)                 0.87     20.87
+  accelerator/dut/tpu_core_tpu/memory_controller/write_word_reg_37_/CLK (sky130_fd_sc_hd__dfxtp_4)
+                                                   0.00     20.87 r
+  clock uncertainty                               -0.25     20.62
+  library setup time                              -0.08     20.53
+  data required time                                        20.53
+  ------------------------------------------------------------------------
+  data required time                                        20.53
+  data arrival time                                        -20.45
+  ------------------------------------------------------------------------
+  slack (MET)                                                0.08
+
+
+1

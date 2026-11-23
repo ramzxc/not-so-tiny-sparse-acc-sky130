@@ -16,8 +16,7 @@ routed for a 20 ns clock on the existing 8×2 floorplan.
   59.54% optimized placement utilization and zero routing DRCs, opens,
   and antenna violations.
 
-This is a separate core layout for review. The Tiny Tapeout wrapper and
-submission workflow on the main branch use a different interface.
+The wrapper uses the matching packaged views under `macro/acc_hard_macro/`.
 The run still reported internal setup slack of -0.01 ns, generic I/O
 setup violations, and 35 floating wire fragments on each supply net.
 No standard cells or hard macros were reported floating. Full-chip
