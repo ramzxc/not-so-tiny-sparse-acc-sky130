@@ -1,5 +1,5 @@
 // IC Compiler II Version Y-2026.03 Verilog Writer
-// Generated on 11/23/2026 at 16:57:49
+// Generated on 11/23/2026 at 17:10:34
 // Library Name: acc_hard_macro.ndm
 // Block Name: acc_hard_macro
 // User Label: optimized
