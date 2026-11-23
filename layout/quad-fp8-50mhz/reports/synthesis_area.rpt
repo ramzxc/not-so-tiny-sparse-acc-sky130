@@ -1,0 +1,83 @@
+ 
+****************************************
+Report : area
+Design : acc_native_fp8_macro
+Version: Y-2026.03-SP1
+Date   : Mon Nov 23 15:59:53 2026
+****************************************
+
+Information: Updating design information... (UID-85)
+Warning: Design 'acc_native_fp8_macro' contains 1 high-fanout nets. A fanout number of 1000 will be used for delay calculations involving these nets. (TIM-134)
+Library(s) Used:
+
+    sky130_fd_sc_hd__tt_025C_1v80 (File: /docker/projects/egru/acc/archive/sky130_20261102_192346/pdk/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.db)
+    tt_sram_1rw_64x64_sky130_TT_1p8V_25C_lib (File: /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130_TT_1p8V_25C.db)
+
+Number of ports:                         5535
+Number of nets:                         16030
+Number of cells:                        11418
+Number of combinational cells:           9494
+Number of sequential cells:              1899
+Number of macros/black boxes:               1
+Number of buf/inv:                       2026
+Number of references:                       6
+
+Combinational area:              76415.787549
+Buf/Inv area:                     7604.793361
+Noncombinational area:           40402.497480
+Macro/Black Box area:            97582.710938
+Net Interconnect area:      undefined  (Wire load has zero net area)
+
+Total cell area:                214400.995967
+Total area:                 undefined
+
+Hierarchical area distribution
+------------------------------
+
+                                  Global cell area               Local cell area
+                                  --------------------  ---------------------------------- 
+Hierarchical cell                 Absolute     Percent  Combi-      Noncombi-   Black-
+                                  Total        Total    national    national    boxes       Design
+--------------------------------  -----------  -------  ----------  ----------  ----------  ---------------------------------------------------------------------------------------------------
+acc_native_fp8_macro              214400.9960    100.0     78.8256     52.5504      0.0000  acc_native_fp8_macro
+accelerator                       214269.6200     99.9    618.0928    297.7856      0.0000  uart_batch_fp8_accel_INGRESS_BYTES2
+accelerator/bridge                 11499.7789      5.4   5355.1359   3722.3198      0.0000  axi_qpi_fp8_bridge_2_1
+accelerator/bridge/serial_memory    2422.3232      1.1   1784.2112    638.1120      0.0000  qpi_burst_engine
+accelerator/dut                   185874.8878     86.7     17.5168      0.0000      0.0000  tpu_COMPUTE_WIDTH4_SRAM_BYTES512
+accelerator/dut/axi_adapter         7006.7198      3.3   3220.5887   3786.1310      0.0000  axi_master_adapter_AXI_DATA_BYTES8_AXI_ID_WIDTH4
+accelerator/dut/dma_engine         13624.3164      6.4   8838.4766   4785.8398      0.0000  dma_COMPUTE_WIDTH4_DRAM_DATA_BYTES8
+accelerator/dut/instruction_fifo    5004.7998      2.3   2197.1071   2807.6927      0.0000  inst_fifo_FIFO_DEPTH2
+accelerator/dut/tpu_core_tpu      160221.5350     74.7    100.0960      0.0000      0.0000  tpu_core_COMPUTE_WIDTH4_SRAM_BYTES512_WEIGHT_BUFFER_DEPTH32_UNIFIED_BUFFER_DEPTH64_REGISTER_DEPTH32
+accelerator/dut/tpu_core_tpu/activation_core
+                                    3365.7279      1.6   1834.2592   1531.4687      0.0000  activation_COMPUTE_WIDTH4
+accelerator/dut/tpu_core_tpu/activation_flow_controller
+                                    4643.2031      2.2   2792.6784   1850.5247      0.0000  activation_ctrl_COMPUTE_WIDTH4_META_FIFO_DEPTH4_UB_ROWS64
+accelerator/dut/tpu_core_tpu/decoder
+                                    2745.1327      1.3   1298.7456   1446.3871      0.0000  inst_decoder
+accelerator/dut/tpu_core_tpu/memory_controller
+                                  118849.3569     55.4  17277.8205   3977.5646      0.0000  mem_ctrl_SRAM_BYTES512_COMPUTE_WIDTH4_UB_ROWS64_ACC_ROWS32_WB_ROWS32
+accelerator/dut/tpu_core_tpu/memory_controller/memory
+                                   97593.9717     45.5     11.2608      0.0000  97582.7109  shared_sram_SRAM_BYTES512
+accelerator/dut/tpu_core_tpu/sparsity_flow_controller
+                                    1537.7248      0.7    793.2608    744.4640      0.0000  sparsity_ctrl_META_FIFO_DEPTH2_UB_ROWS64
+accelerator/dut/tpu_core_tpu/vpu_core
+                                   19388.5948      9.0    987.1968    744.4640      0.0000  vpu_COMPUTE_WIDTH4
+accelerator/dut/tpu_core_tpu/vpu_core/lanes[0].mac
+                                    4414.2335      2.1   3393.2544   1020.9792      0.0000  mac_unit_3
+accelerator/dut/tpu_core_tpu/vpu_core/lanes[1].mac
+                                    4414.2335      2.1   3393.2544   1020.9792      0.0000  mac_unit_2
+accelerator/dut/tpu_core_tpu/vpu_core/lanes[2].mac
+                                    4414.2335      2.1   3393.2544   1020.9792      0.0000  mac_unit_1
+accelerator/dut/tpu_core_tpu/vpu_core/lanes[3].mac
+                                    4414.2335      2.1   3393.2544   1020.9792      0.0000  mac_unit_0
+accelerator/dut/tpu_core_tpu/vpu_flow_controller
+                                    7612.3006      3.6   4506.8223   3105.4783      0.0000  vpu_ctrl_COMPUTE_WIDTH4_META_FIFO_DEPTH4
+accelerator/dut/tpu_core_tpu/weight_flow_controller
+                                    1979.3983      0.9   1043.5008    935.8976      0.0000  weight_load_ctrl_COMPUTE_WIDTH4_REQ_FIFO_DEPTH8
+accelerator/program_ctrl            8519.4206      4.0   6009.5135   2509.9071      0.0000  micro_ctrl
+accelerator/stream                  7459.6542      3.5   3308.1727   2658.7999      0.0000  stream_io_CLKS_PER_BIT87_INGRESS_BYTES2_SLOT_BITS3
+accelerator/stream/uart_input       1492.6816      0.7    769.4880    723.1936      0.0000  uart_rx_CLKS_PER_BIT87
+--------------------------------  -----------  -------  ----------  ----------  ----------  ---------------------------------------------------------------------------------------------------
+Total                                                   76415.7875  40402.4975  97582.7109
+
+1

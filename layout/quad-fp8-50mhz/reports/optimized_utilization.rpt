@@ -1,0 +1,26 @@
+****************************************
+Report : report_utilization
+Design : acc_native_fp8_macro
+Version: Y-2026.03
+Date   : Mon Nov 23 16:06:47 2026
+****************************************
+Utilization Ratio:			0.5954
+Utilization options:
+ - Area calculation based on:		site_row of block acc_native_fp8_macro
+ - Categories of objects excluded:	hard_macros macro_keepouts soft_macros io_cells hard_blockages 
+Total Area:				281469.9520
+Total Capacity Area:			174252.1216
+Total Area of cells:			103748.2528
+Area of excluded objects:
+ - hard_macros         :		97728.7296
+ - macro_keepouts      :		8040.2112
+ - soft_macros         :		0.0000
+ - io_cells            :		0.0000
+ - hard_blockages      :		1448.8896
+Total Area of excluded objects:		107217.8304
+Ratio of excluded objects:		0.3809
+
+Utilization of site-rows with:
+ - Site 'unithd':				0.5954
+
+0.5954

@@ -1,0 +1,61 @@
+{
+  "run": "quad_local_fc_50mhz_20261123_155755_x3PhPW",
+  "checkpoint": "acc_native_fp8_macro/optimized",
+  "top": "acc_native_fp8_macro",
+  "cell_count": 295,
+  "unresolved_cells": 0,
+  "bounding_box_um": [
+    [
+      2.53,
+      0.0
+    ],
+    [
+      1364.51,
+      214.88
+    ]
+  ],
+  "gds_precision_m": 9.999999999999999e-11,
+  "sram": "tt_sram_1rw_64x64_sky130",
+  "top_labels": [
+    "VGND",
+    "VPWR",
+    "clk",
+    "qspi_dq_i[0]",
+    "qspi_dq_i[1]",
+    "qspi_dq_i[2]",
+    "qspi_dq_i[3]",
+    "rst_n",
+    "uart_rx_i",
+    "uio_oe[0]",
+    "uio_oe[1]",
+    "uio_oe[2]",
+    "uio_oe[3]",
+    "uio_oe[4]",
+    "uio_oe[5]",
+    "uio_oe[6]",
+    "uio_oe[7]",
+    "uio_out[0]",
+    "uio_out[1]",
+    "uio_out[2]",
+    "uio_out[3]",
+    "uio_out[4]",
+    "uio_out[5]",
+    "uio_out[6]",
+    "uio_out[7]",
+    "uo_out[0]",
+    "uo_out[1]",
+    "uo_out[2]",
+    "uo_out[3]",
+    "uo_out[4]",
+    "uo_out[5]",
+    "uo_out[6]",
+    "uo_out[7]"
+  ],
+  "mac_instances_in_matching_routed_netlist": [
+    "lanes_0__mac",
+    "lanes_1__mac",
+    "lanes_2__mac",
+    "lanes_3__mac"
+  ],
+  "gds_sha256": "13c3b33a2a9be6b2921c7333f66869e0d15e5fe015dd9c66ef2a38091aebfe5c"
+}
