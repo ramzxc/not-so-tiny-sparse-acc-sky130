@@ -1,6 +1,6 @@
 Tiny Tapeout hard macro for the four-lane FP8 accelerator.
 
-ICC2 source: quad_local_fc_50mhz_20261123_155755_x3PhPW, optimized checkpoint.
+ICC2 source: quad_local_fc_50mhz_20261123_155755_x3PhPW, optimized checkpoint, with standard-cell fillers and local route repair.
 The wrapper retains the acc_hard_macro interface. All active physical views
 derive from the same run. The top cell was renamed consistently, and the
 GDS boundary and database units were normalized for the wrapper flow.

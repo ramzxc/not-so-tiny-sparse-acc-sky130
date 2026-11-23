@@ -3,7 +3,7 @@ Secondary net will be checked together from primary net. They will be treated as
 Primary Net : VPWR    Secondary Net:
 Primary Net : VGND    Secondary Net:
 Loading cell instances...
-Number of Standard Cells: 13315
+Number of Standard Cells: 31715
 Number of Macro Cells: 1
 Number of IO Pad Cells: 0
 Number of Blocks: 0
@@ -34,6 +34,5 @@ Number of VGND Terminals: 70
   Number of floating terminals: 0
   Number of floating hierarchical blocks: 0
 ************************************************************
-Successfully written connectivity statistics to /docker/projects/tapeout/not-so-tiny-sparse-acc-sky130/pnr/runs/quad_local_fc_50mhz_20261123_155755_x3PhPW/pnr/reports/final_pg_clusters.txt.
-Overall runtime: 0 seconds.
+Overall runtime: 1 seconds.
 {PATH_4_5 PATH_4_7 PATH_4_9 PATH_4_11 PATH_4_13 PATH_4_15 PATH_4_17 PATH_4_19 PATH_4_21 PATH_4_23 PATH_4_25 PATH_4_27 PATH_4_29 PATH_4_31 PATH_4_33 PATH_4_35 PATH_4_37 PATH_4_39 PATH_4_41 PATH_4_43 PATH_4_45 PATH_4_47 PATH_4_49 PATH_4_51 PATH_4_53 PATH_4_55 PATH_4_57 PATH_4_59 PATH_4_61 PATH_4_63 PATH_4_65 PATH_4_67 PATH_4_69 PATH_4_71 PATH_4_73 PATH_4_75 PATH_4_77 PATH_4_79 PATH_4_81 PATH_4_83 PATH_4_85 PATH_4_87 PATH_4_89 PATH_4_91 PATH_4_93 PATH_4_95 PATH_4_97 PATH_4_99 PATH_4_101 PATH_4_103 PATH_4_105 PATH_4_107 PATH_4_109 PATH_4_111 PATH_4_113 PATH_4_115 PATH_4_117 PATH_4_119 PATH_4_121 PATH_4_123 PATH_4_125 PATH_4_127 PATH_4_129 PATH_4_131 PATH_4_133 PATH_4_135 PATH_4_137 PATH_4_139 PATH_4_141 PATH_4_143}

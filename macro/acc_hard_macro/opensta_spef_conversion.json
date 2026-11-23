@@ -1,8 +1,8 @@
 {
   "source": "acc_hard_macro.sky130_nominal_25.spef",
   "output": "acc_hard_macro.opensta.spef.gz",
-  "escaped_name_map_entries": 0,
-  "source_sha256": "2b9da1a8485908246957b15da7bca56d966a10ed6561be8bc45e005efdbba899",
-  "decoded_output_sha256": "2b9da1a8485908246957b15da7bca56d966a10ed6561be8bc45e005efdbba899",
+  "escaped_name_map_entries": 18400,
+  "source_sha256": "0151c7fc2820880949506a0e1b5b74fba1e2053412c45e1853042eaff46a69e2",
+  "decoded_output_sha256": "f2d7761d2be6f833c87f7d7bd357cb96a1a6ab30b239d92747bd08ea3e3b811f",
   "rc_sections_unchanged": true
 }

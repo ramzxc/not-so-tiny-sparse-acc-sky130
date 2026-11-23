@@ -1,17 +1,17 @@
 {
   "schema": 1,
-  "source_def": "summary/acc_hard_macro.def",
-  "source_def_sha256": "d837a83f44cfb13423c5a3df8dcefd76bfa2d057c56b109531eb120c798409ba",
+  "source_def": "filled-summary/acc_hard_macro.def",
+  "source_def_sha256": "e2e1c4b8b4f337620d2bef1f46f7814bdeb4a921ca435d7ccfcf851ea3bd0ec4",
   "source_lefs_sha256": {
     "sky130_fd_sc_hd__nom.tlef": "1a18b353fb5457caf0eca5b3cb28b2c0c9bbacdbbdeee7c4fc64a115932066c2",
     "sky130_fd_sc_hd.lef": "e474188a0756bb8a03ce2b4c56c20f4ce37dc4747ed45980745914c29a42afdf",
     "tt_sram_1rw_64x64_sky130.lef": "25561c0ed3d25d88d22747a6ebeb602f4e639073380e6dec8b8ccc8261457a06"
   },
   "submitted_assets_sha256": {
-    "acc_hard_macro.gds": "46c19736c7b8b421c02bbdf9d93bff70ce265e0babaa1da483379fb630f4366b",
+    "acc_hard_macro.gds": "87e977f2b112c3d0c0899f59b5101b592d59c9b2df8ed144e6bc0fcf5135c56b",
     "acc_hard_macro.lef": "fd5bc1aaebbd259d56afeeeada7c24425ca0b2fa6242421233d14c7e62bb79fc",
-    "acc_hard_macro.v": "23ba3e262947ff3940ee6448297a71f2cf5750f7168730d0e661e78e42c7535f",
-    "acc_hard_macro.lvs.spice": "35913517497b5b0b7ecdfd8df30f177839882e64c98c0ca389d8ea7fc983d853"
+    "acc_hard_macro.v": "11254c05ddfd79f960091b873b5bb44b4428175acd6a6e513e598391a446d173",
+    "acc_hard_macro.lvs.spice": "39bd2422b4368ee5b9862a7fdb963e2a8c4c4a0e6acddfbb408b405cd879c5dd"
   },
   "method": "OpenROAD readDef; dbWire.getLength for non-PG regular NETS; LEF master area; union of DEF rows minus macro+halo and placement blockages",
   "wire_exclusions": "SRAM internal wiring, POWER/GROUND, SPECIALNETS shapes (including signal patches), via vertical lengths and pin metal",
@@ -88,6 +88,9 @@
     "sky130_fd_sc_hd__fa_1": 81,
     "sky130_fd_sc_hd__fa_2": 1,
     "sky130_fd_sc_hd__fah_1": 3,
+    "sky130_fd_sc_hd__fill_1": 4179,
+    "sky130_fd_sc_hd__fill_2": 3894,
+    "sky130_fd_sc_hd__fill_4": 10327,
     "sky130_fd_sc_hd__inv_1": 184,
     "sky130_fd_sc_hd__inv_2": 885,
     "sky130_fd_sc_hd__inv_4": 2,
@@ -171,6 +174,7 @@
   "area_um2": {
     "functional": 104318.8,
     "macro": 97582.710225,
+    "fill": 66657.68,
     "tap": 3275.6416,
     "rows": 281469.952,
     "available_rows": 174839.1753
@@ -180,7 +184,7 @@
   },
   "wirelength_um": {
     "clock": 16438.660000000007,
-    "signal": 398984.0949999994
+    "signal": 398984.5899999993
   },
-  "wirelength_total_um": 415422.7549999994
+  "wirelength_total_um": 415423.24999999936
 }

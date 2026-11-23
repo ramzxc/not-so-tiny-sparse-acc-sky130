@@ -1,20 +1,21 @@
 {
-  "source_export": "quad_local_fc_50mhz_20261123_155755_x3PhPW",
-  "source_gds_sha256": "13c3b33a2a9be6b2921c7333f66869e0d15e5fe015dd9c66ef2a38091aebfe5c",
-  "packaging": "Renamed ICC2 top cell consistently for the Tiny Tapeout macro interface.",
+  "source_export": "quad_local_fc_50mhz_20261123_155755_x3PhPW optimized, then standard-cell filler insertion",
+  "source_gds_sha256": "d229c1f9db26ce7b6df7654cc13e6b9ad6028ebd36c80767e07074c7b52ebd30",
+  "packaging": "Renamed the ICC2 top cell consistently for the Tiny Tapeout macro interface.",
   "sha256": {
-    "acc_hard_macro.gds": "46c19736c7b8b421c02bbdf9d93bff70ce265e0babaa1da483379fb630f4366b",
+    "acc_hard_macro.gds": "87e977f2b112c3d0c0899f59b5101b592d59c9b2df8ed144e6bc0fcf5135c56b",
     "acc_hard_macro.lef": "fd5bc1aaebbd259d56afeeeada7c24425ca0b2fa6242421233d14c7e62bb79fc",
-    "acc_hard_macro.v": "23ba3e262947ff3940ee6448297a71f2cf5750f7168730d0e661e78e42c7535f",
-    "acc_hard_macro.sdc": "12b12248ac5fce585ea6a078ca0110e6a42ee58f0cd356f1f8313cb28b9bac66"
+    "acc_hard_macro.sky130_nominal_25.spef": "0151c7fc2820880949506a0e1b5b74fba1e2053412c45e1853042eaff46a69e2",
+    "acc_hard_macro.v": "11254c05ddfd79f960091b873b5bb44b4428175acd6a6e513e598391a446d173",
+    "acc_hard_macro.sdc": "ef3c4883857f387b2a302d353415bd3fc904163aa3f5c8e9c1fc8db80e7ebd62"
   },
   "pr_boundary": "boundary_validation.json: only added top-level SKY130 235/4 boundary; all other GDS records unchanged",
   "gds_units": "units_validation.json: exact 0.1nm to 1nm DBU conversion without rounding",
   "lef_obstructions": "Removed only empty M1 margins after checking all GDS M1 geometry; pins and GDS unchanged. Regenerate with scripts/fix_core_lef_obstructions.py.",
   "lvs_inputs": {
-    "macro/acc_hard_macro/acc_hard_macro.v": "23ba3e262947ff3940ee6448297a71f2cf5750f7168730d0e661e78e42c7535f",
+    "macro/acc_hard_macro/acc_hard_macro.v": "11254c05ddfd79f960091b873b5bb44b4428175acd6a6e513e598391a446d173",
     "memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.lvs.sp": "aecf2d431c88a9e6a144f23c69ec1eae3442e8054eb3da9a8ea30721d195bf3b",
-    "macro/acc_hard_macro/acc_hard_macro.lvs.spice": "35913517497b5b0b7ecdfd8df30f177839882e64c98c0ca389d8ea7fc983d853",
+    "macro/acc_hard_macro/acc_hard_macro.lvs.spice": "39bd2422b4368ee5b9862a7fdb963e2a8c4c4a0e6acddfbb408b405cd879c5dd",
     "macro/acc_hard_macro/sram.lvs_micron.spice": "f6e25d29d38a08721eed0578a2933c8f27126d5644952567706ff15f3e66b163"
   },
   "lvs_nfet_rule": {

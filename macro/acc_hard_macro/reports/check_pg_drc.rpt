@@ -1,5 +1,5 @@
-Command check_pg_drc started  at Mon Nov 23 16:06:50 2026
-Command check_pg_drc finished at Mon Nov 23 16:06:51 2026
-CPU usage for check_pg_drc: 3.95 seconds ( 0.00 hours)
-Elapsed time for check_pg_drc: 0.51 seconds ( 0.00 hours)
+Command check_pg_drc started  at Mon Nov 23 16:57:35 2026
+Command check_pg_drc finished at Mon Nov 23 16:57:39 2026
+CPU usage for check_pg_drc: 4.09 seconds ( 0.00 hours)
+Elapsed time for check_pg_drc: 4.09 seconds ( 0.00 hours)
 No errors found.
