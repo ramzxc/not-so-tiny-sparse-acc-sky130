@@ -1,8 +1,0 @@
-# Exhaustive binary16 hard-activation checks against an independent Python oracle.
-BUILD ?= /tmp/acc-activation
-.PHONY: all
-all:
-	mkdir -p $(BUILD)
-	python3 build_activation_vectors.py $(abspath $(BUILD))/reference.hex
-	verilator --binary --timing -j 2 -Wno-fatal --top-module tb_activation_shared --Mdir $(BUILD) -I../src/legacy -I../src/legacy/core ../src/legacy/core/exec_unit.sv rtl/tb/tb_activation_shared.sv
-	$(abspath $(BUILD))/Vtb_activation_shared +REFERENCE=$(abspath $(BUILD))/reference.hex

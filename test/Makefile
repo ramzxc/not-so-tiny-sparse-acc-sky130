@@ -15,11 +15,9 @@ VERILOG_SOURCES += $(ROOT)/macro/acc_hard_macro/acc_hard_macro.v
 VERILOG_SOURCES += $(CURDIR)/gate_level_netlist.v
 else
 SIM ?= verilator
-RTL_FILELIST := $(shell cat $(ROOT)/src/sources.f)
-RTL_INC_DIRS := $(patsubst +incdir+%,%,$(filter +incdir+%,$(RTL_FILELIST)))
-VERILOG_SOURCES = $(addprefix $(ROOT)/,$(filter-out +incdir+%,$(RTL_FILELIST)))
+VERILOG_SOURCES = $(addprefix $(ROOT)/,$(shell cat $(ROOT)/src/sources.f))
 VERILOG_SOURCES += $(ROOT)/src/wrapper/project.v
-COMPILE_ARGS += -DCOCOTB_SIM $(addprefix -I$(ROOT)/,$(RTL_INC_DIRS)) -Wno-fatal --timing --timescale-override 1ns/1ps
+COMPILE_ARGS += -DCOCOTB_SIM -Wno-fatal --timing --timescale-override 1ns/1ps
 endif
 VERILOG_SOURCES += $(ROOT)/memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.v
 VERILOG_SOURCES += $(CURDIR)/rtl/tb/tb_quad_wrapper.sv $(CURDIR)/rtl/models/qspi_psram_model.sv

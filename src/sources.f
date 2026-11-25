@@ -1,4 +1,3 @@
-+incdir+src/rtl/include
 src/rtl/core/tpu_pkg.sv
 src/rtl/core/activation.sv
 src/rtl/core/activation_ctrl.sv

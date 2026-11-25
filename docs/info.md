@@ -54,8 +54,7 @@ The new SRAM map requires a new physical build.
 The source list is `src/sources.f`. The accelerator datapath, DMA and
 program sequencer live in `src/rtl/core/`. UART and the QPI bridge live in
 `src/rtl/peripherals/`. The synthesizable accelerator and SRAM macro
-wrappers live in `src/rtl/macros/`. Legacy FP16 RTL uses its own file list
-at `src/legacy/sources.f`. Testbenches and peripheral models are under
+wrappers live in `src/rtl/macros/`. Testbenches and peripheral models are under
 `test/rtl/`. The wrapper smoke test exercises QPI boot,
 UART ingress, SRAM DMA, an FP8 vector operation, and UART egress through
 the public pins.
