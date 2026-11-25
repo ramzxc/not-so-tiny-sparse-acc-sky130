@@ -8,6 +8,7 @@ module tpu_core
     import tpu_pkg::*;
 #(
     parameter int COMPUTE_WIDTH                = 2,
+    parameter int DRAM_DATA_BYTES              = 8,
     parameter int SRAM_BYTES                   = DEFAULT_SRAM_BYTES,
     parameter int MAX_COLUMN_ROWS              = COMPUTE_WIDTH,
     parameter int WEIGHT_BUFFER_DEPTH          = SRAM_BYTES / (4*COMPUTE_WIDTH),
@@ -28,23 +29,24 @@ module tpu_core
     input inst_type inst_port,
     input logic     inst_enable,
 
-    // The selected region also identifies the DMA dependency while dma_busy.
-    input logic dma_busy,
-    input sram_region_type dma_sram_region,
+    // External-memory commands use a byte address and a length in beats minus one.
+    output dram_addr_type                         dma_cmd_addr,
+    output logic [7:0]                            dma_cmd_len,
+    output logic                                  dma_cmd_write,
+    output logic                                  dma_cmd_valid,
+    input  logic                                  dma_cmd_ready,
+    input  logic [DRAM_DATA_BYTES*BYTE_WIDTH-1:0] dma_rsp_data,
+    input  logic                                  dma_rsp_valid,
+    output logic                                  dma_rsp_ready,
+    output logic [DRAM_DATA_BYTES*BYTE_WIDTH-1:0] dma_write_data,
+    output logic [DRAM_DATA_BYTES-1:0]            dma_write_strb,
+    output logic                                  dma_write_data_valid,
+    input  logic                                  dma_write_data_ready,
 
-    // DMA command dispatched by the core decoder.
-    output dram_inst_type dma_inst,
-    output logic          dma_inst_enable,
-
-    // One shared SRAM client for both directions of DMA.
-    input  buffer_addr_type                  dma_sram_req_addr,
-    input  fp8_type [COMPUTE_WIDTH-1:0]      dma_sram_req_data,
-    input  logic                             dma_sram_req_write,
-    input  logic                             dma_sram_req_valid,
-    output logic                            dma_sram_req_ready,
-    output fp8_type [COMPUTE_WIDTH-1:0]     dma_sram_rsp_data,
-    output logic                            dma_sram_rsp_valid,
-    input  logic                             dma_sram_rsp_ready,
+    output logic [31:0]                           uart_result_data,
+    output logic [2:0]                            uart_result_bytes,
+    output logic                                  uart_result_valid,
+    input  logic                                  uart_result_ready,
 
     output logic memory_error,
     output logic busy,
@@ -83,12 +85,11 @@ module tpu_core
     // Unified-buffer clients
     // ---------------------------------------------------------------------
 
-    buffer_addr_type              vpu_buffer_req_addr;
-    logic                         vpu_buffer_req_valid;
-    logic                         vpu_buffer_req_ready;
-    fp8_type [COMPUTE_WIDTH-1:0]  vpu_buffer_rsp_data;
-    logic                         vpu_buffer_rsp_valid;
-    logic                         vpu_buffer_rsp_ready;
+    sram_region_type compute_read_region, compute_write_region;
+    buffer_addr_type compute_read_addr, compute_write_addr;
+    logic compute_read_valid, compute_read_ready, compute_read_rsp_valid, compute_read_rsp_ready;
+    logic compute_write_valid, compute_write_ready, compute_write_accumulate;
+    fp8_type [COMPUTE_WIDTH-1:0] compute_read_rsp_data, compute_write_data;
 
     buffer_addr_type              sparse_buffer_req_addr;
     logic                         sparse_buffer_req_valid;
@@ -104,11 +105,6 @@ module tpu_core
     logic                         weight_buffer_rsp_valid;
     logic                         weight_buffer_rsp_ready;
 
-    buffer_addr_type              activation_buffer_write_addr;
-    fp8_type [COMPUTE_WIDTH-1:0]  activation_buffer_write_data;
-    logic                         activation_buffer_write_valid;
-    logic                         activation_buffer_write_ready;
-
     // ---------------------------------------------------------------------
     // VPU datapath
     // ---------------------------------------------------------------------
@@ -120,22 +116,6 @@ module tpu_core
 
     fp8_type [COMPUTE_WIDTH-1:0]  vpu_result_data;
     logic                         vpu_result_valid;
-
-    fp8_type [COMPUTE_WIDTH-1:0]  vpu_acc_write_data;
-    accumulator_addr_type         vpu_acc_write_addr;
-    logic                         vpu_acc_write_valid;
-    logic                         vpu_acc_accumulate;
-
-    // ---------------------------------------------------------------------
-    // Physical accumulation-buffer write port arbitration
-    // ---------------------------------------------------------------------
-
-    accumulator_addr_type         activation_acc_req_addr;
-    logic                         activation_acc_req_valid;
-    logic                         activation_acc_req_ready;
-    fp8_type [COMPUTE_WIDTH-1:0]  activation_acc_rsp_data;
-    logic                         activation_acc_rsp_valid;
-    logic                         activation_acc_rsp_ready;
 
     fp8_type [COMPUTE_WIDTH-1:0]  activation_input_data;
     logic                         activation_input_valid;
@@ -162,6 +142,15 @@ module tpu_core
     logic dispatch_vpu_en;
     logic dispatch_activation_en;
     logic dispatch_dma_en;
+    logic dma_busy;
+    sram_region_type dma_sram_region;
+    dram_inst_type dma_inst;
+    logic dma_inst_enable;
+    buffer_addr_type dma_sram_req_addr;
+    fp8_type [COMPUTE_WIDTH-1:0] dma_sram_req_data, dma_sram_rsp_data;
+    logic dma_sram_req_write, dma_sram_req_valid, dma_sram_req_ready;
+    logic dma_sram_rsp_valid, dma_sram_rsp_ready;
+    logic uart_range_error;
 
     logic weight_busy;
     logic weight_resource_busy;
@@ -170,7 +159,6 @@ module tpu_core
     logic vpu_busy;
     logic vpu_resource_busy, vpu_read_wb;
     logic mem_busy, sram_error, vpu_address_error;
-    logic vpu_acc_write_ready;
     logic activation_busy;
     logic activation_resource_busy;
 
@@ -284,39 +272,64 @@ module tpu_core
     // VPU execution path
     // ---------------------------------------------------------------------
 
-    vpu_ctrl #(
-        .COMPUTE_WIDTH   (COMPUTE_WIDTH),
-        .META_FIFO_DEPTH (VPU_META_FIFO_DEPTH)
-    ) vpu_flow_controller (
-        .clk                 (clk),
-        .rst                 (rst),
-        .inst                (dispatch_vpu_inst),
-        .inst_enable         (dispatch_vpu_en),
-        .inst_read_wb        (dispatch_vpu_read_wb),
-        .read_wb             (vpu_read_wb),
-        .buffer_req_addr     (vpu_buffer_req_addr),
-        .buffer_req_valid    (vpu_buffer_req_valid),
-        .buffer_req_ready    (vpu_buffer_req_ready),
-        .buffer_rsp_data     (vpu_buffer_rsp_data),
-        .buffer_rsp_valid    (vpu_buffer_rsp_valid),
-        .buffer_rsp_ready    (vpu_buffer_rsp_ready),
-        .sparse_input_data   (sparse_vpu_input_data),
-        .sparse_input_valid  (sparse_vpu_input_valid),
-        .sparse_input_ready  (sparse_vpu_input_ready),
-        .sparsity_en         (sparsity_en),
-        .input_data          (input_data),
-        .input_data_valid    (input_valid),
-        .last_sum_data       (last_sum_data),
-        .last_sum_valid      (last_sum_valid),
-        .vpu_result_data     (vpu_result_data),
-        .vpu_result_valid    (vpu_result_valid),
-        .acc_data            (vpu_acc_write_data),
-        .acc_addr            (vpu_acc_write_addr),
-        .accumulate          (vpu_acc_accumulate),
-        .acc_enable          (vpu_acc_write_valid),
-        .acc_ready           (vpu_acc_write_ready),
-        .busy                (vpu_busy),
-        .resource_busy       (vpu_resource_busy)
+    mem_ctrl #(
+        .COMPUTE_WIDTH    (COMPUTE_WIDTH),
+        .VPU_DEPTH        (VPU_META_FIFO_DEPTH),
+        .ACTIVATION_DEPTH (ACTIVATION_META_FIFO_DEPTH),
+        .UB_ROWS          (UNIFIED_BUFFER_DEPTH),
+        .DRAM_DATA_BYTES  (DRAM_DATA_BYTES)
+    ) memory_flow_controller (
+        .clk(clk), .rst(rst),
+        .vpu_inst(dispatch_vpu_inst), .vpu_start(dispatch_vpu_en),
+        .inst_read_wb(dispatch_vpu_read_wb), .vpu_read_wb(vpu_read_wb),
+        .vpu_busy(vpu_busy), .vpu_resource_busy(vpu_resource_busy),
+        .activation_inst(dispatch_activate_inst), .activation_start(dispatch_activation_en),
+        .activation_busy(activation_busy), .activation_resource_busy(activation_resource_busy),
+        .read_region(compute_read_region), .read_addr(compute_read_addr),
+        .read_valid(compute_read_valid), .read_ready(compute_read_ready),
+        .read_rsp_data(compute_read_rsp_data), .read_rsp_valid(compute_read_rsp_valid),
+        .read_rsp_ready(compute_read_rsp_ready),
+        .write_region(compute_write_region), .write_addr(compute_write_addr),
+        .write_valid(compute_write_valid), .write_data(compute_write_data),
+        .write_accumulate(compute_write_accumulate), .write_ready(compute_write_ready),
+        .sparsity_en(sparsity_en), .sparse_input_data(sparse_vpu_input_data),
+        .sparse_input_valid(sparse_vpu_input_valid), .sparse_input_ready(sparse_vpu_input_ready),
+        .input_data(input_data), .input_data_valid(input_valid),
+        .last_sum_data(last_sum_data), .last_sum_valid(last_sum_valid),
+        .vpu_result_data(vpu_result_data), .vpu_result_valid(vpu_result_valid),
+        .activation_data(activation_input_data), .activation_data_valid(activation_input_valid),
+        .activation_data_ready(activation_input_ready), .activation_function(activation_input_function),
+        .activation_rsp_data(activation_output_data), .activation_rsp_valid(activation_output_valid),
+        .activation_rsp_ready(activation_output_ready),
+        .dma_cmd_addr              (dma_cmd_addr),
+        .dma_cmd_len               (dma_cmd_len),
+        .dma_cmd_write             (dma_cmd_write),
+        .dma_cmd_valid             (dma_cmd_valid),
+        .dma_cmd_ready             (dma_cmd_ready),
+        .dma_rsp_data              (dma_rsp_data),
+        .dma_rsp_valid             (dma_rsp_valid),
+        .dma_rsp_ready             (dma_rsp_ready),
+        .dma_write_data            (dma_write_data),
+        .dma_write_strb            (dma_write_strb),
+        .dma_write_data_valid      (dma_write_data_valid),
+        .dma_write_data_ready      (dma_write_data_ready),
+        .uart_result_data          (uart_result_data),
+        .uart_result_bytes         (uart_result_bytes),
+        .uart_result_valid         (uart_result_valid),
+        .uart_result_ready         (uart_result_ready),
+        .dma_busy                  (dma_busy),
+        .dma_sram_region           (dma_sram_region),
+        .dma_inst                  (dma_inst),
+        .dma_inst_enable           (dma_inst_enable),
+        .dma_sram_req_addr         (dma_sram_req_addr),
+        .dma_sram_req_data         (dma_sram_req_data),
+        .dma_sram_req_write        (dma_sram_req_write),
+        .dma_sram_req_valid        (dma_sram_req_valid),
+        .dma_sram_req_ready        (dma_sram_req_ready),
+        .dma_sram_rsp_data         (dma_sram_rsp_data),
+        .dma_sram_rsp_valid        (dma_sram_rsp_valid),
+        .dma_sram_rsp_ready        (dma_sram_rsp_ready),
+        .uart_range_error          (uart_range_error)
     );
 
     vpu #(
@@ -338,36 +351,6 @@ module tpu_core
     // Activation path
     // ---------------------------------------------------------------------
 
-    activation_ctrl #(
-        .COMPUTE_WIDTH   (COMPUTE_WIDTH),
-        .META_FIFO_DEPTH (ACTIVATION_META_FIFO_DEPTH),
-        .UB_ROWS         (UNIFIED_BUFFER_DEPTH)
-    ) activation_flow_controller (
-        .clk                    (clk),
-        .rst                    (rst),
-        .inst                   (dispatch_activate_inst),
-        .inst_enable            (dispatch_activation_en),
-        .acc_req_addr           (activation_acc_req_addr),
-        .acc_req_valid          (activation_acc_req_valid),
-        .acc_req_ready          (activation_acc_req_ready),
-        .acc_rsp_data           (activation_acc_rsp_data),
-        .acc_rsp_valid          (activation_acc_rsp_valid),
-        .acc_rsp_ready          (activation_acc_rsp_ready),
-        .activation_data        (activation_input_data),
-        .activation_data_valid  (activation_input_valid),
-        .activation_data_ready  (activation_input_ready),
-        .activation_function    (activation_input_function),
-        .activation_rsp_data    (activation_output_data),
-        .activation_rsp_valid   (activation_output_valid),
-        .activation_rsp_ready   (activation_output_ready),
-        .buffer_write_addr      (activation_buffer_write_addr),
-        .buffer_write_data      (activation_buffer_write_data),
-        .buffer_write_valid     (activation_buffer_write_valid),
-        .buffer_write_ready     (activation_buffer_write_ready),
-        .busy                   (activation_busy),
-        .resource_busy          (activation_resource_busy)
-    );
-
     activation #(
         .COMPUTE_WIDTH (COMPUTE_WIDTH)
     ) activation_core (
@@ -383,7 +366,7 @@ module tpu_core
     );
 
     // One request channel per compute client, plus one for DMA.
-    localparam int SRAM_CLIENTS = 8;
+    localparam int SRAM_CLIENTS = 6;
     localparam int DMA_CLIENT = SRAM_CLIENTS-1;
     logic [SRAM_CLIENTS-1:0] m_valid, m_ready, m_write, m_accumulate, m_rsp_valid, m_rsp_ready;
     logic [SRAM_CLIENTS-1:0][1:0] m_region;
@@ -399,16 +382,16 @@ module tpu_core
     assign m_rsp_ready[0] = 1'b1;
     assign weight_rsp_valid = m_rsp_valid[0];
     assign weight_rsp_data = m_rdata[0];
-    assign m_valid[1] = vpu_buffer_req_valid;
-    assign vpu_buffer_req_ready = m_ready[1];
-    assign m_region[1] = vpu_read_wb ? SRAM_REGION_WB : SRAM_REGION_UB;
-    assign m_addr[1] = 24'(vpu_buffer_req_addr);
+    assign m_valid[1] = compute_read_valid;
+    assign compute_read_ready = m_ready[1];
+    assign m_region[1] = compute_read_region;
+    assign m_addr[1] = 24'(compute_read_addr);
     assign m_write[1] = 1'b0;
     assign m_wdata[1] = '0;
     assign m_accumulate[1] = '0;
-    assign m_rsp_ready[1] = vpu_buffer_rsp_ready;
-    assign vpu_buffer_rsp_valid = m_rsp_valid[1];
-    assign vpu_buffer_rsp_data = m_rdata[1];
+    assign m_rsp_ready[1] = compute_read_rsp_ready;
+    assign compute_read_rsp_valid = m_rsp_valid[1];
+    assign compute_read_rsp_data = m_rdata[1];
     assign m_valid[2] = weight_buffer_req_valid;
     assign weight_buffer_req_ready = m_ready[2];
     assign m_region[2] = SRAM_REGION_UB;
@@ -429,32 +412,14 @@ module tpu_core
     assign m_rsp_ready[3] = sparse_buffer_rsp_ready;
     assign sparse_buffer_rsp_valid = m_rsp_valid[3];
     assign sparse_buffer_rsp_data = m_rdata[3][7:0];
-    assign m_valid[4] = activation_buffer_write_valid;
-    assign activation_buffer_write_ready = m_ready[4];
-    assign m_region[4] = SRAM_REGION_UB;
-    assign m_addr[4] = 24'(activation_buffer_write_addr);
+    assign m_valid[4] = compute_write_valid;
+    assign compute_write_ready = m_ready[4];
+    assign m_region[4] = compute_write_region;
+    assign m_addr[4] = 24'(compute_write_addr);
     assign m_write[4] = 1'b1;
-    assign m_wdata[4] = activation_buffer_write_data;
-    assign m_accumulate[4] = '0;
+    assign m_wdata[4] = compute_write_data;
+    assign m_accumulate[4] = compute_write_accumulate;
     assign m_rsp_ready[4] = '1;
-    assign m_valid[5] = activation_acc_req_valid;
-    assign activation_acc_req_ready = m_ready[5];
-    assign m_region[5] = SRAM_REGION_ACC;
-    assign m_addr[5] = 24'(activation_acc_req_addr);
-    assign m_write[5] = 1'b0;
-    assign m_wdata[5] = '0;
-    assign m_accumulate[5] = '0;
-    assign m_rsp_ready[5] = activation_acc_rsp_ready;
-    assign activation_acc_rsp_valid = m_rsp_valid[5];
-    assign activation_acc_rsp_data = m_rdata[5];
-    assign m_valid[6] = vpu_acc_write_valid;
-    assign vpu_acc_write_ready = m_ready[6];
-    assign m_region[6] = SRAM_REGION_ACC;
-    assign m_addr[6] = 24'(vpu_acc_write_addr);
-    assign m_write[6] = 1'b1;
-    assign m_wdata[6] = vpu_acc_write_data;
-    assign m_accumulate[6] = vpu_acc_accumulate;
-    assign m_rsp_ready[6] = '1;
     assign m_valid[DMA_CLIENT] = dma_sram_req_valid;
     assign dma_sram_req_ready = m_ready[DMA_CLIENT];
     assign m_region[DMA_CLIENT] = dma_sram_region;
@@ -466,7 +431,7 @@ module tpu_core
     assign dma_sram_rsp_valid = m_rsp_valid[DMA_CLIENT];
     assign dma_sram_rsp_data = m_rdata[DMA_CLIENT];
 
-    assign memory_error = sram_error || vpu_address_error;
+    assign memory_error = sram_error || vpu_address_error || uart_range_error;
 
     sram_controller #(.SRAM_BYTES(SRAM_BYTES), .CLIENTS(SRAM_CLIENTS),
                .COMPUTE_WIDTH(COMPUTE_WIDTH), .UB_ROWS(UNIFIED_BUFFER_DEPTH),

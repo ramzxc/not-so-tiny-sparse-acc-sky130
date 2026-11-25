@@ -1,6 +1,5 @@
 src/rtl/accelerator/tpu_pkg.sv
 src/rtl/accelerator/activation.sv
-src/rtl/accelerator/activation_ctrl.sv
 src/rtl/accelerator/dma.sv
 src/rtl/accelerator/inst_decoder.sv
 src/rtl/accelerator/inst_fifo.sv
@@ -11,7 +10,7 @@ src/rtl/accelerator/sparsity_ctrl.sv
 src/rtl/accelerator/tpu.sv
 src/rtl/accelerator/tpu_core.sv
 src/rtl/accelerator/vpu.sv
-src/rtl/accelerator/vpu_ctrl.sv
+src/rtl/accelerator/mem_ctrl.sv
 src/rtl/accelerator/weight_load_ctrl.sv
 src/rtl/accelerator_top.sv
 src/rtl/peripherals/qpi_ctrl.sv

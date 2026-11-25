@@ -17,7 +17,7 @@ module sparsity_ctrl
     output logic            busy,
     output logic            resource_busy,
 
-    // sparsity_ctrl -> vpu_ctrl
+    // sparsity_ctrl -> mem_ctrl
     output fp8_type        vpu_input_data,    
     output logic            vpu_input_valid,
     input  logic            vpu_input_ready,

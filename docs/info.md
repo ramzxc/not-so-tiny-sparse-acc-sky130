@@ -75,8 +75,11 @@ with a shared read/write burst command and 64-bit data beats. The command
 length determines the number of beats. The same response channel returns
 read data or acknowledges a completed write. The DMA shares one
 region-tagged row request port across UB, WB, and ACC in the SRAM
-controller. The PSRAM controller arbitrates DMA, instruction fetch and
-UART ingress. The accelerator and SRAM macro
+controller. The VPU and activation datapaths share the row counters,
+metadata queue and SRAM request ports in `mem_ctrl`. The DMA engine
+inside `mem_ctrl` has its own transfer state and SRAM request port.
+The PSRAM controller arbitrates DMA, instruction fetch and UART ingress.
+The accelerator and SRAM macro
 wrappers live in `src/rtl/macros/`. Testbenches and peripheral models live
 under `test/rtl/`. The wrapper smoke test exercises QPI boot,
 UART ingress, SRAM DMA, an FP8 vector operation, and UART egress through
