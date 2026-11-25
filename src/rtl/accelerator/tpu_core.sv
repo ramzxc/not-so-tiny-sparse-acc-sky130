@@ -26,52 +26,25 @@ module tpu_core
     input logic rst,
 
     input inst_type inst_port,
-    input logic inst_direct_wb,
     input logic     inst_enable,
 
-    // DMA status consumed by the instruction decoder.
+    // The selected region also identifies the DMA dependency while dma_busy.
     input logic dma_busy,
-    input logic dma_weight_resource_busy,
-    input logic dma_buffer_resource_busy,
-    input logic dma_acc_resource_busy,
+    input sram_region_type dma_sram_region,
 
     // DMA command dispatched by the core decoder.
     output dram_inst_type dma_inst,
     output logic          dma_inst_enable,
 
-    // DMA -> explicitly preloaded weight buffer.
-    input weight_addr_type dma_weight_write_addr,
-    input fp8_type [COMPUTE_WIDTH-1:0] dma_weight_write_data,
-    input logic dma_weight_write_valid,
-    output logic dma_weight_write_ready,
-
-    // DMA -> unified-buffer load-write path.
-    input  buffer_addr_type              dma_buffer_write_addr,
-    input  fp8_type [COMPUTE_WIDTH-1:0] dma_buffer_write_data,
-    input  logic                         dma_buffer_write_valid,
-    output logic                         dma_buffer_write_ready,
-
-    // DMA -> unified-buffer store-read request/response path.
-    input  buffer_addr_type              dma_buffer_read_req_addr,
-    input  logic                         dma_buffer_read_req_valid,
-    output logic                         dma_buffer_read_req_ready,
-    output fp8_type [COMPUTE_WIDTH-1:0] dma_buffer_read_rsp_data,
-    output logic                         dma_buffer_read_rsp_valid,
-    input  logic                         dma_buffer_read_rsp_ready,
-
-    // DMA -> accumulation-buffer store-read request/response.
-    input  accumulator_addr_type         dma_acc_read_req_addr,
-    input  logic                         dma_acc_read_req_valid,
-    output logic                         dma_acc_read_req_ready,
-    output fp8_type [COMPUTE_WIDTH-1:0] dma_acc_read_rsp_data,
-    output logic                         dma_acc_read_rsp_valid,
-    input  logic                         dma_acc_read_rsp_ready,
-
-    // DMA -> accumulation-buffer restore-write path.
-    input  accumulator_addr_type         dma_acc_write_addr,
-    input  fp8_type [COMPUTE_WIDTH-1:0] dma_acc_write_data,
-    input  logic                         dma_acc_write_valid,
-    output logic                         dma_acc_write_ready,
+    // One shared SRAM client for both directions of DMA.
+    input  buffer_addr_type                  dma_sram_req_addr,
+    input  fp8_type [COMPUTE_WIDTH-1:0]      dma_sram_req_data,
+    input  logic                             dma_sram_req_write,
+    input  logic                             dma_sram_req_valid,
+    output logic                            dma_sram_req_ready,
+    output fp8_type [COMPUTE_WIDTH-1:0]     dma_sram_rsp_data,
+    output logic                            dma_sram_rsp_valid,
+    input  logic                             dma_sram_rsp_ready,
 
     output logic memory_error,
     output logic busy,
@@ -97,13 +70,13 @@ module tpu_core
     logic            sparse_rsp_data;
     logic            sparse_rsp_valid;
 
-    logic            weight_req_valid;
-    logic            weight_req_ready;
-    weight_addr_type weight_req_addr;
-    fp8_type [COMPUTE_WIDTH-1:0] weight_rsp_data;
+    logic                         weight_req_valid;
+    logic                         weight_req_ready;
+    weight_addr_type              weight_req_addr;
+    fp8_type [COMPUTE_WIDTH-1:0]  weight_rsp_data;
     logic                         weight_rsp_valid;
 
-    fp8_type [COMPUTE_WIDTH-1:0] vpu_weight_data;
+    fp8_type [COMPUTE_WIDTH-1:0]  vpu_weight_data;
     logic                         vpu_weight_valid;
 
     // ---------------------------------------------------------------------
@@ -113,26 +86,26 @@ module tpu_core
     buffer_addr_type              vpu_buffer_req_addr;
     logic                         vpu_buffer_req_valid;
     logic                         vpu_buffer_req_ready;
-    fp8_type [COMPUTE_WIDTH-1:0] vpu_buffer_rsp_data;
+    fp8_type [COMPUTE_WIDTH-1:0]  vpu_buffer_rsp_data;
     logic                         vpu_buffer_rsp_valid;
     logic                         vpu_buffer_rsp_ready;
 
     buffer_addr_type              sparse_buffer_req_addr;
     logic                         sparse_buffer_req_valid;
     logic                         sparse_buffer_req_ready;
-    fp8_type                     sparse_buffer_rsp_data;
+    fp8_type                      sparse_buffer_rsp_data;
     logic                         sparse_buffer_rsp_valid;
     logic                         sparse_buffer_rsp_ready;
 
     buffer_addr_type              weight_buffer_req_addr;
     logic                         weight_buffer_req_valid;
     logic                         weight_buffer_req_ready;
-    fp8_type [COMPUTE_WIDTH-1:0] weight_buffer_rsp_data;
+    fp8_type [COMPUTE_WIDTH-1:0]  weight_buffer_rsp_data;
     logic                         weight_buffer_rsp_valid;
     logic                         weight_buffer_rsp_ready;
 
     buffer_addr_type              activation_buffer_write_addr;
-    fp8_type [COMPUTE_WIDTH-1:0] activation_buffer_write_data;
+    fp8_type [COMPUTE_WIDTH-1:0]  activation_buffer_write_data;
     logic                         activation_buffer_write_valid;
     logic                         activation_buffer_write_ready;
 
@@ -140,15 +113,15 @@ module tpu_core
     // VPU datapath
     // ---------------------------------------------------------------------
 
-    fp8_type [COMPUTE_WIDTH-1:0] input_data;
+    fp8_type [COMPUTE_WIDTH-1:0]  input_data;
     logic                         input_valid;
-    fp8_type [COMPUTE_WIDTH-1:0] last_sum_data;
+    fp8_type [COMPUTE_WIDTH-1:0]  last_sum_data;
     logic                         last_sum_valid;
 
-    fp8_type [COMPUTE_WIDTH-1:0] vpu_result_data;
+    fp8_type [COMPUTE_WIDTH-1:0]  vpu_result_data;
     logic                         vpu_result_valid;
 
-    fp8_type [COMPUTE_WIDTH-1:0] vpu_acc_write_data;
+    fp8_type [COMPUTE_WIDTH-1:0]  vpu_acc_write_data;
     accumulator_addr_type         vpu_acc_write_addr;
     logic                         vpu_acc_write_valid;
     logic                         vpu_acc_accumulate;
@@ -160,16 +133,16 @@ module tpu_core
     accumulator_addr_type         activation_acc_req_addr;
     logic                         activation_acc_req_valid;
     logic                         activation_acc_req_ready;
-    fp8_type [COMPUTE_WIDTH-1:0] activation_acc_rsp_data;
+    fp8_type [COMPUTE_WIDTH-1:0]  activation_acc_rsp_data;
     logic                         activation_acc_rsp_valid;
     logic                         activation_acc_rsp_ready;
 
-    fp8_type [COMPUTE_WIDTH-1:0] activation_input_data;
+    fp8_type [COMPUTE_WIDTH-1:0]  activation_input_data;
     logic                         activation_input_valid;
     logic                         activation_input_ready;
     activation_type               activation_input_function;
 
-    fp8_type [COMPUTE_WIDTH-1:0] activation_output_data;
+    fp8_type [COMPUTE_WIDTH-1:0]  activation_output_data;
     logic                         activation_output_valid;
     logic                         activation_output_ready;
 
@@ -184,7 +157,7 @@ module tpu_core
     dram_inst_type     dispatch_dram_inst;
     activate_inst_type dispatch_activate_inst;
 
-    logic dispatch_weight_en, dispatch_direct_wb;
+    logic dispatch_weight_en, dispatch_vpu_read_wb;
     logic dispatch_input_en;
     logic dispatch_vpu_en;
     logic dispatch_activation_en;
@@ -196,14 +169,13 @@ module tpu_core
     logic input_resource_busy;
     logic vpu_busy;
     logic vpu_resource_busy, vpu_read_wb;
-    logic mem_busy;
+    logic mem_busy, sram_error, vpu_address_error;
     logic vpu_acc_write_ready;
     logic activation_busy;
     logic activation_resource_busy;
 
     assign dispatch_weight_inst   = weight_inst_type'(dispatch_inst);
     assign dispatch_input_inst    = input_inst_type'(dispatch_inst);
-    assign dispatch_vpu_inst      = vpu_inst_type'(dispatch_inst);
     assign dispatch_dram_inst     = dram_inst_type'(dispatch_inst);
     assign dispatch_activate_inst = activate_inst_type'(dispatch_inst);
 
@@ -215,12 +187,12 @@ module tpu_core
     // Decoder
     // ---------------------------------------------------------------------
 
-    inst_decoder decoder (
+    inst_decoder #(
+        .UB_ROWS(UNIFIED_BUFFER_DEPTH), .WB_ROWS(WEIGHT_BUFFER_DEPTH)
+    ) decoder (
         .clk                         (clk),
         .rst                         (rst),
         .inst_in                     (inst_port),
-        .inst_direct_wb              (inst_direct_wb),
-        .dispatch_direct_wb          (dispatch_direct_wb),
         .inst_write                  (inst_enable),
         .decoder_busy                (busy),
         .weight_busy                 (weight_busy),
@@ -234,13 +206,16 @@ module tpu_core
         .activation_resource_busy    (activation_resource_busy),
         .dma_busy                    (dma_busy || mem_busy),
         .dma_engine_busy             (dma_busy),
-        .dma_weight_resource_busy    (dma_weight_resource_busy || mem_busy),
-        .dma_buffer_resource_busy    (dma_buffer_resource_busy || mem_busy),
-        .dma_acc_resource_busy       (dma_acc_resource_busy || mem_busy),
+        .dma_weight_resource_busy    (mem_busy || (dma_busy && dma_sram_region == SRAM_REGION_WB)),
+        .dma_buffer_resource_busy    (mem_busy || (dma_busy && dma_sram_region == SRAM_REGION_UB)),
+        .dma_acc_resource_busy       (mem_busy || (dma_busy && dma_sram_region == SRAM_REGION_ACC)),
         .dispatch_inst               (dispatch_inst),
         .dispatch_weight_en          (dispatch_weight_en),
         .dispatch_input_en          (dispatch_input_en),
         .dispatch_vpu_en             (dispatch_vpu_en),
+        .dispatch_vpu_inst           (dispatch_vpu_inst),
+        .dispatch_vpu_read_wb        (dispatch_vpu_read_wb),
+        .vpu_address_error           (vpu_address_error),
         .dispatch_activation_en      (dispatch_activation_en),
         .dispatch_dma_en             (dispatch_dma_en),
         .synchronize                 (synchronize)
@@ -283,7 +258,6 @@ module tpu_core
         .clk               (clk),
         .rst               (rst),
         .weight_inst       (dispatch_weight_inst),
-        .direct_wb          (dispatch_direct_wb),
         .weight_inst_enable(dispatch_weight_en),
         .busy              (weight_busy),
         .resource_busy     (weight_resource_busy),
@@ -318,7 +292,7 @@ module tpu_core
         .rst                 (rst),
         .inst                (dispatch_vpu_inst),
         .inst_enable         (dispatch_vpu_en),
-        .inst_read_wb        (dispatch_direct_wb),
+        .inst_read_wb        (dispatch_vpu_read_wb),
         .read_wb             (vpu_read_wb),
         .buffer_req_addr     (vpu_buffer_req_addr),
         .buffer_req_valid    (vpu_buffer_req_valid),
@@ -408,14 +382,16 @@ module tpu_core
         .data_out_ready      (activation_output_ready)
     );
 
-    // One request channel per former WB/UB/ACC client.
-    logic [11:0] m_valid, m_ready, m_write, m_accumulate, m_rsp_valid, m_rsp_ready;
-    logic [11:0][1:0] m_region;
-    logic [11:0][23:0] m_addr;
-    logic [11:0][8*COMPUTE_WIDTH-1:0] m_wdata, m_rdata;
+    // One request channel per compute client, plus one for DMA.
+    localparam int SRAM_CLIENTS = 8;
+    localparam int DMA_CLIENT = SRAM_CLIENTS-1;
+    logic [SRAM_CLIENTS-1:0] m_valid, m_ready, m_write, m_accumulate, m_rsp_valid, m_rsp_ready;
+    logic [SRAM_CLIENTS-1:0][1:0] m_region;
+    logic [SRAM_CLIENTS-1:0][23:0] m_addr;
+    logic [SRAM_CLIENTS-1:0][8*COMPUTE_WIDTH-1:0] m_wdata, m_rdata;
     assign m_valid[0] = weight_req_valid;
     assign weight_req_ready = m_ready[0];
-    assign m_region[0] = 2'd2;
+    assign m_region[0] = SRAM_REGION_WB;
     assign m_addr[0] = 24'(weight_req_addr);
     assign m_write[0] = 1'b0;
     assign m_wdata[0] = '0;
@@ -423,112 +399,82 @@ module tpu_core
     assign m_rsp_ready[0] = 1'b1;
     assign weight_rsp_valid = m_rsp_valid[0];
     assign weight_rsp_data = m_rdata[0];
-    assign m_valid[1] = dma_weight_write_valid;
-    assign dma_weight_write_ready = m_ready[1];
-    assign m_region[1] = 2'd2;
-    assign m_addr[1] = 24'(dma_weight_write_addr);
-    assign m_write[1] = 1'b1;
-    assign m_wdata[1] = dma_weight_write_data;
+    assign m_valid[1] = vpu_buffer_req_valid;
+    assign vpu_buffer_req_ready = m_ready[1];
+    assign m_region[1] = vpu_read_wb ? SRAM_REGION_WB : SRAM_REGION_UB;
+    assign m_addr[1] = 24'(vpu_buffer_req_addr);
+    assign m_write[1] = 1'b0;
+    assign m_wdata[1] = '0;
     assign m_accumulate[1] = '0;
-    assign m_rsp_ready[1] = '1;
-    assign m_valid[2] = vpu_buffer_req_valid;
-    assign vpu_buffer_req_ready = m_ready[2];
-    assign m_region[2] = vpu_read_wb ? 2'd2 : 2'd0;
-    assign m_addr[2] = 24'(vpu_buffer_req_addr);
+    assign m_rsp_ready[1] = vpu_buffer_rsp_ready;
+    assign vpu_buffer_rsp_valid = m_rsp_valid[1];
+    assign vpu_buffer_rsp_data = m_rdata[1];
+    assign m_valid[2] = weight_buffer_req_valid;
+    assign weight_buffer_req_ready = m_ready[2];
+    assign m_region[2] = SRAM_REGION_UB;
+    assign m_addr[2] = 24'(weight_buffer_req_addr);
     assign m_write[2] = 1'b0;
     assign m_wdata[2] = '0;
     assign m_accumulate[2] = '0;
-    assign m_rsp_ready[2] = vpu_buffer_rsp_ready;
-    assign vpu_buffer_rsp_valid = m_rsp_valid[2];
-    assign vpu_buffer_rsp_data = m_rdata[2];
-    assign m_valid[3] = weight_buffer_req_valid;
-    assign weight_buffer_req_ready = m_ready[3];
-    assign m_region[3] = 2'd0;
-    assign m_addr[3] = 24'(weight_buffer_req_addr);
+    assign m_rsp_ready[2] = weight_buffer_rsp_ready;
+    assign weight_buffer_rsp_valid = m_rsp_valid[2];
+    assign weight_buffer_rsp_data = m_rdata[2];
+    assign m_valid[3] = sparse_buffer_req_valid;
+    assign sparse_buffer_req_ready = m_ready[3];
+    assign m_region[3] = SRAM_REGION_UB;
+    assign m_addr[3] = 24'(sparse_buffer_req_addr);
     assign m_write[3] = 1'b0;
     assign m_wdata[3] = '0;
     assign m_accumulate[3] = '0;
-    assign m_rsp_ready[3] = weight_buffer_rsp_ready;
-    assign weight_buffer_rsp_valid = m_rsp_valid[3];
-    assign weight_buffer_rsp_data = m_rdata[3];
-    assign m_valid[4] = sparse_buffer_req_valid;
-    assign sparse_buffer_req_ready = m_ready[4];
-    assign m_region[4] = 2'd0;
-    assign m_addr[4] = 24'(sparse_buffer_req_addr);
-    assign m_write[4] = 1'b0;
-    assign m_wdata[4] = '0;
+    assign m_rsp_ready[3] = sparse_buffer_rsp_ready;
+    assign sparse_buffer_rsp_valid = m_rsp_valid[3];
+    assign sparse_buffer_rsp_data = m_rdata[3][7:0];
+    assign m_valid[4] = activation_buffer_write_valid;
+    assign activation_buffer_write_ready = m_ready[4];
+    assign m_region[4] = SRAM_REGION_UB;
+    assign m_addr[4] = 24'(activation_buffer_write_addr);
+    assign m_write[4] = 1'b1;
+    assign m_wdata[4] = activation_buffer_write_data;
     assign m_accumulate[4] = '0;
-    assign m_rsp_ready[4] = sparse_buffer_rsp_ready;
-    assign sparse_buffer_rsp_valid = m_rsp_valid[4];
-    assign sparse_buffer_rsp_data = m_rdata[4][7:0];
-    assign m_valid[5] = dma_buffer_read_req_valid;
-    assign dma_buffer_read_req_ready = m_ready[5];
-    assign m_region[5] = 2'd0;
-    assign m_addr[5] = 24'(dma_buffer_read_req_addr);
+    assign m_rsp_ready[4] = '1;
+    assign m_valid[5] = activation_acc_req_valid;
+    assign activation_acc_req_ready = m_ready[5];
+    assign m_region[5] = SRAM_REGION_ACC;
+    assign m_addr[5] = 24'(activation_acc_req_addr);
     assign m_write[5] = 1'b0;
     assign m_wdata[5] = '0;
     assign m_accumulate[5] = '0;
-    assign m_rsp_ready[5] = dma_buffer_read_rsp_ready;
-    assign dma_buffer_read_rsp_valid = m_rsp_valid[5];
-    assign dma_buffer_read_rsp_data = m_rdata[5];
-    assign m_valid[6] = activation_buffer_write_valid;
-    assign activation_buffer_write_ready = m_ready[6];
-    assign m_region[6] = 2'd0;
-    assign m_addr[6] = 24'(activation_buffer_write_addr);
+    assign m_rsp_ready[5] = activation_acc_rsp_ready;
+    assign activation_acc_rsp_valid = m_rsp_valid[5];
+    assign activation_acc_rsp_data = m_rdata[5];
+    assign m_valid[6] = vpu_acc_write_valid;
+    assign vpu_acc_write_ready = m_ready[6];
+    assign m_region[6] = SRAM_REGION_ACC;
+    assign m_addr[6] = 24'(vpu_acc_write_addr);
     assign m_write[6] = 1'b1;
-    assign m_wdata[6] = activation_buffer_write_data;
-    assign m_accumulate[6] = '0;
+    assign m_wdata[6] = vpu_acc_write_data;
+    assign m_accumulate[6] = vpu_acc_accumulate;
     assign m_rsp_ready[6] = '1;
-    assign m_valid[7] = dma_buffer_write_valid;
-    assign dma_buffer_write_ready = m_ready[7];
-    assign m_region[7] = 2'd0;
-    assign m_addr[7] = 24'(dma_buffer_write_addr);
-    assign m_write[7] = 1'b1;
-    assign m_wdata[7] = dma_buffer_write_data;
-    assign m_accumulate[7] = '0;
-    assign m_rsp_ready[7] = '1;
-    assign m_valid[8] = activation_acc_req_valid;
-    assign activation_acc_req_ready = m_ready[8];
-    assign m_region[8] = 2'd1;
-    assign m_addr[8] = 24'(activation_acc_req_addr);
-    assign m_write[8] = 1'b0;
-    assign m_wdata[8] = '0;
-    assign m_accumulate[8] = '0;
-    assign m_rsp_ready[8] = activation_acc_rsp_ready;
-    assign activation_acc_rsp_valid = m_rsp_valid[8];
-    assign activation_acc_rsp_data = m_rdata[8];
-    assign m_valid[9] = dma_acc_read_req_valid;
-    assign dma_acc_read_req_ready = m_ready[9];
-    assign m_region[9] = 2'd1;
-    assign m_addr[9] = 24'(dma_acc_read_req_addr);
-    assign m_write[9] = 1'b0;
-    assign m_wdata[9] = '0;
-    assign m_accumulate[9] = '0;
-    assign m_rsp_ready[9] = dma_acc_read_rsp_ready;
-    assign dma_acc_read_rsp_valid = m_rsp_valid[9];
-    assign dma_acc_read_rsp_data = m_rdata[9];
-    assign m_valid[10] = vpu_acc_write_valid;
-    assign vpu_acc_write_ready = m_ready[10];
-    assign m_region[10] = 2'd1;
-    assign m_addr[10] = 24'(vpu_acc_write_addr);
-    assign m_write[10] = 1'b1;
-    assign m_wdata[10] = vpu_acc_write_data;
-    assign m_accumulate[10] = vpu_acc_accumulate;
-    assign m_rsp_ready[10] = '1;
-    assign m_valid[11] = dma_acc_write_valid;
-    assign dma_acc_write_ready = m_ready[11];
-    assign m_region[11] = 2'd1;
-    assign m_addr[11] = 24'(dma_acc_write_addr);
-    assign m_write[11] = 1'b1;
-    assign m_wdata[11] = dma_acc_write_data;
-    assign m_accumulate[11] = '0;
-    assign m_rsp_ready[11] = '1;
-    sram_controller #(.SRAM_BYTES(SRAM_BYTES), .COMPUTE_WIDTH(COMPUTE_WIDTH), .UB_ROWS(UNIFIED_BUFFER_DEPTH),
+    assign m_valid[DMA_CLIENT] = dma_sram_req_valid;
+    assign dma_sram_req_ready = m_ready[DMA_CLIENT];
+    assign m_region[DMA_CLIENT] = dma_sram_region;
+    assign m_addr[DMA_CLIENT] = 24'(dma_sram_req_addr);
+    assign m_write[DMA_CLIENT] = dma_sram_req_write;
+    assign m_wdata[DMA_CLIENT] = dma_sram_req_data;
+    assign m_accumulate[DMA_CLIENT] = 1'b0;
+    assign m_rsp_ready[DMA_CLIENT] = dma_sram_rsp_ready;
+    assign dma_sram_rsp_valid = m_rsp_valid[DMA_CLIENT];
+    assign dma_sram_rsp_data = m_rdata[DMA_CLIENT];
+
+    assign memory_error = sram_error || vpu_address_error;
+
+    sram_controller #(.SRAM_BYTES(SRAM_BYTES), .CLIENTS(SRAM_CLIENTS),
+               .COMPUTE_WIDTH(COMPUTE_WIDTH), .UB_ROWS(UNIFIED_BUFFER_DEPTH),
                .ACC_ROWS(REGISTER_DEPTH), .WB_ROWS(WEIGHT_BUFFER_DEPTH)) memory_controller (
         .clk(clk), .rst(rst), .req_valid(m_valid), .req_ready(m_ready),
         .req_write(m_write), .req_accumulate(m_accumulate), .req_region(m_region),
         .req_addr(m_addr), .req_data(m_wdata), .rsp_valid(m_rsp_valid),
-        .rsp_ready(m_rsp_ready), .rsp_data(m_rdata), .busy(mem_busy), .error(memory_error)
+        .rsp_ready(m_rsp_ready), .rsp_data(m_rdata), .busy(mem_busy), .error(sram_error)
     );
 `ifndef SYNTHESIS
     initial if (COMPUTE_WIDTH != 2 && COMPUTE_WIDTH != 4) $fatal(1,"Shared memory requires two or four FP8 lanes");

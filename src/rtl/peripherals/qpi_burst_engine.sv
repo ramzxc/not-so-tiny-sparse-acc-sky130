@@ -51,7 +51,7 @@ module qpi_burst_engine (
                 end
                 SELECT: begin cs_n<=0; sck<=0; nibble_left<=1; state<=COMMAND; end
                 COMMAND,ADDRESS,DUMMY,DATA: begin
-                    // At a completed byte, SCK is low. The bridge can hold
+                    // At a completed byte, SCK is low. The controller can hold
                     // one beat briefly or close this read before the next byte.
                     if (state==DATA && !write_reg && !sck && !low_nibble && read_cut)
                         state<=FINISH;

@@ -11,9 +11,9 @@ HIDDEN = 256
 TABLE_BASE = 0x1FF000
 HEADER_ADDR = 0x1FFFF8
 PROGRAM_BASE = 0x200000
-STATE_C, STATE_Y, FC_OUTPUT = 0x2000, 0x3000, 0x3800
+STATE_C, STATE_Y = 0x2000, 0x3000
 
-LOAD_UB, STORE_UB, STORE_ACC, LOAD_ACC = 0x40, 0x42, 0x43, 0x44
+LOAD_UB, STORE_UB, STORE_ACC, LOAD_ACC, ACC_TO_UART = 0x40, 0x42, 0x43, 0x44, 0x45
 WEIGHT = 0x08
 MUL, SUB, ACCUMULATE = 0x20, 0x24, 0x01
 COPY, SIGMOID, TANH, STEP, SYNC = 0x80, 0x89, 0x8A, 0x8B, 0xFF
@@ -136,7 +136,7 @@ def build_image(model_dir, add_table, uart_clocks=0, state_c=None, state_y=None)
 
     dma(LOAD_ACC, alloc(head_bias.tobytes()), 0, 1)
     repeat(head_weight, recurrent=True)
-    dma(STORE_ACC, FC_OUTPUT, 0, 1)
+    dma(ACC_TO_UART, 0, 0, 1)
     words.append(SYNC)
     table.append(0x1FFFF)
 

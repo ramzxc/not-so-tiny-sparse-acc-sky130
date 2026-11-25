@@ -12,7 +12,6 @@ module weight_load_ctrl
 
     // Instruction decoder -> controller
     input  weight_inst_type  weight_inst,
-    input  logic direct_wb,
     input  logic             weight_inst_enable,
 
     // Controller status -> instruction decoder
@@ -58,7 +57,6 @@ module weight_load_ctrl
     logic            is_dense_cs;
 
     logic accept_inst;
-    logic direct_weight;
     logic sparse_req_fire;
     logic weight_req_fire;
     logic unified_req_fire;
@@ -71,8 +69,6 @@ module weight_load_ctrl
     assign resource_busy = busy;
 
     assign accept_inst = weight_inst_enable && !busy;
-    // Read an explicitly selected dense WB row without consuming sparse metadata.
-    assign direct_weight = !weight_inst.is_unified && weight_inst.opcode == OPCODE_WEIGHT && direct_wb;
 
     // Stage 1: sparse_ctrl로 Input 0 판정 요청
     // sparse_req_fire와 같은 cycle에 sparse_rsp_data가 유효함
@@ -126,11 +122,10 @@ module weight_load_ctrl
         end
         else begin
             if (accept_inst) begin
-                IR_valid        <= !direct_weight;
+                IR_valid        <= 1'b1;
                 weight_addr_cs  <= weight_inst.weight_addr;
                 unified_addr_cs <= weight_inst.unified_addr;
                 is_unified_cs   <= weight_inst.is_unified;
-                is_dense_cs     <= direct_weight;
             end
 
             // Sparse 결과는 request handshake와 같은 cycle에 소비

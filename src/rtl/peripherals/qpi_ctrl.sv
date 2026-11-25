@@ -1,22 +1,19 @@
-// Original TPU adapter. Keep AXI bursts independent of QPI read chunks.
-module axi_qpi_bridge #(
-    parameter int INGRESS_BYTES = 8,
-    parameter bit LOCAL_FC_OUTPUT = 1'b0
+// Share QPI PSRAM between DMA, program fetch, and UART input writes.
+module qpi_ctrl #(
+    parameter int INGRESS_BYTES = 2
 ) (
     input wire clk, rst_n,
-    input wire [31:0] araddr, awaddr,
-    input wire [7:0] arlen, awlen,
-    input wire [3:0] arid, awid,
-    input wire arvalid, awvalid,
-    output wire arready, awready,
-    input wire [63:0] wdata,
-    input wire [7:0] wstrb,
-    input wire wlast, wvalid,
-    output wire wready,
-    output wire [63:0] rdata,
-    output wire [3:0] rid, bid,
-    output wire rlast, rvalid, bvalid,
-    input wire rready, bready,
+    input wire [31:0] dma_cmd_addr,
+    input wire [7:0] dma_cmd_len,
+    input wire dma_cmd_write, dma_cmd_valid,
+    output wire dma_cmd_ready,
+    input wire [63:0] dma_write_data,
+    input wire [7:0] dma_write_strb,
+    input wire dma_write_data_valid,
+    output wire dma_write_data_ready,
+    output wire [63:0] dma_rsp_data,
+    output wire dma_rsp_valid,
+    input wire dma_rsp_ready,
     input wire input_valid,
     input wire [22:0] input_addr,
     input wire [8*INGRESS_BYTES-1:0] input_data,
@@ -31,10 +28,8 @@ module axi_qpi_bridge #(
     output wire [3:0] dq_out, dq_oe
 );
     localparam [2:0] IDLE=0, READ_REQ=1, READ_WAIT=2, WRITE_BEAT=3,
-        WRITE_REQ=4, WRITE_WAIT=5, WRITE_RESPONSE=6, LOCAL_WRITE_BEAT=7;
-    localparam [31:0] FC_OUTPUT_ADDR = 32'h00003800;
+        WRITE_REQ=4, WRITE_WAIT=5, WRITE_RESPONSE=6;
     reg [2:0] state;
-    reg [3:0] tag;
     reg [63:0] beat;
     reg [63:0] instruction;
     reg instruction_pending;
@@ -52,15 +47,16 @@ module axi_qpi_bridge #(
     wire [2:0] last_byte = fetching && pair_fetching ? 3'd1 :
                            !fetching && scalar_alias ? 3'd0 : 3'd7;
     wire complete_beat = byte_valid && byte_index==last_byte;
-    wire r_fire = rvalid && rready;
-    wire stalled = rvalid && !rready;
+    wire read_data_valid = state==READ_WAIT && !fetching && pending;
+    wire read_fire = read_data_valid && dma_rsp_ready;
+    wire stalled = read_data_valid && !dma_rsp_ready;
     // End the physical chunk if the consumer blocks. Retain the assembled
-    // beat until AXI takes it, then issue another header at the next address.
+    // beat until DMA takes it, then issue another header at the next address.
     wire read_hold = state==READ_WAIT && complete_beat;
     // A prefetched instruction can outlive its QPI transaction so a stalled
-    // instruction FIFO can never block an AXI transfer needed to drain it.
+    // instruction FIFO can never block a DMA transfer needed to drain it.
     wire fetch_cut = fetching && instruction_pending &&
-                     (!fetch_take || arvalid || awvalid);
+                     (!fetch_take || dma_cmd_valid);
     wire read_cut = state==READ_WAIT && (stalled || fetch_cut);
 
     // Split ordinary reads at 64 bytes and at the next PSRAM page. The alias
@@ -74,15 +70,11 @@ module axi_qpi_bridge #(
 
     assign input_ready=rst_n && state==IDLE;
     assign input_done=state==WRITE_WAIT && input_write && done;
-    assign arready=input_ready && !input_valid;
-    assign awready=arready && !arvalid;
-    assign wready=state==WRITE_BEAT || state==LOCAL_WRITE_BEAT;
-    assign rvalid=state==READ_WAIT && !fetching && pending;
-    assign bvalid=state==WRITE_RESPONSE;
-    assign rlast=remaining==0;
-    assign rdata=beat;
-    assign rid=tag;
-    assign bid=tag;
+    assign dma_cmd_ready=input_ready && !input_valid;
+    assign dma_write_data_ready=state==WRITE_BEAT;
+    assign dma_rsp_valid=read_data_valid || state==WRITE_RESPONSE;
+    wire final_read_beat = remaining==0;
+    assign dma_rsp_data=beat;
     assign fetch_valid=instruction_pending;
     assign fetch_data=instruction;
 
@@ -96,7 +88,7 @@ module axi_qpi_bridge #(
 
     always @(posedge clk) begin
         if (!rst_n) begin
-            state<=IDLE; tag<=0; beat<=0; addr<=0; remaining<=0; byte_index<=0;
+            state<=IDLE; beat<=0; addr<=0; remaining<=0; byte_index<=0;
             fetching<=0; pair_fetching<=0; scalar_alias<=0; broadcast_lane<=0; write_bytes<=0;
             pending<=0; chunk_done<=0; last_sent<=0; input_write<=0;
             instruction<=0; instruction_pending<=0; fetch_length<=0;
@@ -109,16 +101,17 @@ module axi_qpi_bridge #(
                     write_bytes<=4'(INGRESS_BYTES);
                     input_write<=1;
                     state<=WRITE_REQ;
-                end else if(arvalid) begin
-                    addr<=araddr[22] ? {4'b0,araddr[21:3]} : araddr[22:0];
-                    remaining<=arlen; tag<=arid; fetching<=0;
-                    scalar_alias<=araddr[22]; broadcast_lane<=araddr[23];
-                    last_sent<=0; state<=READ_REQ;
-                end else if(awvalid) begin
-                    addr<=awaddr[22:0]; remaining<=awlen; tag<=awid;
-                    if(LOCAL_FC_OUTPUT && awaddr==FC_OUTPUT_ADDR && awlen==0)
-                        state<=LOCAL_WRITE_BEAT;
-                    else state<=WRITE_BEAT;
+                end else if(dma_cmd_valid && dma_cmd_ready) begin
+                    remaining<=dma_cmd_len;
+                    if (dma_cmd_write) begin
+                        addr<=dma_cmd_addr[22:0];
+                        state<=WRITE_BEAT;
+                    end else begin
+                        addr<=dma_cmd_addr[22] ? {4'b0,dma_cmd_addr[21:3]} : dma_cmd_addr[22:0];
+                        fetching<=0;
+                        scalar_alias<=dma_cmd_addr[22]; broadcast_lane<=dma_cmd_addr[23];
+                        last_sent<=0; state<=READ_REQ;
+                    end
                 end else if(fetch_req && !instruction_pending) begin
                     addr<=fetch_addr; fetching<=1; pair_fetching<=fetch_pair; broadcast_lane<=0;
                     fetch_length<=fetch_page_beats<{5'b0,fetch_words} ?
@@ -151,9 +144,9 @@ module axi_qpi_bridge #(
                             end
                         end
                     end
-                    if(r_fire) begin
+                    if(read_fire) begin
                         pending<=0;
-                        if(rlast)last_sent<=1;
+                        if(final_read_beat)last_sent<=1;
                         else begin
                             remaining<=remaining-1'b1;
                             addr<=addr+23'd8;
@@ -162,19 +155,16 @@ module axi_qpi_bridge #(
                     if(done)chunk_done<=1;
                     if((chunk_done || done) && !byte_valid) begin
                         if(fetching)state<=IDLE;
-                        else if(!pending || r_fire) begin
-                            if(last_sent || (r_fire && rlast))state<=IDLE;
+                        else if(!pending || read_fire) begin
+                            if(last_sent || (read_fire && final_read_beat))state<=IDLE;
                             else state<=READ_REQ;
                         end
                     end
                 end
 
-                // uart_stream captures the result on the same AXI W handshake.
-                // Keep the normal B response and skip the QPI write states.
-                LOCAL_WRITE_BEAT: if(wvalid)state<=WRITE_RESPONSE;
-                WRITE_BEAT: if(wvalid) begin
-                    beat<=wdata;
-                    case(wstrb)
+                WRITE_BEAT: if(dma_write_data_valid) begin
+                    beat<=dma_write_data;
+                    case(dma_write_strb)
                         8'h03: write_bytes<=2;
                         8'h0f: write_bytes<=4;
                         8'h3f: write_bytes<=6;
@@ -192,7 +182,7 @@ module axi_qpi_bridge #(
                         addr<=addr+23'd8; remaining<=remaining-1'b1; state<=WRITE_BEAT;
                     end
                 end
-                WRITE_RESPONSE: if(bready)state<=IDLE;
+                WRITE_RESPONSE: if(dma_rsp_ready)state<=IDLE;
                 default: state<=IDLE;
             endcase
         end
@@ -200,18 +190,17 @@ module axi_qpi_bridge #(
 
 `ifndef SYNTHESIS
     always @(posedge clk) if(rst_n) begin
-        if(arvalid && arready) begin
-            if(araddr[2:0]!=0)$fatal(1,"AXI read address must be beat-aligned");
-            if(araddr[22] && arlen!=0)$fatal(1,"scalar view requires one beat");
+        if(dma_cmd_valid && dma_cmd_ready && !dma_cmd_write) begin
+            if(dma_cmd_addr[2:0]!=0)$fatal(1,"DMA read address must be beat-aligned");
+            if(dma_cmd_addr[22] && dma_cmd_len!=0)$fatal(1,"scalar view requires one beat");
         end
-        if(wvalid && wready) begin
-            if(wstrb!=8'hff && wstrb!=8'h3f && wstrb!=8'h0f && wstrb!=8'h03)$fatal(1,"unexpected write strobe");
-            if(wlast!=(remaining==0))$fatal(1,"unexpected write last");
+        if(dma_write_data_valid && dma_write_data_ready) begin
+            if(dma_write_strb!=8'hff && dma_write_strb!=8'h3f && dma_write_strb!=8'h0f && dma_write_strb!=8'h03)$fatal(1,"unexpected write strobe");
         end
-        if(byte_valid && pending)$fatal(1,"PSRAM overwrote a pending AXI beat");
+        if(byte_valid && pending)$fatal(1,"PSRAM overwrote a pending DMA beat");
         if(fetching && complete_beat && instruction_pending && !fetch_take)
             $fatal(1,"PSRAM overwrote a pending instruction");
-        if(state==IDLE && !input_valid && !arvalid && !awvalid && fetch_req && !instruction_pending &&
+        if(state==IDLE && !input_valid && !dma_cmd_valid && fetch_req && !instruction_pending &&
            (fetch_words==0 || fetch_words>4 ||
             (fetch_pair ? (fetch_words!=1 || fetch_addr[0]!=0) : fetch_addr[2:0]!=0)))
             $fatal(1,"invalid instruction batch");

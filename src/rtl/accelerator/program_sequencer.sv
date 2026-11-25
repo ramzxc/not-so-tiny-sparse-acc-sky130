@@ -1,13 +1,15 @@
 // Keep a WB weight block resident while processing independent batch lanes.
-module program_sequencer (
-    input wire clk, rst_n, sync, frame_ready, tx_idle,
+module program_sequencer #(
+    parameter int VPU_WB_BASE = 32
+) (
+    input wire clk, rst_n, sync, frame_ready,
     input wire [2:0] batch_size,
     input wire [3:0] complete_frames,
     input wire [2:0] frame_slot,
     input wire [8:0] available_bytes,
     input wire full,
     output logic [63:0] inst_word,
-    output wire inst_enable, direct_wb,
+    output wire inst_enable,
     output wire fetch_req, fetch_take, fetch_pair,
     output logic [22:0] fetch_addr,
     input wire [63:0] fetched_word,
@@ -58,18 +60,15 @@ module program_sequencer (
     wire [7:0] rows_this_load = full_column ? 8'd32 : rows;
     wire [22:0] column_weight_addr = weight_addr + (full_column && upper_column_half ? 23'd128 : 23'd0);
     wire queued_sync = raw_instruction && fetched_word[7:0]==OPCODE_SYNCHRONIZE;
-    wire can_emit_raw = raw_instruction && fetch_valid && (!queued_sync || tx_idle);
+    wire can_emit_raw = raw_instruction && fetch_valid;
     wire emit = state==LOAD_INPUT || state==LOAD_WB || state==MAC ||
                 (state==SELECT_INPUT && active_samples[sample]);
 
     assign fetch_req = metadata_read || (need_probe && column_ready) ||
                        (raw_instruction && !full);
-    assign fetch_take = fetch_req && fetch_valid && (!queued_sync || tx_idle);
+    assign fetch_take = fetch_req && fetch_valid;
     assign fetch_pair = need_probe;
     assign inst_enable = !full && (emit || can_emit_raw);
-    // Internal FIFO qualifier for the VPU SRAM request. It is not encoded
-    // in the PSRAM instruction stream.
-    assign direct_wb = state==MAC;
 
     always_comb begin
         if (metadata_read) fetch_addr = TABLE_BASE + {11'b0,table_index,3'b0};
@@ -81,7 +80,8 @@ module program_sequencer (
             LOAD_INPUT: inst_word = {8'b0,scalar_alias,14'b0,sample,8'd1,OPCODE_DRAM_TO_BUFFER};
             LOAD_WB: inst_word = {9'b0,column_weight_addr,16'b0,rows_this_load,OPCODE_DRAM_TO_WEIGHT};
             SELECT_INPUT: inst_word = {53'b0,sample,1'b1,OPCODE_WEIGHT};
-            MAC: inst_word = {40'b0,acc_addr,rows_this_load,(OPCODE_VPU_VEC_MUL | 8'h01)};
+            MAC: inst_word = {24'b0,buffer_addr_type'(VPU_WB_BASE),acc_addr,rows_this_load,
+                              (OPCODE_VPU_VEC_MUL | 8'h01)};
             default: ;
         endcase
     end

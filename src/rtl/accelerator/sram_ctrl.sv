@@ -103,9 +103,9 @@ module sram_controller
         row_limit = '0;
         row_base = '0;
         case (selected_region)
-            0: begin row_limit = (AW+2)'(UB_ROWS); row_base = 0; end
-            1: begin row_limit = (AW+2)'(ACC_ROWS); row_base = (AW+2)'(UB_ROWS); end
-            2: begin row_limit = (AW+2)'(WB_ROWS); row_base = (AW+2)'(UB_ROWS+ACC_ROWS); end
+            SRAM_REGION_UB: begin row_limit = (AW+2)'(UB_ROWS); row_base = 0; end
+            SRAM_REGION_ACC: begin row_limit = (AW+2)'(ACC_ROWS); row_base = (AW+2)'(UB_ROWS); end
+            SRAM_REGION_WB: begin row_limit = (AW+2)'(WB_ROWS); row_base = (AW+2)'(UB_ROWS+ACC_ROWS); end
             default: ;
         endcase
         address_ok = !selected_address_high && selected_row < row_limit;

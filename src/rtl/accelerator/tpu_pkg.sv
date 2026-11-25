@@ -73,6 +73,13 @@ package tpu_pkg;
     localparam logic [OPCODE_WIDTH-1:0] OPCODE_BUFFER_TO_DRAM = 8'h42;
     localparam logic [OPCODE_WIDTH-1:0] OPCODE_ACC_TO_DRAM    = 8'h43;
     localparam logic [OPCODE_WIDTH-1:0] OPCODE_DRAM_TO_ACC    = 8'h44;
+    localparam logic [OPCODE_WIDTH-1:0] OPCODE_ACC_TO_UART    = 8'h45;
+
+    typedef enum logic [1:0] {
+        SRAM_REGION_UB = 2'd0,
+        SRAM_REGION_ACC = 2'd1,
+        SRAM_REGION_WB = 2'd2
+    } sram_region_type;
 
     // Synchronize
     // The host waits for the TPU until it flushes the instructions
@@ -278,6 +285,7 @@ package tpu_pkg;
         mem_op_store_buffer,
         mem_op_store_acc,
         mem_op_load_acc,
+        mem_op_acc_to_uart,
         mem_op_none
     } memory_op_type;
 

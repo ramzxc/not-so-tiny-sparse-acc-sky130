@@ -10,13 +10,11 @@ module inst_fifo
     input logic clk,
     input logic rst,
     input inst_type word,
-    input logic direct_wb,
     input logic write_en,
 
     input logic core_busy,
 
     output inst_type data_out,
-    output logic direct_wb_out,
 
     output logic inst_pop,
 
@@ -24,33 +22,17 @@ module inst_fifo
     output logic full
 );
 
-    localparam FIFO_WIDTH = $bits(inst_type)+1;
-
     logic pop;
 
     assign pop = !core_busy && !empty;
     assign inst_pop = pop;
-
-    //fifo #(
-    //    .FIFO_DEPTH(FIFO_DEPTH),
-    //    .FIFO_WIDTH($bits(inst_type))
-    //) fifo_0 (
-    //    .clk(clk),
-    //    .rst(rst),
-    //    .data_in(word),
-    //    .write_en(write_en),
-    //    .data_out(data_out),
-    //    .next_en(inst_pop),
-    //    .empty(empty),
-    //    .full(full)
-    //);
 
     localparam int PTR_WIDTH =
         (FIFO_DEPTH > 1) ? $clog2(FIFO_DEPTH) : 1;
 
     typedef logic [PTR_WIDTH-1:0] fifo_ptr_t;
 
-    logic [FIFO_WIDTH-1:0] ram [FIFO_DEPTH-1:0];
+    inst_type ram [FIFO_DEPTH-1:0];
 
     fifo_ptr_t   read_ptr_cs;
     fifo_ptr_t   write_ptr_cs;
@@ -72,7 +54,7 @@ module inst_fifo
 
     // Keep the existing fall-through interface: data_out always presents
     // the current FIFO head without adding a read-latency cycle.
-    assign {direct_wb_out,data_out} = empty ? '0 : ram[read_ptr_cs];
+    assign data_out = empty ? '0 : ram[read_ptr_cs];
 
     assign pop_fire = pop && !empty;
 
@@ -82,9 +64,7 @@ module inst_fifo
 `ifndef SYNTHESIS
     initial begin
         if (FIFO_DEPTH < 2)
-            $fatal(1, "fifo FIFO_DEPTH must be at least two");
-        if (FIFO_WIDTH < 1)
-            $fatal(1, "fifo FIFO_WIDTH must be positive");
+            $fatal(1, "inst_fifo FIFO_DEPTH must be at least two");
     end
 `endif
 
@@ -95,7 +75,7 @@ module inst_fifo
         end
         else begin
             if (push_fire) begin
-                ram[write_ptr_cs] <= {direct_wb,word};
+                ram[write_ptr_cs] <= word;
                 write_ptr_cs      <= next_ptr(write_ptr_cs);
             end
 

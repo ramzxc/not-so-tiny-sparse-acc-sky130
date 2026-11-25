@@ -6,8 +6,9 @@
 //   * unified buffer -> DRAM stores
 //   * accumulation buffer -> DRAM partial-result stores
 //   * DRAM -> accumulation buffer partial-result restores
+//   * accumulation buffer -> UART result words
 //   * Continuous byte-stream packing/unpacking across local-memory rows
-//   * AXI-sized burst command and data generation
+//   * Memory burst command and data generation
 module dma
     import tpu_pkg::*;
 #(
@@ -23,77 +24,43 @@ module dma
     input dram_inst_type inst,
     input logic          inst_enable,
 
-    output logic busy,
-    output logic weight_resource_busy,
-    output logic buffer_resource_busy,
-    output logic acc_resource_busy,
+    output logic          busy,
+    output logic          uart_range_error,
 
-    // Explicit DRAM -> weight-buffer preload (opcode 0x41).
-    output weight_addr_type weight_write_addr,
-    output fp8_type [COMPUTE_WIDTH-1:0] weight_write_data,
-    output logic weight_write_valid,
-    input logic weight_write_ready,
+    // One external-memory command at a time, with directional data handshakes.
+    output dram_addr_type                         dram_cmd_addr,
+    output logic [7:0]                            dram_cmd_len,
+    output logic                                  dram_cmd_write,
+    output logic                                  dram_cmd_valid,
+    input  logic                                  dram_cmd_ready,
 
-    // -------------------------------------------------------------
-    // DRAM Read-burst command and returned data stream
-    // -------------------------------------------------------------
-    output dram_addr_type                         dram_read_cmd_addr,
-    output logic [7:0]                            dram_read_cmd_len,
-    output logic                                  dram_read_cmd_valid,
-    input  logic                                  dram_read_cmd_ready,
-    input  logic [DRAM_DATA_BYTES*BYTE_WIDTH-1:0] dram_read_data,
-    input  logic                                  dram_read_data_last,
-    input  logic                                  dram_read_data_valid,
-    output logic                                  dram_read_data_ready,
+    input  logic [DRAM_DATA_BYTES*BYTE_WIDTH-1:0] dram_rsp_data,
+    input  logic                                  dram_rsp_valid,
+    output logic                                  dram_rsp_ready,
 
-    // -------------------------------------------------------------
-    // DRAM Write-burst command, data stream, and completion response
-    // -------------------------------------------------------------
-    output dram_addr_type                         dram_write_cmd_addr,
-    output logic [7:0]                            dram_write_cmd_len,
-    output logic                                  dram_write_cmd_valid,
-    input  logic                                  dram_write_cmd_ready,
     output logic [DRAM_DATA_BYTES*BYTE_WIDTH-1:0] dram_write_data,
     output logic [DRAM_DATA_BYTES-1:0]            dram_write_strb,
-    output logic                                  dram_write_data_last,
     output logic                                  dram_write_data_valid,
     input  logic                                  dram_write_data_ready,
-    input  logic                                  dram_write_rsp_valid,
-    output logic                                  dram_write_rsp_ready,
 
-    // -------------------------------------------------------------
-    // Local Memory Paths (UB, ACC)
-    // -------------------------------------------------------------
-    // DRAM to unified buffer.
-    output buffer_addr_type               buffer_write_addr,
-    output fp8_type [COMPUTE_WIDTH-1:0]  buffer_write_data,
-    output logic                          buffer_write_valid,
-    input  logic                          buffer_write_ready,
+    output logic [31:0]                           uart_result_data,
+    output logic [2:0]                            uart_result_bytes,
+    output logic                                  uart_result_valid,
+    input  logic                                  uart_result_ready,
 
-    // Unified buffer to DRAM.
-    output buffer_addr_type               buffer_read_req_addr,
-    output logic                          buffer_read_req_valid,
-    input  logic                          buffer_read_req_ready,
-    input  fp8_type [COMPUTE_WIDTH-1:0]  buffer_read_rsp_data,
-    input  logic                          buffer_read_rsp_valid,
-    output logic                          buffer_read_rsp_ready,
-
-    // Accumulator to DRAM.
-    output accumulator_addr_type          acc_read_req_addr,
-    output logic                          acc_read_req_valid,
-    input  logic                          acc_read_req_ready,
-    input  fp8_type [COMPUTE_WIDTH-1:0]  acc_read_rsp_data,
-    input  logic                          acc_read_rsp_valid,
-    output logic                          acc_read_rsp_ready,
-
-    // DRAM to accumulator.
-    output accumulator_addr_type          acc_write_addr,
-    output fp8_type [COMPUTE_WIDTH-1:0]  acc_write_data,
-    output logic                          acc_write_valid,
-    input  logic                          acc_write_ready
+    // The region stays selected for the active instruction, including stalls.
+    output sram_region_type                       sram_region,
+    output buffer_addr_type                       sram_req_addr,
+    output fp8_type [COMPUTE_WIDTH-1:0]            sram_req_data,
+    output logic                                  sram_req_write,
+    output logic                                  sram_req_valid,
+    input  logic                                  sram_req_ready,
+    input  fp8_type [COMPUTE_WIDTH-1:0]            sram_rsp_data,
+    input  logic                                  sram_rsp_valid,
+    output logic                                  sram_rsp_ready
 );
 
-    // This implementation targets two or four FP8 lanes and a 64-bit AXI beat.
+    // This implementation targets two or four FP8 lanes and a 64-bit memory beat.
     // LOAD/STORE are mutually exclusive, so address/count/data registers share
     // storage. FIFO entries contain data only; local addresses advance on use.
     localparam int ROW_BITS = 8*COMPUTE_WIDTH;
@@ -105,9 +72,8 @@ module dma
     localparam int BURST_W = $clog2(MAX_BURST_BEATS + 1);
     typedef logic [PTR_W-1:0] ptr_t;
     typedef logic [BURST_W-1:0] burst_t;
-    typedef enum logic [1:0] {DMA_IDLE, DMA_LOAD, DMA_STORE} state_t;
+    typedef enum logic [1:0] {DMA_IDLE, DMA_LOAD, DMA_STORE, DMA_UART} state_t;
     state_t state;
-    memory_op_type operation;
 
     logic [ROW_BITS-1:0] fifo [ROW_FIFO_DEPTH];
     ptr_t wr_ptr, rd_ptr, reserve_ptr;
@@ -127,9 +93,12 @@ module dma
     logic [7:0] beat_strb;
 
     logic command_fire, read_fire, write_fire, response_fire;
-    logic load_write_fire, store_req_fire, store_rsp_fire;
+    logic local_req_fire, load_write_fire, store_req_fire, store_rsp_fire;
+    logic uart_result_fire;
+    logic [2:0] inst_uart_bytes;
+    logic [3:0] inst_uart_end_lane;
     logic unpack_fire, pack_fire, consume_load_beat;
-    logic [ROW_BITS-1:0] unpack_row, store_row;
+    logic [ROW_BITS-1:0] unpack_row;
 
     function automatic ptr_t next_ptr(input ptr_t ptr);
         next_ptr = (ptr == PTR_W'(ROW_FIFO_DEPTH-1)) ? '0 : ptr + 1'b1;
@@ -140,7 +109,7 @@ module dma
         logic [9:0] boundary_beats;
         logic [7:0] selected;
     begin
-        // Aligned 8-byte AXI beats: low 12 bits define the 4 KiB boundary.
+        // Keep DMA requests within 4 KiB. The controller may split them further.
         // 512 must be representable when the address is page-aligned.
         boundary_beats = 10'd512 - {1'b0,address[11:3]};
         selected = remaining;
@@ -153,9 +122,6 @@ module dma
     endfunction
 
     assign busy = state != DMA_IDLE;
-    assign weight_resource_busy = state == DMA_LOAD && operation == mem_op_load_weight;
-    assign buffer_resource_busy = busy && (operation == mem_op_load_buffer || operation == mem_op_store_buffer);
-    assign acc_resource_busy = busy && (operation == mem_op_load_acc || operation == mem_op_store_acc);
     assign empty = wr_ptr == rd_ptr;
     assign full = next_ptr(wr_ptr) == rd_ptr;
     assign reserved_empty = reserve_ptr == wr_ptr;
@@ -163,51 +129,43 @@ module dma
     assign fifo_head = fifo[rd_ptr];
 
     assign command_beats = select_burst(command_addr,command_beats_left);
-    assign dram_read_cmd_addr = command_addr;
-    assign dram_write_cmd_addr = command_addr;
-    assign dram_read_cmd_len = command_beats == 0 ? 8'd0 : 8'(command_beats - 1'b1);
-    assign dram_write_cmd_len = dram_read_cmd_len;
-    assign dram_read_cmd_valid = state == DMA_LOAD && !burst_active && command_beats_left != 0;
-    assign dram_write_cmd_valid = state == DMA_STORE && !burst_active && command_beats_left != 0;
-    assign command_fire = (dram_read_cmd_valid && dram_read_cmd_ready) ||
-                          (dram_write_cmd_valid && dram_write_cmd_ready);
+    assign dram_cmd_addr = command_addr;
+    assign dram_cmd_len = command_beats == 0 ? 8'd0 : 8'(command_beats - 1'b1);
+    assign dram_cmd_write = state == DMA_STORE;
+    assign dram_cmd_valid = (state == DMA_LOAD || state == DMA_STORE) &&
+                            !burst_active && command_beats_left != 0;
+    assign command_fire = dram_cmd_valid && dram_cmd_ready;
 
-    assign weight_write_addr = weight_addr_type'(local_addr);
-    assign buffer_write_addr = local_addr;
-    assign acc_write_addr = accumulator_addr_type'(local_addr);
-    assign weight_write_data = fifo_head;
-    assign buffer_write_data = fifo_head;
-    assign acc_write_data = fifo_head;
-    assign weight_write_valid = state == DMA_LOAD && !empty && operation == mem_op_load_weight;
-    assign buffer_write_valid = state == DMA_LOAD && !empty && operation == mem_op_load_buffer;
-    assign acc_write_valid = state == DMA_LOAD && !empty && operation == mem_op_load_acc;
-    assign load_write_fire = (weight_write_valid && weight_write_ready) ||
-                             (buffer_write_valid && buffer_write_ready) ||
-                             (acc_write_valid && acc_write_ready);
+    assign sram_req_addr = local_addr;
+    assign sram_req_data = fifo_head;
+    assign sram_req_write = state == DMA_LOAD;
+    // No combinational ready -> valid path through the shared-memory arbiter.
+    assign sram_req_valid = (state == DMA_LOAD && !empty) ||
+                            (state == DMA_STORE && local_rows_left != 0 && !reserved_full) ||
+                            (state == DMA_UART && local_rows_left != 0 && uart_result_ready);
+    assign local_req_fire = sram_req_valid && sram_req_ready;
+    assign load_write_fire = local_req_fire && sram_req_write;
+    assign store_req_fire = local_req_fire && state == DMA_STORE;
+    assign sram_rsp_ready = state == DMA_UART ? uart_result_ready :
+                            (state == DMA_STORE && !reserved_empty && (!full || pack_fire));
+    assign store_rsp_fire = sram_rsp_valid && sram_rsp_ready;
+
+    // ACC_TO_UART reuses the low bits of the address register for its byte window.
+    assign inst_uart_bytes = inst.dram_addr[2:0] == 0 ? 3'd2 : inst.dram_addr[2:0];
+    assign inst_uart_end_lane = 4'(inst.dram_addr[4:3]) + 4'(inst_uart_bytes);
+    assign uart_result_data = 32'(sram_rsp_data) >> {command_addr[4:3], 3'b000};
+    assign uart_result_bytes = command_addr[2:0];
+    assign uart_result_valid = state == DMA_UART && sram_rsp_valid;
+    assign uart_result_fire = uart_result_valid && uart_result_ready;
+
     assign unpack_row = beat_data[row_index*ROW_BITS+:ROW_BITS];
     assign unpack_fire = state == DMA_LOAD && beat_valid && stream_rows_left != 0 &&
                          (!full || load_write_fire);
     assign consume_load_beat = unpack_fire && (row_index==ROW_INDEX_WIDTH'(ROWS_PER_BEAT-1) || stream_rows_left == 1);
-    assign dram_read_data_ready = state == DMA_LOAD && burst_active && burst_left != 0 &&
-                                  (!beat_valid || consume_load_beat);
-    assign read_fire = dram_read_data_valid && dram_read_data_ready;
-
-    assign buffer_read_req_addr = local_addr;
-    assign acc_read_req_addr = accumulator_addr_type'(local_addr);
-    // No combinational ready -> valid path through the shared-memory arbiter.
-    assign buffer_read_req_valid = state == DMA_STORE && operation == mem_op_store_buffer &&
-                                   local_rows_left != 0 && !reserved_full;
-    assign acc_read_req_valid = state == DMA_STORE && operation == mem_op_store_acc &&
-                                local_rows_left != 0 && !reserved_full;
-    assign store_req_fire = (buffer_read_req_valid && buffer_read_req_ready) ||
-                            (acc_read_req_valid && acc_read_req_ready);
-    assign buffer_read_rsp_ready = state == DMA_STORE && operation == mem_op_store_buffer &&
-                                   !reserved_empty && (!full || pack_fire);
-    assign acc_read_rsp_ready = state == DMA_STORE && operation == mem_op_store_acc &&
-                                !reserved_empty && (!full || pack_fire);
-    assign store_rsp_fire = (buffer_read_rsp_valid && buffer_read_rsp_ready) ||
-                            (acc_read_rsp_valid && acc_read_rsp_ready);
-    assign store_row = operation == mem_op_store_buffer ? buffer_read_rsp_data : acc_read_rsp_data;
+    assign dram_rsp_ready = burst_active &&
+        ((state == DMA_LOAD && burst_left != 0 && (!beat_valid || consume_load_beat)) ||
+         (state == DMA_STORE && burst_left == 0));
+    assign read_fire = state == DMA_LOAD && dram_rsp_valid && dram_rsp_ready;
 
     assign pack_fire = state == DMA_STORE && !empty && stream_rows_left != 0 &&
                        (!beat_valid || write_fire);
@@ -215,15 +173,14 @@ module dma
     assign dram_write_data = beat_data;
     assign dram_write_strb = beat_strb;
     assign dram_write_data_valid = state == DMA_STORE && burst_active && burst_left != 0 && beat_valid;
-    assign dram_write_data_last = burst_left == 1;
     assign write_fire = dram_write_data_valid && dram_write_data_ready;
-    assign dram_write_rsp_ready = state == DMA_STORE && burst_active && burst_left == 0;
-    assign response_fire = dram_write_rsp_valid && dram_write_rsp_ready;
+    assign response_fire = state == DMA_STORE && dram_rsp_valid && dram_rsp_ready;
 
     always_ff @(posedge clk) begin
         if (rst) begin
             state <= DMA_IDLE;
-            operation <= mem_op_none;
+            uart_range_error <= 1'b0;
+            sram_region <= SRAM_REGION_UB;
             wr_ptr <= '0;
             rd_ptr <= '0;
             reserve_ptr <= '0;
@@ -241,7 +198,6 @@ module dma
         end else begin
             if (state == DMA_IDLE) begin
                 if (inst_enable) begin
-                    operation <= memory_op_type'(inst.opcode[2:0]);
                     command_addr <= inst.dram_addr;
                     local_addr <= inst.sram_addr;
                     command_beats_left <= 8'(inst.length >> ROW_INDEX_WIDTH) + 8'(|inst.length[ROW_INDEX_WIDTH-1:0]);
@@ -258,9 +214,36 @@ module dma
                     reserve_ptr <= 0;
                     if (inst.length != 0) begin
                         case (memory_op_type'(inst.opcode[2:0]))
-                            mem_op_load_buffer, mem_op_load_weight, mem_op_load_acc: state <= DMA_LOAD;
-                            mem_op_store_buffer, mem_op_store_acc: state <= DMA_STORE;
-                            default: operation <= mem_op_none;
+                            mem_op_load_buffer: begin
+                                state <= DMA_LOAD;
+                                sram_region <= SRAM_REGION_UB;
+                            end
+                            mem_op_load_weight: begin
+                                state <= DMA_LOAD;
+                                sram_region <= SRAM_REGION_WB;
+                            end
+                            mem_op_load_acc: begin
+                                state <= DMA_LOAD;
+                                sram_region <= SRAM_REGION_ACC;
+                            end
+                            mem_op_store_buffer: begin
+                                state <= DMA_STORE;
+                                sram_region <= SRAM_REGION_UB;
+                            end
+                            mem_op_store_acc: begin
+                                state <= DMA_STORE;
+                                sram_region <= SRAM_REGION_ACC;
+                            end
+                            mem_op_acc_to_uart: begin
+                                if (inst_uart_end_lane <= 4'(COMPUTE_WIDTH)) begin
+                                    state <= DMA_UART;
+                                    sram_region <= SRAM_REGION_ACC;
+                                    command_addr[2:0] <= inst_uart_bytes;
+                                end else begin
+                                    uart_range_error <= 1'b1;
+                                end
+                            end
+                            default: ;
                         endcase
                     end
                 end
@@ -271,7 +254,7 @@ module dma
                     burst_left <= command_beats;
                     burst_active <= 1;
                 end
-                if (load_write_fire || store_req_fire) begin
+                if (local_req_fire) begin
                     local_addr <= local_addr + 1'b1;
                     local_rows_left <= local_rows_left - 1'b1;
                 end
@@ -285,7 +268,7 @@ module dma
                     end
                     // A newly accepted beat replaces the consumed beat on the same edge.
                     if (read_fire) begin
-                        beat_data <= dram_read_data;
+                        beat_data <= dram_rsp_data;
                         beat_valid <= 1;
                         row_index <= 0;
                         burst_left <= burst_left - 1'b1;
@@ -293,11 +276,11 @@ module dma
                     end
                     if (load_write_fire) begin
                         rd_ptr <= next_ptr(rd_ptr);
-                        if (local_rows_left == 1) begin state <= DMA_IDLE; operation <= mem_op_none; end
+                        if (local_rows_left == 1) state <= DMA_IDLE;
                     end
-                end else begin
+                end else if (state == DMA_STORE) begin
                     if (store_req_fire) reserve_ptr <= next_ptr(reserve_ptr);
-                    if (store_rsp_fire) begin fifo[wr_ptr] <= store_row; wr_ptr <= next_ptr(wr_ptr); end
+                    if (store_rsp_fire) begin fifo[wr_ptr] <= sram_rsp_data; wr_ptr <= next_ptr(wr_ptr); end
                     if (write_fire) begin
                         burst_left <= burst_left - 1'b1;
                         beat_valid <= 0;
@@ -317,9 +300,11 @@ module dma
                         burst_active <= 0;
                         if (command_beats_left == 0 && stream_rows_left == 0) begin
                             state <= DMA_IDLE;
-                            operation <= mem_op_none;
                         end
                     end
+                end else if (uart_result_fire) begin
+                    stream_rows_left <= stream_rows_left - 1'b1;
+                    if (stream_rows_left == 1) state <= DMA_IDLE;
                 end
             end
         end
@@ -327,15 +312,14 @@ module dma
 `ifndef SYNTHESIS
     initial begin
         if ((COMPUTE_WIDTH != 2 && COMPUTE_WIDTH != 4) || DRAM_DATA_BYTES != 8 || LENGTH_WIDTH != 8)
-            $fatal(1,"DMA requires two or four FP8 lanes, 64-bit AXI and 8-bit length");
+            $fatal(1,"DMA requires two or four FP8 lanes, 64-bit beats and 8-bit length");
         if (ROW_FIFO_DEPTH < 2 || MAX_BURST_BYTES < 8 || MAX_BURST_BYTES > 2048 || MAX_BURST_BYTES % 8 != 0)
             $fatal(1,"Invalid DMA FIFO/burst parameters");
     end
     always @(posedge clk) begin
-        if (!rst && state == DMA_IDLE && inst_enable && inst.length != 0 && inst.dram_addr[2:0] != 0)
-            $error("DMA AXI addresses must be 8-byte aligned");
-        if (!rst && read_fire && dram_read_data_last != (burst_left == 1))
-            $error("DMA read LAST mismatch");
+        if (!rst && state == DMA_IDLE && inst_enable && inst.length != 0 &&
+            inst.opcode[2:0] != mem_op_acc_to_uart && inst.dram_addr[2:0] != 0)
+            $error("DMA addresses must be 8-byte aligned");
     end
 `endif
 endmodule

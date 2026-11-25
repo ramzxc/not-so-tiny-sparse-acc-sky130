@@ -1,4 +1,5 @@
-module uart_stream #(
+// UART host port with PSRAM input slots and direct result output.
+module uart #(
     parameter int INGRESS_BYTES = 2,
     parameter int SLOT_BITS = 2
 ) (
@@ -10,7 +11,6 @@ module uart_stream #(
     output wire frame_ready,
     output wire [SLOT_BITS-1:0] frame_slot,
     output wire [SLOT_BITS:0] complete_frames,
-    output wire tx_idle,
     output wire [8:0] available_bytes,
 
     output logic input_valid,
@@ -18,13 +18,12 @@ module uart_stream #(
     output logic [8*INGRESS_BYTES-1:0] input_data,
     input wire input_ready, input_done,
 
-    input wire aw_fire,
-    input wire [31:0] awaddr,
-    input wire w_fire,
-    input wire [63:0] wdata
+    input wire result_valid,
+    input wire [31:0] result_data,
+    input wire [2:0] result_bytes,
+    output wire result_ready
 );
     localparam logic [22:0] INPUT_BASE = 23'h008000;
-    localparam logic [22:0] OUTPUT_BASE = 23'h003800;
     wire [9:0] uart_bit_last = uart_clks_per_bit - 10'd1;
     logic [SLOT_BITS:0] produced, consumed;
     logic [8:0] byte_offset;
@@ -32,9 +31,6 @@ module uart_stream #(
     logic [8:0] committed_bytes;
     logic final_beat, inflight_final;
     logic queue_fault;
-    logic [19:0] tx_word;
-    logic [4:0] tx_bits;
-    logic [9:0] tx_timer;
     wire [SLOT_BITS:0] pending_frames = produced - consumed;
     localparam logic [8:0] INGRESS_MASK = 9'(INGRESS_BYTES-1);
     wire [8:0] padded_bytes = (input_bytes + INGRESS_MASK) & ~INGRESS_MASK;
@@ -59,7 +55,6 @@ module uart_stream #(
     assign frame_ready = available_bytes != 0;
     assign frame_slot = consumed[SLOT_BITS-1:0];
     assign complete_frames = pending_frames;
-    assign tx_idle = tx_bits==0;
     assign fault = receive_fault || queue_fault;
 
     // A queued complete slot is entirely readable. The producer also exposes
@@ -89,7 +84,7 @@ module uart_stream #(
                 end else committed_bytes <= committed_bytes + 9'(INGRESS_BYTES);
             end
             if (sync) begin
-                if (pending_frames == 0 || tx_bits != 0) queue_fault <= 1;
+                if (pending_frames == 0) queue_fault <= 1;
                 consumed <= consumed + 1'b1;
             end
             if (received) begin
@@ -114,41 +109,11 @@ module uart_stream #(
         end
     end
 
-    logic [22:0] store_addr;
-    logic [15:0] result;
-    always_ff @(posedge clk) begin
-        if (!rst_n) begin
-            store_addr <= '0;
-            result <= '0;
-        end else begin
-            if (aw_fire) store_addr <= awaddr[22:0];
-            else if (w_fire) begin
-                store_addr <= store_addr + 23'd8;
-                if (store_addr == OUTPUT_BASE) result <= wdata[15:0];
-            end
-        end
-    end
-
-    assign tx = tx_bits == 0 ? 1'b1 : tx_word[0];
-    always_ff @(posedge clk) begin
-        if (!rst_n) begin
-            tx_word <= '1;
-            tx_bits <= '0;
-            tx_timer <= '0;
-        end else if (sync && tx_bits == 0) begin
-            tx_word <= {1'b1,result[15:8],1'b0,1'b1,result[7:0],1'b0};
-            tx_bits <= 20;
-            tx_timer <= 0;
-        end else if (tx_bits != 0) begin
-            if (tx_timer == uart_bit_last) begin
-                tx_timer <= 0;
-                tx_bits <= tx_bits - 1'b1;
-                tx_word <= {1'b1,tx_word[19:1]};
-            end else begin
-                tx_timer <= tx_timer + 1'b1;
-            end
-        end
-    end
+    uart_tx uart_output (
+        .clk(clk), .rst_n(rst_n), .bit_last(uart_bit_last),
+        .start(result_valid), .data_in(result_data), .byte_count(result_bytes),
+        .tx(tx), .idle(result_ready)
+    );
 `ifndef SYNTHESIS
     initial if (INGRESS_BYTES != 2 && INGRESS_BYTES != 8) $fatal(1,"Unsupported ingress write size");
 `endif
