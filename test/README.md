@@ -17,13 +17,13 @@ make -C test -f Makefile.data_ctrl
 make -C test -f Makefile.activation
 ```
 
-- The default test drives real UART instructions and QSPI Flash pins. Only the
-  external Flash model is preloaded. It exercises FP16 execution, SRAM storage,
-  accumulation, sparse reads, boundary addresses and retained data after reset.
+- The default test uses the Tiny Tapeout wrapper with the current FP8 RTL
+  from `src/sources.f`. It checks QPI boot, UART input, DMA, FP8 execution,
+  and UART output. The bench is in `rtl/tb/` and the QPI models are in
+  `rtl/models/`.
+- The component makefiles below exercise the earlier FP16 RTL in `src/legacy/`.
 - `Makefile.exec` checks FP16 operations and activations against a Python model,
   scalar selection, sparse zero bypass and snapshots during execution.
-- The UART test also exercises two prefetched inputs, explicit column selection,
-  repeated accumulation, selected-zero weight skipping and nonzero subnormals.
 - `Makefile.mem_itf` checks all 128 SRAM vectors, neighboring halves of a word,
   accumulation, invalid accesses and reset cancellation using the OpenRAM model.
 - `Makefile.dma` checks random request/response delays, completion after writes,
@@ -49,6 +49,6 @@ make -C test -f Makefile.activation
 Build outputs default to `/tmp`; the default test writes `test/results.xml`.
 `BUILD=/tmp/another-build` selects a different build directory.
 
-`GATES=yes` selects the packaged gate netlist and cell models. The checked-in
-macro still implements the previous core, so it needs rebuilding before the
-new protocol can pass gate-level tests. RTL tests are not post-layout validation.
+`GATES=yes` selects the routed netlists and PDK cell models. It runs the
+wrapper smoke test with the packaged macro's UART configuration. This uses
+the `gate_level_netlist.v` produced by the Tiny Tapeout flow.

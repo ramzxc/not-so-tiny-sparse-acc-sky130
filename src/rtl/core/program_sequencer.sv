@@ -1,5 +1,5 @@
 // Keep a WB weight block resident while processing independent batch lanes.
-module micro_ctrl (
+module program_sequencer (
     input wire clk, rst_n, sync, frame_ready, tx_idle,
     input wire [2:0] batch_size,
     input wire [3:0] complete_frames,
@@ -32,6 +32,9 @@ module micro_ctrl (
     logic [8:0] table_index, column, columns_left;
     logic [22:0] weight_addr;
     logic [2:0] row_shift;
+    logic upper_column_half;
+    // The 256-byte ACC holds the complete column. WB holds one half.
+    wire full_column = row_shift == 3'd6;
     logic [3:0] active_samples;
     logic probe_valid;
     logic [9:0] probe_group;
@@ -50,7 +53,10 @@ module micro_ctrl (
     wire [23:0] scalar_alias = 24'hc00000 + {1'b0,scalar_addr[19:0],3'b0};
     wire [7:0] rows = 8'd1 << row_shift;
     wire [22:0] weight_stride = row_shift<1 ? 23'd8 : 23'(rows)*4;
-    wire [7:0] acc_addr = 8'(sample)<<row_shift;
+    wire [7:0] acc_addr = full_column ? (upper_column_half ? 8'd32 : 8'd0)
+                                           : 8'(sample) << row_shift;
+    wire [7:0] rows_this_load = full_column ? 8'd32 : rows;
+    wire [22:0] column_weight_addr = weight_addr + (full_column && upper_column_half ? 23'd128 : 23'd0);
     wire queued_sync = raw_instruction && fetched_word[7:0]==OPCODE_SYNCHRONIZE;
     wire can_emit_raw = raw_instruction && fetch_valid && (!queued_sync || tx_idle);
     wire emit = state==LOAD_INPUT || state==LOAD_WB || state==MAC ||
@@ -73,9 +79,9 @@ module micro_ctrl (
         inst_word = fetched_word;
         case (state)
             LOAD_INPUT: inst_word = {8'b0,scalar_alias,14'b0,sample,8'd1,OPCODE_DRAM_TO_BUFFER};
-            LOAD_WB: inst_word = {9'b0,weight_addr,16'b0,rows,OPCODE_DRAM_TO_WEIGHT};
+            LOAD_WB: inst_word = {9'b0,column_weight_addr,16'b0,rows_this_load,OPCODE_DRAM_TO_WEIGHT};
             SELECT_INPUT: inst_word = {53'b0,sample,1'b1,OPCODE_WEIGHT};
-            MAC: inst_word = {40'b0,acc_addr,rows,(OPCODE_VPU_VEC_MUL | 8'h01)};
+            MAC: inst_word = {40'b0,acc_addr,rows_this_load,(OPCODE_VPU_VEC_MUL | 8'h01)};
             default: ;
         endcase
     end
@@ -94,6 +100,7 @@ module micro_ctrl (
             columns_left <= 0;
             weight_addr <= 0;
             row_shift <= 0;
+            upper_column_half <= 0;
             active_samples <= 0;
             probe_valid <= 0;
             probe_group <= 0;
@@ -164,7 +171,10 @@ module micro_ctrl (
                     end
                 end
                 MAC: if (inst_enable) begin
-                    if (3'(sample)+1'b1==samples) state <= NEXT_COLUMN;
+                    if (full_column && !upper_column_half) begin
+                        upper_column_half <= 1;
+                        state <= LOAD_WB;
+                    end else if (3'(sample)+1'b1==samples) state <= NEXT_COLUMN;
                     else begin
                         sample <= sample+1'b1;
                         state <= SELECT_INPUT;
@@ -172,6 +182,7 @@ module micro_ctrl (
                 end
                 NEXT_COLUMN: begin
                     column <= column + 1'b1;
+                    upper_column_half <= 0;
                     columns_left <= columns_left - 1'b1;
                     weight_addr <= weight_addr + weight_stride;
                     active_samples <= 0;
@@ -192,8 +203,9 @@ module micro_ctrl (
         if (inst_enable && (inst_word[7:0]==8'hfd || inst_word[7:0]==8'hfe || inst_word[7:0]==8'h0a))
             $fatal(1,"Unexpected opcode");
         if (fetch_take && state==TABLE_META && fetched_word[16:0]!=TABLE_END &&
-            (fetched_word[34:26]==0 || fetched_word[16:0]<pc || fetched_word[37:35]>5 ||
-             ((32'd1<<fetched_word[37:35])*32'(samples)>32)))
+            (fetched_word[34:26]==0 || fetched_word[16:0]<pc || fetched_word[37:35]>6 ||
+             ((32'd1<<fetched_word[37:35])*32'(samples)>64) ||
+             (fetched_word[37:35]==3'd6 && samples!=1)))
             $fatal(1,"Invalid repeat descriptor");
         if (fetch_take && state==TABLE_WEIGHT && (fetched_word[63:21]!=0 || fetched_word[2:0]!=0))
             $fatal(1,"Invalid WB address");

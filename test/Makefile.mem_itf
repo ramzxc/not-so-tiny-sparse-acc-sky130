@@ -6,7 +6,7 @@ ROOT := $(abspath $(CURDIR)/..)
 BUILD ?= /tmp/acc-mem-itf
 SIM_BUILD = $(BUILD)/sim
 COCOTB_RESULTS_FILE = $(BUILD)/results.xml
-VERILOG_SOURCES = $(ROOT)/src/rtl/shared_sram.sv $(ROOT)/src/rtl/mem_itf.sv
+VERILOG_SOURCES = $(ROOT)/src/legacy/shared_sram.sv $(ROOT)/src/legacy/mem_itf.sv
 VERILOG_SOURCES += $(ROOT)/memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.v
-COMPILE_ARGS += -I$(ROOT)/src/rtl -I$(ROOT)/src/rtl -Wno-fatal --timing --timescale-override 1ns/1ps
+COMPILE_ARGS += -I$(ROOT)/src/legacy -I$(ROOT)/src/legacy -Wno-fatal --timing --timescale-override 1ns/1ps
 include $(shell cocotb-config --makefiles)/Makefile.sim

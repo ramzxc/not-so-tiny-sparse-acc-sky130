@@ -1,4 +1,4 @@
-module acc_native_fp8_macro (
+module acc_hard_macro (
     input wire clk, rst_n, uart_rx_i,
     input wire [3:0] qspi_dq_i,
     output wire [7:0] uo_out, uio_out, uio_oe
@@ -12,7 +12,7 @@ module acc_native_fp8_macro (
 
     wire tx, sck, cs_n, fault, ready;
     wire [3:0] dq_out, dq_oe;
-    uart_batch_fp8_accel #(.INGRESS_BYTES(2)) accelerator (
+    accelerator_top #(.INGRESS_BYTES(2)) accelerator (
         .clk(clk), .rst_n(core_rst_n), .rx(uart_rx_i), .dq_in(qspi_dq_i),
         .dq_out(dq_out), .dq_oe(dq_oe), .tx(tx), .sck(sck), .cs_n(cs_n),
         .fault(fault), .ready(ready)

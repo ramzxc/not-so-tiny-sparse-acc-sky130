@@ -523,7 +523,7 @@ module tpu_core
     assign m_wdata[11] = dma_acc_write_data;
     assign m_accumulate[11] = '0;
     assign m_rsp_ready[11] = '1;
-    mem_ctrl #(.SRAM_BYTES(SRAM_BYTES), .COMPUTE_WIDTH(COMPUTE_WIDTH), .UB_ROWS(UNIFIED_BUFFER_DEPTH),
+    sram_controller #(.SRAM_BYTES(SRAM_BYTES), .COMPUTE_WIDTH(COMPUTE_WIDTH), .UB_ROWS(UNIFIED_BUFFER_DEPTH),
                .ACC_ROWS(REGISTER_DEPTH), .WB_ROWS(WEIGHT_BUFFER_DEPTH)) memory_controller (
         .clk(clk), .rst(rst), .req_valid(m_valid), .req_ready(m_ready),
         .req_write(m_write), .req_accumulate(m_accumulate), .req_region(m_region),

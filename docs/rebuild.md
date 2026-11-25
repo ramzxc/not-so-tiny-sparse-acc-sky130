@@ -34,7 +34,7 @@ There is no separate SPI host bridge or old DMA/controller path.
 MEM device `00` retains tiny's Flash path. Previously unused device `01` selects
 flat SRAM. Devices `10/11` are rejected. MEM bit 9 is a local extension for
 SRAM read-add-write; it is valid only on SRAM writes. Other reserved bits should
-be zero. Instruction macros are in `src/rtl/defs/inst_defs.vh`.
+be zero. Instruction macros are in `src/legacy/defs/inst_defs.vh`.
 
 DATA LOAD selects the operand register for the following MEM READ. DATA STORE
 snapshots the last held execution result; MEM WRITE stores that snapshot.
@@ -318,6 +318,6 @@ Reset clears control and error state, not memory. A pending operation may be
 cancelled before its write is captured by the SRAM; a captured write can still
 commit. External Flash operations already started cannot be undone.
 
-`src/sources.f` selects the new RTL. Existing macro GDS, LEF, netlist and timing
+`src/legacy/sources.f` lists the historical rebuild RTL. Existing macro GDS, LEF, netlist and timing
 views are from the previous core. They are not inputs to the current Actions flow. Actions synthesizes the RTL
 and uses only the SRAM physical macro. Local DC/ICC2 builds remain separate.

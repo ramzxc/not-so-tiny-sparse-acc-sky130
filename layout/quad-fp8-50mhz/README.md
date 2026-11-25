@@ -7,8 +7,11 @@ routed for a 20 ns clock on the existing 8×2 floorplan.
 
 - `acc_native_fp8_macro.gds` contains the routed core, SKY130HD cell
   geometry, and the embedded 512-byte SRAM geometry.
-- `rtl/` is the source snapshot from the synthesis run, in compilation
-  order in `rtl/sources.f`. The SRAM simulation model is supplied by the
+- Current synthesizable sources live in `src/rtl/` at the repository root.
+  The compilation order is in `src/sources.f`.
+  The RTL uses the fixed 256-byte ACC map and reads the UART divisor from
+  the PSRAM boot header. The archived physical views use the earlier
+  128-byte ACC map and the fixed 87-clock UART divisor. The SRAM simulation model is supplied by the
   existing OpenRAM macro sources in this project.
 - `acc_native_fp8_macro.routed.v` and the matching SDC come from the same
   PnR run.

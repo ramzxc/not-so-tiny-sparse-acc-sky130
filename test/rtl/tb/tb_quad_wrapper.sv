@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 module tb_quad_wrapper;
-    localparam integer CLKS_PER_BIT = 87;
+    integer clks_per_bit = 87;
     reg clk = 0, rst_n = 0, rx = 1;
     reg done = 0;
     always #10 clk = ~clk;
@@ -29,29 +29,30 @@ module tb_quad_wrapper;
 
     task automatic send(input [7:0] value);
         rx = 0;
-        repeat(CLKS_PER_BIT) @(negedge clk);
+        repeat(clks_per_bit) @(negedge clk);
         for (integer bit_index = 0; bit_index < 8; bit_index++) begin
             rx = value[bit_index];
-            repeat(CLKS_PER_BIT) @(negedge clk);
+            repeat(clks_per_bit) @(negedge clk);
         end
         rx = 1;
-        repeat(CLKS_PER_BIT) @(negedge clk);
+        repeat(clks_per_bit) @(negedge clk);
     endtask
 
     task automatic receive(output reg [7:0] value);
         @(negedge uo[4]);
-        repeat(CLKS_PER_BIT + CLKS_PER_BIT/2) @(negedge clk);
+        repeat(clks_per_bit + clks_per_bit/2) @(negedge clk);
         for (integer bit_index = 0; bit_index < 8; bit_index++) begin
             value[bit_index] = uo[4];
-            repeat(CLKS_PER_BIT) @(negedge clk);
+            repeat(clks_per_bit) @(negedge clk);
         end
         if (uo[4] !== 1'b1) $fatal(1,"UART stop bit");
     endtask
 
-    reg [7:0] low, high;
-    initial begin
-        #1;
-        put('h1ffff8, 64'h202);          // batch 1, two input channels
+    task automatic exchange(input integer header_divisor);
+        reg [7:0] low, high;
+        rst_n = 0;
+        clks_per_bit = header_divisor == 0 ? 87 : header_divisor;
+        put('h1ffff8, 64'h202 | (64'(header_divisor) << 12)); // batch 1, two channels
         put('h1ff000, 64'h1ffff);        // no repeated blocks
         put('h200000, 64'h00009000_00000240); // load 2 UB rows
         put('h200008, 64'h00000000_00000108); // select UB row 0
@@ -59,6 +60,16 @@ module tb_quad_wrapper;
         put('h200018, 64'h00003800_00000143); // send ACC row 0 to FC destination
         put('h200020, 64'h00000000_000000ff); // synchronize
         put('h9000, 64'h00_00_3c_40_00_00_40_38);
+        // At 1 Mbaud, also spill ACC, clobber it, reload it, then add a second product.
+        if (header_divisor == 50) begin
+            put('h200018, 64'h00009100_00000143); // store partial sum
+            put('h200020, 64'h00009108_00000144); // clobber ACC
+            put('h200028, 64'h00009100_00000144); // reload partial sum
+            put('h200030, 64'h00000000_01000121); // accumulate another product
+            put('h200038, 64'h00003800_00000143);
+            put('h200040, 64'h00000000_000000ff);
+            put('h9108, 0);
+        end
         repeat(32) @(negedge clk);
         rst_n = 1;
         wait (uo[2] === 1'b1);
@@ -67,18 +78,37 @@ module tb_quad_wrapper;
             begin send(8'h30); send(8'h38); end
             begin receive(low); receive(high); end
         join
-        if ({high,low} !== 16'h4440 || uo[1] !== 1'b0)
+        if ({high,low} !== (header_divisor == 50 ? 16'h4c48 : 16'h4440) || uo[1] !== 1'b0)
             $fatal(1,"FC output %h, fault bit %b", {high,low}, uo[1]);
+        if (header_divisor == 50 && {memory.mem['h9101],memory.mem['h9100]} !== 16'h4440)
+            $fatal(1,"ACC partial sum did not reach PSRAM");
         if ({memory.mem['h8001],memory.mem['h8000]} !== 16'h3830)
             $fatal(1,"UART input did not reach PSRAM");
-        $display("QUAD_WRAPPER_UART_QPI_PASS");
+        $display("QUAD_WRAPPER_UART_QPI_PASS clocks_per_bit=%0d", clks_per_bit);
+    endtask
+
+    initial begin
+        #1;
+        exchange(0);
+`ifndef GL_TEST
+        exchange(50);
+        exchange(434);
+
+        rst_n = 0;
+        put('h1ffff8, 64'h202 | (64'd31 << 12));
+        repeat(32) @(negedge clk);
+        rst_n = 1;
+        repeat(200) @(negedge clk);
+        if (uo[2] !== 1'b0 || uo[1] !== 1'b1)
+            $fatal(1,"Unsupported UART divisor did not raise the boot fault");
+`endif
         done = 1;
 `ifndef COCOTB_SIM
         $finish;
 `endif
     end
     initial begin
-        repeat(10000) @(negedge clk);
+        repeat(35000) @(negedge clk);
         if (!done) $fatal(1,"Timeout waiting for UART/QPI exchange");
     end
 endmodule

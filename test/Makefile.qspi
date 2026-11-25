@@ -6,6 +6,6 @@ ROOT := $(abspath $(CURDIR)/..)
 BUILD ?= /tmp/acc-qspi-burst
 SIM_BUILD = $(BUILD)/sim
 COCOTB_RESULTS_FILE = $(BUILD)/results.xml
-VERILOG_SOURCES = $(ROOT)/src/rtl/qspi_ctrl.v $(CURDIR)/qspi_nor_model.sv $(CURDIR)/tb_qspi_burst.sv
-COMPILE_ARGS += -I$(ROOT)/src/rtl -Wno-fatal --timing --timescale-override 1ns/1ps
+VERILOG_SOURCES = $(ROOT)/src/legacy/qspi_ctrl.v $(CURDIR)/rtl/models/qspi_nor_model.sv $(CURDIR)/rtl/tb/tb_qspi_burst.sv
+COMPILE_ARGS += -I$(ROOT)/src/legacy -Wno-fatal --timing --timescale-override 1ns/1ps
 include $(shell cocotb-config --makefiles)/Makefile.sim

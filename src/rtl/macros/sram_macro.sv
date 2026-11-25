@@ -1,5 +1,5 @@
 // Select exactly one generated OpenRAM 1RW macro. The 65th bit is a spare.
-module shared_sram #(
+module sram_macro #(
     parameter int SRAM_BYTES = 512,
     parameter int ADDR_WIDTH = $clog2(SRAM_BYTES / 8)
 )(
@@ -25,6 +25,6 @@ module shared_sram #(
     assign rdata = raw_data[63:0];
 `ifndef SYNTHESIS
     initial if (SRAM_BYTES != 512 && SRAM_BYTES != 1024)
-        $fatal(1, "shared_sram requires 512 or 1024 bytes");
+        $fatal(1, "sram_macro requires 512 or 1024 bytes");
 `endif
 endmodule

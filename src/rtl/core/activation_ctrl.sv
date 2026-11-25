@@ -132,7 +132,7 @@ module activation_ctrl
 
     assign accept_inst = inst_enable && !issue_valid_cs;
 
-    // Registered FIFO occupancy avoids a ready-to-valid loop through mem_ctrl.
+    // Registered FIFO occupancy avoids a ready-to-valid loop through sram_controller.
     assign acc_req_valid =
         issue_valid_cs && !fifo_full;
 

@@ -2,7 +2,7 @@
 // Region 0=UB, 1=ACC, 2=WB. Each physical word holds two or four logical rows.
 // Round-robin arbitration; two shared tagged response slots. Writes are atomic
 // read-modify-write transactions because the macro has no byte write mask.
-module mem_ctrl
+module sram_controller
     import tpu_pkg::*;
 #(
     parameter int SRAM_BYTES = DEFAULT_SRAM_BYTES,
@@ -125,7 +125,7 @@ module mem_ctrl
     assign macro_enable = !rst && ((state == IDLE && selected_valid && address_ok) || state == WRITE_COMMIT);
     assign macro_write = (state == WRITE_COMMIT);
     assign macro_addr = (state == WRITE_COMMIT) ? saved_addr : mapped_addr;
-    shared_sram #(.SRAM_BYTES(SRAM_BYTES)) memory (
+    sram_macro #(.SRAM_BYTES(SRAM_BYTES)) memory (
         .clk(clk), .enable(macro_enable), .write(macro_write),
         .addr(macro_addr), .wdata(write_word), .rdata(macro_data)
     );
@@ -200,7 +200,7 @@ module mem_ctrl
     end
 `ifndef SYNTHESIS
     initial begin
-        if (CLIENTS < 2) $fatal(1,"mem_ctrl requires at least two clients");
+        if (CLIENTS < 2) $fatal(1,"sram_controller requires at least two clients");
         if (UB_ROWS < 2 || ACC_ROWS < 2 || WB_ROWS < 2 ||
             (UB_ROWS % ROWS_PER_WORD != 0) || (ACC_ROWS % ROWS_PER_WORD != 0) || (WB_ROWS % ROWS_PER_WORD != 0) ||
             ((UB_ROWS+ACC_ROWS+WB_ROWS)*COMPUTE_WIDTH > SRAM_BYTES))

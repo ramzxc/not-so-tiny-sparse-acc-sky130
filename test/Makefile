@@ -15,11 +15,12 @@ VERILOG_SOURCES += $(ROOT)/macro/acc_hard_macro/acc_hard_macro.v
 VERILOG_SOURCES += $(CURDIR)/gate_level_netlist.v
 else
 SIM ?= verilator
-QUAD := $(ROOT)/layout/quad-fp8-50mhz
-VERILOG_SOURCES = $(addprefix $(QUAD)/,$(shell cat $(QUAD)/rtl/sources.f))
-VERILOG_SOURCES += $(CURDIR)/quad_macro_adapter.sv $(ROOT)/src/wrapper/project.v
-COMPILE_ARGS += -DCOCOTB_SIM -I$(QUAD)/rtl -Wno-fatal --timing --timescale-override 1ns/1ps
+RTL_FILELIST := $(shell cat $(ROOT)/src/sources.f)
+RTL_INC_DIRS := $(patsubst +incdir+%,%,$(filter +incdir+%,$(RTL_FILELIST)))
+VERILOG_SOURCES = $(addprefix $(ROOT)/,$(filter-out +incdir+%,$(RTL_FILELIST)))
+VERILOG_SOURCES += $(ROOT)/src/wrapper/project.v
+COMPILE_ARGS += -DCOCOTB_SIM $(addprefix -I$(ROOT)/,$(RTL_INC_DIRS)) -Wno-fatal --timing --timescale-override 1ns/1ps
 endif
 VERILOG_SOURCES += $(ROOT)/memory/openram/generated/tt_sram_1rw_64x64_sky130/tt_sram_1rw_64x64_sky130.v
-VERILOG_SOURCES += $(CURDIR)/tb_quad_wrapper.sv $(CURDIR)/qspi_psram_model.sv
+VERILOG_SOURCES += $(CURDIR)/rtl/tb/tb_quad_wrapper.sv $(CURDIR)/rtl/models/qspi_psram_model.sv
 include $(shell cocotb-config --makefiles)/Makefile.sim

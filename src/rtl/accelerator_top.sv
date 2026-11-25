@@ -1,5 +1,5 @@
 // UART and QPI pins for the weight-stationary FP8 batch experiment.
-module uart_batch_fp8_accel #(
+module accelerator_top #(
     parameter int INGRESS_BYTES = 2
 ) (
     input wire clk, rst_n, rx,
@@ -9,7 +9,9 @@ module uart_batch_fp8_accel #(
     output logic ready
 );
     import tpu_pkg::*;
-    localparam int SRAM_BYTES = 512, CLKS_PER_BIT = 87;
+    localparam int SRAM_BYTES = 512;
+    localparam logic [9:0] UART_DEFAULT_CLKS = 10'd87;
+    localparam logic [9:0] UART_MIN_CLKS = 10'd32;
     wire rst = !rst_n;
     wire [63:0] inst_word, fetched_word;
     wire fetch_take, fetch_req, inst_enable, full;
@@ -32,9 +34,12 @@ module uart_batch_fp8_accel #(
 
     // The board prepares PSRAM in QPI mode and initializes c and y for each lane
     // before reset release. An eight-byte header immediately before the program
-    // gives the channel count in bits [8:0] and batch size in bits [11:9].
+    // gives the channel count [8:0], batch size [11:9], and UART clocks per bit
+    // [21:12]. A zero UART field selects the legacy default.
     localparam logic [22:0] HEADER_ADDR = 23'h1ffff8;
     logic [8:0] channels;
+    logic [9:0] uart_clks_per_bit;
+    wire [9:0] header_uart_clks = fetched_word[21:12];
     logic config_fault;
     wire core_fault;
     wire boot = !ready && !config_fault;
@@ -47,12 +52,15 @@ module uart_batch_fp8_accel #(
             ready <= 0;
             channels <= 0;
             batch_size <= 0;
+            uart_clks_per_bit <= UART_DEFAULT_CLKS;
             config_fault <= 0;
         end else if (boot && fetch_valid) begin
-            if (fetched_word[63:12] == 0 && fetched_word[8:0] > 0 && fetched_word[8:0] <= 256 &&
-                fetched_word[11:9] >= 1 && fetched_word[11:9] <= 4) begin
+            if (fetched_word[63:22] == 0 && fetched_word[8:0] > 0 && fetched_word[8:0] <= 256 &&
+                fetched_word[11:9] >= 1 && fetched_word[11:9] <= 4 &&
+                (header_uart_clks == 0 || header_uart_clks >= UART_MIN_CLKS)) begin
                 channels <= fetched_word[8:0];
                 batch_size <= fetched_word[11:9];
+                uart_clks_per_bit <= header_uart_clks == 0 ? UART_DEFAULT_CLKS : header_uart_clks;
                 ready <= 1;
             end else begin
                 config_fault <= 1;
@@ -60,7 +68,11 @@ module uart_batch_fp8_accel #(
         end
     end
 
-    tpu #(.SRAM_BYTES(SRAM_BYTES), .COMPUTE_WIDTH(4)) dut (
+    // Four FP8 elements per row: 128 B UB, 256 B ACC, and 128 B WB.
+    tpu #(
+        .SRAM_BYTES(SRAM_BYTES), .COMPUTE_WIDTH(4),
+        .UNIFIED_BUFFER_DEPTH(32), .REGISTER_DEPTH(64), .WEIGHT_BUFFER_DEPTH(32)
+    ) dut (
         .clk(clk), .rst(rst), .inst_word(inst_type'(inst_word)), .inst_direct_wb(direct_wb),
         .inst_write_enable(inst_enable), .inst_fifo_full(full),
         .m_axi_awid(awid), .m_axi_awaddr(awaddr), .m_axi_awlen(awlen),
@@ -74,7 +86,7 @@ module uart_batch_fp8_accel #(
         .m_axi_rlast(rlast), .m_axi_rvalid(rvalid), .m_axi_rready(rready),
         .synchronize(synchronized), .axi_error(core_fault)
     );
-    axi_qpi_fp8_bridge #(.INGRESS_BYTES(INGRESS_BYTES), .LOCAL_FC_OUTPUT(1'b1)) bridge (
+    axi_qpi_bridge #(.INGRESS_BYTES(INGRESS_BYTES), .LOCAL_FC_OUTPUT(1'b1)) bridge (
         .clk(clk), .rst_n(!rst), .araddr(araddr), .awaddr(awaddr),
         .arlen(arlen), .awlen(awlen), .arid(arid), .awid(awid),
         .arvalid(arvalid), .awvalid(awvalid), .arready(arready), .awready(awready),
@@ -88,9 +100,9 @@ module uart_batch_fp8_accel #(
         .fetch_words(3'd1), .fetch_valid(fetch_valid), .fetch_data(fetched_word),
         .sck(sck), .cs_n(cs_n), .dq_out(dq_out), .dq_oe(dq_oe), .dq_in(dq_in)
     );
-    stream_io #(.CLKS_PER_BIT(CLKS_PER_BIT), .INGRESS_BYTES(INGRESS_BYTES), .SLOT_BITS(3)) stream (
+    uart_stream #(.INGRESS_BYTES(INGRESS_BYTES), .SLOT_BITS(3)) stream (
         .clk(clk), .rst_n(rst_n), .rx(ready ? rx : 1'b1), .tx(tx), .fault(uart_fault),
-        .input_bytes(channels), .sync(synchronized),
+        .uart_clks_per_bit(uart_clks_per_bit), .input_bytes(channels), .sync(synchronized),
         .complete_frames(complete_frames), .tx_idle(tx_idle),
         .frame_ready(frame_ready), .frame_slot(frame_slot), .available_bytes(available_bytes),
         .input_valid(input_valid), .input_addr(input_addr), .input_data(input_data),
@@ -98,7 +110,7 @@ module uart_batch_fp8_accel #(
         .aw_fire(awvalid && awready), .awaddr(awaddr),
         .w_fire(wvalid && wready), .wdata(wdata)
     );
-    micro_ctrl program_ctrl (
+    program_sequencer program_ctrl (
         .complete_frames(complete_frames), .tx_idle(tx_idle),
         .batch_size(batch_size), .direct_wb(direct_wb),
         .clk(clk), .rst_n(rst_n && ready), .sync(synchronized), .frame_ready(frame_ready),

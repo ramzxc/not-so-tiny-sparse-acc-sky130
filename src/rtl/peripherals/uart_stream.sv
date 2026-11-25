@@ -1,10 +1,10 @@
-module stream_io #(
-    parameter int CLKS_PER_BIT = 87,
+module uart_stream #(
     parameter int INGRESS_BYTES = 2,
     parameter int SLOT_BITS = 2
 ) (
     input wire clk, rst_n, rx,
     output wire tx, fault,
+    input wire [9:0] uart_clks_per_bit,
     input wire [8:0] input_bytes,
     input wire sync,
     output wire frame_ready,
@@ -25,7 +25,7 @@ module stream_io #(
 );
     localparam logic [22:0] INPUT_BASE = 23'h008000;
     localparam logic [22:0] OUTPUT_BASE = 23'h003800;
-    localparam int TIMER_WIDTH = $clog2(CLKS_PER_BIT);
+    wire [9:0] uart_bit_last = uart_clks_per_bit - 10'd1;
     logic [SLOT_BITS:0] produced, consumed;
     logic [8:0] byte_offset;
     logic [8*INGRESS_BYTES-1:0] packing;
@@ -34,7 +34,7 @@ module stream_io #(
     logic queue_fault;
     logic [19:0] tx_word;
     logic [4:0] tx_bits;
-    logic [TIMER_WIDTH-1:0] tx_timer;
+    logic [9:0] tx_timer;
     wire [SLOT_BITS:0] pending_frames = produced - consumed;
     localparam logic [8:0] INGRESS_MASK = 9'(INGRESS_BYTES-1);
     wire [8:0] padded_bytes = (input_bytes + INGRESS_MASK) & ~INGRESS_MASK;
@@ -49,9 +49,10 @@ module stream_io #(
         wire [63:0] packed_word = 64'(receive_word) << (beat_offset[2:1]*16);
         assign next_beat_data = beat_offset == 0 ? packed_word : packing | packed_word;
     end
-    uart_rx #(.CLKS_PER_BIT(CLKS_PER_BIT)) uart_input (
-        .clk(clk), .rst_n(rst_n), .inst(receive_word), .inst_val(received),
-        .error(receive_fault), .rx(rx)
+    uart_rx uart_input (
+        .clk(clk), .rst_n(rst_n), .data_out(receive_word), .data_valid(received),
+        .error(receive_fault), .rx(rx),
+        .bit_last(uart_bit_last), .half_bit_last((uart_clks_per_bit >> 1) - 10'd1)
     );
 
     assign available_bytes = pending_frames != 0 ? padded_bytes : committed_bytes;
@@ -139,7 +140,7 @@ module stream_io #(
             tx_bits <= 20;
             tx_timer <= 0;
         end else if (tx_bits != 0) begin
-            if (tx_timer == TIMER_WIDTH'(CLKS_PER_BIT-1)) begin
+            if (tx_timer == uart_bit_last) begin
                 tx_timer <= 0;
                 tx_bits <= tx_bits - 1'b1;
                 tx_word <= {1'b1,tx_word[19:1]};

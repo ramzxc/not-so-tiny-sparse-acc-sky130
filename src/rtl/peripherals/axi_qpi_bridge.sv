@@ -1,5 +1,5 @@
 // Original TPU adapter. Keep AXI bursts independent of QPI read chunks.
-module axi_qpi_fp8_bridge #(
+module axi_qpi_bridge #(
     parameter int INGRESS_BYTES = 8,
     parameter bit LOCAL_FC_OUTPUT = 1'b0
 ) (
@@ -169,7 +169,7 @@ module axi_qpi_fp8_bridge #(
                     end
                 end
 
-                // stream_io captures the result on the same AXI W handshake.
+                // uart_stream captures the result on the same AXI W handshake.
                 // Keep the normal B response and skip the QPI write states.
                 LOCAL_WRITE_BEAT: if(wvalid)state<=WRITE_RESPONSE;
                 WRITE_BEAT: if(wvalid) begin
