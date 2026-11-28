@@ -1,6 +1,8 @@
 `timescale 1ns/1ps
 module tb_quad_wrapper;
-`ifdef GL_TEST
+`ifdef ACC_TILE_GATES
+    localparam logic [63:0] FC_OUTPUT_INST = 64'h00000000_00000145;
+`elsif GL_TEST
     localparam logic [63:0] FC_OUTPUT_INST = 64'h00003800_00000143;
 `else
     localparam logic [63:0] FC_OUTPUT_INST = 64'h00000000_00000145;
@@ -23,7 +25,11 @@ module tb_quad_wrapper;
         .uio_out(uio_out), .uio_oe(uio_oe), .ena(1'b1), .clk(clk), .rst_n(rst_n)
     );
     qspi_psram_model #(.DEPTH(23'h200100)) memory (
+`ifdef ACC_TILE_GATES
+        .sck(uio_oe[3] && uio_out[3]), .cs_n(!uio_oe[6] || uio_out[6]),
+`else
         .sck(uio_out[3]), .cs_n(uio_out[6]),
+`endif
         .dq_out({uio_out[5:4],uio_out[2:1]}),
         .dq_oe({uio_oe[5:4],uio_oe[2:1]}), .dq_in(dq_in)
     );

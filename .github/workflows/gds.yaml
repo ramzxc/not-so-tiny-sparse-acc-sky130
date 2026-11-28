@@ -7,19 +7,47 @@ on:
 jobs:
   gds:
     runs-on: ubuntu-24.04
+    outputs:
+      ready: ${{ steps.inputs.outputs.ready }}
+      netlist: ${{ steps.inputs.outputs.netlist }}
     steps:
       - name: checkout repo
         uses: actions/checkout@v6
         with:
           submodules: recursive
 
-      - name: Build GDS
-        uses: ./.github/actions/gds
+      - name: Locate completed tile
+        id: inputs
+        shell: bash
+        run: |
+          tile=layout/final/tt_um_not_so_tiny_sparse_acc_ramzxc
+          if [[ ! -s "$tile.gds" && ! -s "$tile.lef" ]]; then
+            echo "::notice::Completed custom tile GDS and LEF are pending"
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [[ ! -s "$tile.gds" || ! -s "$tile.lef" ]]; then
+            echo "::error::Provide both the completed tile GDS and the matching LEF"
+            exit 1
+          fi
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+          if [[ -s "$tile.v" ]]; then
+            echo "netlist=$tile.v" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Package completed tile
+        if: steps.inputs.outputs.ready == 'true'
+        uses: TinyTapeout/tt-gds-action/custom_gds@ttsky26d
         with:
           pdk: sky130A
+          top_module: tt_um_not_so_tiny_sparse_acc_ramzxc
+          gds_path: layout/final/tt_um_not_so_tiny_sparse_acc_ramzxc.gds
+          lef_path: layout/final/tt_um_not_so_tiny_sparse_acc_ramzxc.lef
+          verilog_path: ${{ steps.inputs.outputs.netlist }}
 
   precheck:
     needs: gds
+    if: needs.gds.outputs.ready == 'true'
     runs-on: ubuntu-24.04
     steps:
       - name: Run Tiny Tapeout Precheck
@@ -27,20 +55,38 @@ jobs:
 
   gl_test:
     needs: gds
+    if: needs.gds.outputs.ready == 'true' && needs.gds.outputs.netlist != ''
     runs-on: ubuntu-24.04
     env:
       SIM: icarus
+      PDK_ROOT: /home/runner/pdk
     steps:
-      - name: checkout repo
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+      - name: Install SKY130 PDK used by SKY26d Precheck
+        uses: TinyTapeout/ciel-action@v1
         with:
-          submodules: recursive
-
-      - name: GL test
-        uses: TinyTapeout/tt-gds-action/gl_test@ttsky26d
+          pdk_name: sky130A
+          pdk_version: 0536d02d875c8f67dd7cca3902ac457e62f20005
+          pdk_root: /home/runner/pdk
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Install simulation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y iverilog
+          pip install -r test/requirements.txt
+      - name: Test completed tile netlist
+        env:
+          TILE_NETLIST: ${{ needs.gds.outputs.netlist }}
+        run: |
+          make -C test GATES=yes TILE_GATES=yes GATE_NETLIST="$PWD/$TILE_NETLIST" \
+            GATE_MACRO_SOURCES="$PWD/memory/sram22/sram22_256x8m4w8.v"
+          python -m cocotb_tools.check_results test/results.xml
 
   viewer:
     needs: gds
+    if: needs.gds.outputs.ready == 'true'
     runs-on: ubuntu-24.04
     permissions:
       pages: write      # to deploy to Pages
